@@ -61,7 +61,7 @@ Więcej: [architektura](docs/architecture.md), [kontrakt danych](docs/data-contr
 
 ## Stan przygotowanej wersji
 
-Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 181 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
+Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 196 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
 
 Bieżące prawdopodobieństwa nadal są wstrzymane. Ani rozpoczęcie zbierania migawek, ani dodatni wynik badawczego testu retrospektywnego nie zastępują niezależnej walidacji przedmeczowej. CS2 pozostaje wyłączone z powodów opisanych w [audycie źródeł](docs/cs2-sources.md).
 
@@ -104,3 +104,14 @@ Kontekst spotkania obejmuje znane obciążenie terminarza, czas od ostatniego me
 Potwierdzenie publikacji i testów tej rozbudowy: [docs/journal-release.json](docs/journal-release.json).
 
 Potwierdzenie widocznych typów zawodników i sprawdzenia produkcji: [docs/player-picks-release.json](docs/player-picks-release.json).
+
+
+## Wynik czy suma punktów i wykresy
+
+Główna zakładka porównuje rynek wyniku z sumą punktów NBA i wyróżnia najmocniejszy zgodny sygnał w zapisanej historii. Dotychczasowe typy zawodników są w sąsiedniej zakładce. Wybór nie jest porównaniem opłacalności ani zweryfikowaną prognozą szans.
+
+Suma punktów korzysta z po 8–10 wcześniejszych meczów każdej drużyny, znanych przed punktem odcięcia. Wspólne spotkania są liczone raz przy wyznaczaniu średniej i łącznych liczników. Linia analityczna to najbliższa połówka średniej unikalnych sum; nie przeszukujemy linii, aby uzyskać wyższą historyczną trafność. Kierunek powyżej/poniżej wymaga zgodności obu historii, większości łącznych wyników i zgodnej średniej ostatnich pięciu spotkań. Rynek wyniku zachowuje dotychczasowe kryteria formy. Wyróżnienie porównuje słabszy bilans poparcia obu drużyn, a następnie oba bilanse łącznie. Historia nie gwarantuje przyszłego wyniku.
+
+W analizie można wpisać własną linię połówkową, np. 224,5. Liczniki, wyróżnienie i poziom na wykresie przeliczają się dla tej linii. Zakres sum NBA obejmuje wynik końcowy z dogrywką; nie dodano sum goli NHL o niejednoznacznych zasadach rozliczenia.
+
+Wykresy pokazują rzeczywiste sumy obu drużyn w ich wcześniejszych spotkaniach, z datami, rywalem, wynikiem, średnią i ostatnimi pięcioma meczami. Mają wspólną skalę od zera i nie łączą różnych spotkań w jedną fikcyjną serię. Błędne i sprzeczne wyniki są pomijane, a brak danych nie staje się zerem. Widok mobilny układa wykresy pionowo. Wskazanie jest usuwane także w otwartym oknie po utracie aktualności analizy lub rozpoczęciu meczu. Zamrożone źródła i protokół nie zostały zmienione.

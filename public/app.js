@@ -1,10 +1,12 @@
 import { previewHTML, matchDetailHTML, playerFormHTML } from '/analysis-view.js';
-import { assessBetting, bettingHTML, bettingDetailHTML } from '/betting-view.js';
+import { assessBetting } from '/betting-view.js';
 import { createJournalUI } from '/journal-ui.js';
 import { contextHTML, availabilityHTML } from '/context-view.js';
 import { readinessHTML } from '/readiness-view.js';
 import { oddsHTML } from '/odds-view.js';
 import { buildPlayerPicks, playerPicksHTML, evaluatePlayerLine } from '/player-picks.js';
+import { buildMatchPicks, matchPicksHTML } from '/match-picks.js';
+import { matchChartsHTML } from '/match-charts.js';
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
 const leagues = {
   football: [['all', 'Wszystkie ligi'], ['eng.1', 'Premier League'], ['esp.1', 'La Liga'], ['ger.1', 'Bundesliga'], ['ita.1', 'Serie A'], ['fra.1', 'Ligue 1'], ['pol.1', 'Ekstraklasa'], ['uefa.champions', 'Liga Mistrzów'], ['uefa.europa', 'Liga Europy'], ['eng.2', 'Championship'], ['ned.1', 'Eredivisie'], ['por.1', 'Portugalia']],
@@ -18,7 +20,9 @@ const localDate = value => value ? new Date(value).toLocaleString('pl-PL') : '�
 let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = null, readinessReport = null, detailEvent = null;
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
+let marketView = 'matches';
 const previews = new Map();
+const matchLines = new Map();
 const playerForms = new Map(), fixtureDetails = new Map();
 let playerQueue = [], playerWorkers = 0;
 const today = new Date();
@@ -145,7 +149,13 @@ function previewRequest(event, signal) {
 }
 function previewContent(event) {
   const entry = previews.get(previewKey(event));
-  if (entry?.data) return previewHTML(entry.data, event) + bettingHTML(entry.data, event);
+  if (entry?.data) {
+    const options = matchLines.has(event.id) ? { totalLine: matchLines.get(event.id) } : {};
+    const picks = buildMatchPicks(entry.data, event, options);
+    return matchPicksHTML(entry.data, event, { ...options, compact: true })
+      + matchChartsHTML(entry.data, event, { line: picks.totals?.line ?? null, compact: true })
+      + `<details class="card-form-details"><summary>Forma obu drużyn</summary>${previewHTML(entry.data, event)}</details>`;
+  }
   if (entry?.status === 'error') return '<p class="small">Podsumowanie chwilowo niedostępne. Otwórz analizę, aby spróbować ponownie.</p>';
   return '<p class="small">Pobieranie porównania ostatnich wyników…</p>';
 }
@@ -158,6 +168,26 @@ function renderBetting() {
   const upcoming = events.filter(event => event.state === 'pre' && Date.parse(event.date) > Date.now()
     && (status === 'all' || status === 'pre')
     && `${event.home} ${event.away} ${event.league}`.toLocaleLowerCase('pl').includes(query));
+  $('pick-toolbar').hidden = marketView !== 'players';
+  document.querySelectorAll('[data-market-view]').forEach(button => {
+    const active = button.dataset.marketView === marketView;
+    button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active));
+  });
+  if (marketView === 'matches') {
+    const rows = upcoming.flatMap(event => {
+      const data = previews.get(previewKey(event))?.data;
+      const options = matchLines.has(event.id) ? { totalLine: matchLines.get(event.id) } : {};
+      return data ? [{ event, data, options, picks: buildMatchPicks(data, event, options) }] : [];
+    });
+    const strength = row => row.picks.best ? Math.min(row.picks.best.support.home.hits / row.picks.best.support.home.sample, row.picks.best.support.away.hits / row.picks.best.support.away.sample) : -1;
+    const highlighted = rows.filter(row => row.picks.best).sort((a, b) => strength(b) - strength(a));
+    const shown = (highlighted.length ? highlighted : rows).slice(0, 4);
+    $('betting-summary').innerHTML = !upcoming.length ? '<p class="small">W wybranej dacie nie ma nadchodzących spotkań. Poniżej znajdziesz analizy archiwalne.</p>'
+      : `${shown.length ? `<div class="match-pick-summary-grid">${shown.map(({ event, data, options, picks }) => `<article class="match-signal-card"><div class="match-signal-header"><span class="small">${esc(event.league)} • ${esc(localDate(event.date))}</span><h3>${esc(event.home)} — ${esc(event.away)}</h3></div>${matchPicksHTML(data, event, { ...options, compact: true })}${matchChartsHTML(data, event, { line: picks.totals?.line ?? null, compact: true })}<button data-bet-id="${esc(event.id)}">Porównaj wynik i punkty</button></article>`).join('')}</div>` : '<p class="small">Porównywanie ostatnich wyników i sum punktów…</p>'}
+      <p class="small dashboard-summary-note">${highlighted.length ? `Wyraźniejsze wskazanie z historii: ${highlighted.length} z ${upcoming.length} meczów.` : rows.length ? 'Porównaj pokazane wyniki z własną linią punktową w analizie meczu.' : 'Wczytywanie wcześniejszych spotkań…'}</p>`;
+    document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
+    return;
+  }
   const rows = upcoming.flatMap(event => eventPlayerPicks(event).slice(0, 4).map(pick => ({ event, pick })));
   const metric = $('pick-market')?.value || 'all';
   const selected = rows.filter(row => metric === 'all' || row.pick.metric === metric).slice(0, 8);
@@ -192,6 +222,7 @@ function queuePreviews(selected) {
 function nav() {
   $('sports').innerHTML = Object.entries(sports).map(([key, title]) => `<button data-s="${key}" class="${key === sport ? 'active' : ''}" aria-pressed="${key === sport}">${title}</button>`).join('');
   $('leagues').innerHTML = leagues[sport].map(([key, title]) => `<button data-l="${key}" class="${key === league ? 'active' : ''}" aria-pressed="${key === league}">${title}</button>`).join('');
+  $('leagues').hidden = leagues[sport].length === 1;
   document.querySelectorAll('[data-s]').forEach(button => button.onclick = () => { sport = button.dataset.s; league = 'all'; closeDetail(); nav(); renderModel(); renderReadiness(); load(); });
   document.querySelectorAll('[data-l]').forEach(button => button.onclick = () => { league = button.dataset.l; closeDetail(); nav(); renderModel(); renderReadiness(); load(); });
 }
@@ -232,7 +263,7 @@ async function load() {
   loadController?.abort(); previewController?.abort();
   const controller = new AbortController(); loadController = controller; previewController = new AbortController();
   viewAsOf = Math.floor(Date.now() / 60000) * 60000;
-  previews.clear(); playerForms.clear(); fixtureDetails.clear(); playerQueue = []; events = []; archiveEvents = []; ++renderVersion;
+  previews.clear(); matchLines.clear(); playerForms.clear(); fixtureDetails.clear(); playerQueue = []; events = []; archiveEvents = []; ++renderVersion;
   $('archive-status').textContent = ''; $('info').textContent = 'Pobieranie meczów…'; render();
   if (!$('date').value) { $('info').textContent = 'Wybierz datę spotkań.'; return; }
   try {
@@ -269,8 +300,8 @@ async function detail(id, button) {
   lastDetailButton = button; $('modal').classList.add('on'); $('close').focus();
   $('mtitle').textContent = `${event.home} — ${event.away}`;
   $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p>
+    <div id="betting-detail"><p class="small">Porównywanie wyniku i sumy punktów…</p></div>
     ${event.sport !== 'tennis' ? `<section class="match-player-picks"><h3>Typy na zawodników</h3><p class="small">Linie analityczne z wcześniejszych występów; sprawdź linię z oferty i dostępność zawodnika przed decyzją.</p><div class="analysis-sides"><div id="player-picks-home"><h4>${esc(event.home)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Poniżej pozostaje analiza archiwalna.'}</p></div><div id="player-picks-away"><h4>${esc(event.away)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Poniżej pozostaje analiza archiwalna.'}</p></div></div></section>` : ''}
-    <div id="betting-detail"><p class="small">Porównanie formy drużyn…</p></div>
     <div id="availability"><p class="small">Sprawdzanie dostępności zawodników…</p></div>
     <details class="panel detail-section"><summary>Pełna forma drużyn i bezpośrednie spotkania</summary><div id="match-detail"><p>Wczytywanie porównania…</p></div></details>
     ${event.sport !== 'tennis' ? `<details class="panel detail-section"><summary>Pełna forma zawodników — do 10 meczów</summary><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div></details>` : ''}
@@ -286,7 +317,10 @@ async function detail(id, button) {
   }
   void previewRequest(event, previewController?.signal).then(data => {
     if (!controller.signal.aborted) {
-      $('betting-detail').innerHTML = bettingDetailHTML(data, event);
+      const options = matchLines.has(event.id) ? { totalLine: matchLines.get(event.id) } : {};
+      const marketPicks = buildMatchPicks(data, event, options);
+      $('betting-detail').innerHTML = matchPicksHTML(data, event, options) + matchChartsHTML(data, event, { line: marketPicks.totals?.line ?? null });
+      $('betting-detail').dataset.marketStatus = marketPicks.status;
       $('match-detail').innerHTML = matchDetailHTML(data, event) + contextHTML(data, event);
     }
   }).catch(() => { if (!controller.signal.aborted) { $('betting-detail').innerHTML = '<p class="small">Forma drużyn jest chwilowo niedostępna.</p>'; $('match-detail').innerHTML = '<p>Analiza wcześniejszych wyników jest chwilowo niedostępna. Spróbuj otworzyć ją ponownie.</p>'; } });
@@ -356,6 +390,7 @@ function closeDetail() {
   if (lastDetailButton?.isConnected) lastDetailButton.focus();
 }
 let searchTimer;
+document.querySelectorAll('[data-market-view]').forEach(button => button.onclick = () => { marketView = button.dataset.marketView; renderBetting(); });
 $('pick-market').onchange = renderBetting;
 $('q').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(render, 150); }; $('status').onchange = render; $('date').onchange = () => { closeDetail(); load(); };
 $('refresh').onclick = () => { closeDetail(); load(); loadModel(); loadReadiness(); };
@@ -373,6 +408,28 @@ document.addEventListener('keydown', event => {
   }
 });
 $('detail').addEventListener('submit', submit => {
+  const matchForm = submit.target.closest('form[data-match-line]');
+  if (matchForm && detailEvent) {
+    submit.preventDefault();
+    const raw = String(matchForm.elements.namedItem('totalLine').value).trim();
+    const line = /^\d+(?:[,.]\d+)?$/.test(raw) ? Number(raw.replace(',', '.')) : NaN;
+    const output = matchForm.querySelector('[data-match-line-result]');
+    if (!Number.isFinite(line) || line < 1.5 || line >= 600 || !Number.isInteger(line * 2) || Number.isInteger(line)) {
+      output.textContent = 'Wpisz linię połówkową, np. 224,5.'; return;
+    }
+    const data = previews.get(previewKey(detailEvent))?.data;
+    if (!data) { output.textContent = 'Wczytaj analizę meczu przed porównaniem linii.'; return; }
+    const picks = buildMatchPicks(data, detailEvent, { totalLine: line });
+    if (!picks.totals) { output.textContent = picks.reason || 'Odśwież analizę przed porównaniem własnej linii.'; return; }
+    matchLines.set(detailEvent.id, line);
+    $('betting-detail').innerHTML = matchPicksHTML(data, detailEvent, { totalLine: line }) + matchChartsHTML(data, detailEvent, { line });
+    $('betting-detail').dataset.marketStatus = picks.status;
+    const updated = $('betting-detail').querySelector('[data-match-line-result]');
+    if (updated) updated.textContent = picks.totals ? `Porównano Twoją linię ${String(line).replace('.', ',')} z wcześniejszymi sumami punktów.` : picks.reason;
+    updatePreviewNodes(detailEvent);
+    $('betting-detail').querySelector('[name=totalLine]')?.focus({ preventScroll: true });
+    return;
+  }
   const form = submit.target.closest('form[data-player-line]');
   if (!form || !detailEvent) return;
   submit.preventDefault();
@@ -398,7 +455,14 @@ setInterval(() => {
     if (event && previews.get(previewKey(event))?.data) node.innerHTML = previewContent(event);
   });
   const data = detailEvent && previews.get(previewKey(detailEvent))?.data;
-  if (data && $('betting-detail')) $('betting-detail').innerHTML = bettingDetailHTML(data, detailEvent);
+  if (data && $('betting-detail')) {
+    const options = matchLines.has(detailEvent.id) ? { totalLine: matchLines.get(detailEvent.id) } : {};
+    const current = buildMatchPicks(data, detailEvent, options);
+    if (['unavailable', 'closed'].includes(current.status) && $('betting-detail').dataset.marketStatus !== current.status) {
+      $('betting-detail').innerHTML = matchPicksHTML(data, detailEvent, options) + matchChartsHTML(data, detailEvent, { line: current.totals?.line ?? null });
+      $('betting-detail').dataset.marketStatus = current.status;
+    }
+  }
   if (detailEvent) updatePlayerViews(detailEvent);
   if (detailEvent && Date.now() - Date.parse(fixtureDetails.get(detailEvent.id)?.data?.fetchedAt || 0) >= 5 * 60000) {
     void requestFixtureDetails(detailEvent, loadController?.signal).catch(() => {});
