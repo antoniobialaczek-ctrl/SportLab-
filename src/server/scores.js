@@ -7,9 +7,10 @@ export function liveEvents(data, { sport, route, date }) {
   const rows = [];
   for (const event of data.events) {
     const competitions = sport === 'tennis'
-      ? (event.groupings || []).filter(g => /singles/.test(g.grouping?.slug || '')).flatMap(g => g.competitions || [])
+      ? (event.groupings || []).filter(g => g.grouping?.slug === (route === 'tennis/atp' ? 'mens-singles' : 'womens-singles')).flatMap(g => g.competitions || [])
       : event.competitions || [];
     for (const competition of competitions) {
+      if (sport === 'tennis' && competition.type?.slug && competition.type.slug !== (route === 'tennis/atp' ? 'mens-singles' : 'womens-singles')) continue;
       const participants = competition.competitors || [];
       if (participants.length !== 2 || !/^\d{4,14}$/.test(String(competition.id || ''))) continue;
       const home = participants.find(c => c.homeAway === 'home');

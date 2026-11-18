@@ -1,3 +1,4 @@
+import { previewHTML, matchDetailHTML, playerFormHTML } from '/analysis-view.js';
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
 const leagues = {
   football: [['all', 'Wszystkie ligi'], ['eng.1', 'Premier League'], ['esp.1', 'La Liga'], ['ger.1', 'Bundesliga'], ['ita.1', 'Serie A'], ['fra.1', 'Ligue 1'], ['pol.1', 'Ekstraklasa'], ['uefa.champions', 'Liga Mistrzów'], ['uefa.europa', 'Liga Europy'], ['eng.2', 'Championship'], ['ned.1', 'Eredivisie'], ['por.1', 'Portugalia']],
@@ -8,7 +9,10 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;
 const number = value => Number.isFinite(value) ? value.toFixed(3) : '—';
 const percent = value => Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : '—';
 const localDate = value => value ? new Date(value).toLocaleString('pl-PL') : '—';
-let sport = 'nba', league = 'all', events = [], report = null, loadController, detailController, lastDetailButton;
+let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = null;
+let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
+let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
+const previews = new Map();
 const today = new Date();
 $('date').value = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'), String(today.getDate()).padStart(2, '0')].join('-');
 
@@ -18,93 +22,142 @@ async function json(url, signal) {
   if (!response.ok) throw Error(data.error || `HTTP ${response.status}`);
   return data;
 }
-
+function cutoffFor(event) {
+  const time = new Date(Math.min(viewAsOf, Date.parse(event.date)));
+  time.setUTCSeconds(0, 0);
+  return time.toISOString();
+}
+function previewKey(event) { return `${event.id}:${cutoffFor(event)}`; }
+function previewRequest(event, signal) {
+  const key = previewKey(event), cached = previews.get(key);
+  if (cached?.promise) return cached.promise;
+  if (cached?.data) return Promise.resolve(cached.data);
+  const params = new URLSearchParams({ sport: event.sport, route: event.route, homeId: event.homeId, awayId: event.awayId, cutoff: cutoffFor(event), fixtureId: event.id });
+  const entry = { status: 'loading' };
+  entry.promise = json(`/api/match-analysis?${params}`, signal).then(data => {
+    entry.status = 'ready'; entry.data = data; delete entry.promise; updatePreviewNodes(event); return data;
+  }).catch(error => {
+    delete entry.promise;
+    entry.status = signal?.aborted ? 'idle' : 'error';
+    updatePreviewNodes(event); throw error;
+  });
+  previews.set(key, entry);
+  return entry.promise;
+}
+function previewContent(event) {
+  const entry = previews.get(previewKey(event));
+  if (entry?.data) return previewHTML(entry.data, event);
+  if (entry?.status === 'error') return '<p class="small">Podsumowanie chwilowo niedostępne. Otwórz analizę, aby spróbować ponownie.</p>';
+  return '<p class="small">Pobieranie porównania ostatnich wyników…</p>';
+}
+function updatePreviewNodes(event) {
+  document.querySelectorAll('[data-preview]').forEach(node => { if (node.dataset.preview === event.id) node.innerHTML = previewContent(event); });
+}
+function queuePreviews(selected) {
+  const controller = previewController;
+  if (!controller || controller.signal.aborted) return;
+  const version = ++renderVersion, pending = selected.slice(0, 24);
+  let next = 0;
+  async function worker() {
+    while (next < pending.length && !controller.signal.aborted && version === renderVersion) {
+      const event = pending[next++];
+      try { await previewRequest(event, controller.signal); } catch { /* Each card has its own recovery message. */ }
+    }
+  }
+  void Promise.all([worker(), worker(), worker()]);
+}
 function nav() {
   $('sports').innerHTML = Object.entries(sports).map(([key, title]) => `<button data-s="${key}" class="${key === sport ? 'active' : ''}" aria-pressed="${key === sport}">${title}</button>`).join('');
   $('leagues').innerHTML = leagues[sport].map(([key, title]) => `<button data-l="${key}" class="${key === league ? 'active' : ''}" aria-pressed="${key === league}">${title}</button>`).join('');
-  document.querySelectorAll('[data-s]').forEach(button => button.onclick = () => {
-    sport = button.dataset.s; league = 'all'; closeDetail(); nav(); renderModel(); load();
-  });
-  document.querySelectorAll('[data-l]').forEach(button => button.onclick = () => {
-    league = button.dataset.l; nav(); renderModel(); load();
-  });
+  document.querySelectorAll('[data-s]').forEach(button => button.onclick = () => { sport = button.dataset.s; league = 'all'; closeDetail(); nav(); renderModel(); load(); });
+  document.querySelectorAll('[data-l]').forEach(button => button.onclick = () => { league = button.dataset.l; closeDetail(); nav(); renderModel(); load(); });
 }
-
+function card(event, eager) {
+  return `<article class="card"><div class="row small"><span>${esc(event.league)}</span><span>${esc(event.state === 'post' ? `${localDate(event.date)} • zakończony` : event.state === 'in' ? 'Na żywo' : localDate(event.date))}</span></div>
+    <div class="teams"><span>${esc(event.home)}</span><small>${event.state === 'pre' ? 'VS' : `${esc(event.homeScore ?? '—')} : ${esc(event.awayScore ?? '—')}`}</small><span>${esc(event.away)}</span></div>
+    <div class="match-preview" data-preview="${esc(event.id)}">${eager || previews.has(previewKey(event)) ? previewContent(event) : '<p class="small">Porównanie wcześniejszych wyników i formy dostępne w analizie meczu.</p>'}</div>
+    <button data-id="${esc(event.id)}">Otwórz analizę meczu</button></article>`;
+}
 function render() {
   const query = $('q').value.toLocaleLowerCase('pl'), status = $('status').value;
-  const selected = events.filter(event => `${event.home} ${event.away} ${event.league}`.toLocaleLowerCase('pl').includes(query) && (status === 'all' || event.state === status));
-  $('title').textContent = `${sports[sport]} • ${selected.length} meczów`;
-  $('cards').innerHTML = selected.length ? selected.map(event => `<article class="card">
-    <div class="row small"><span>${esc(event.league)}</span><span>${esc(event.state === 'post' ? event.statusDetail || 'Zakończony' : event.state === 'in' ? 'Na żywo' : localDate(event.date))}</span></div>
-    <div class="teams"><span>${esc(event.home)}</span><small>${event.state === 'pre' ? 'VS' : `${esc(event.homeScore ?? '—')} : ${esc(event.awayScore ?? '—')}`}</small><span>${esc(event.away)}</span></div>
-    <p class="small">Bilanse źródła: ${esc(event.homeRecord || 'brak')} / ${esc(event.awayRecord || 'brak')}</p>
-    <p class="small">Prognoza: wstrzymana do czasu wiarygodnej walidacji przedmeczowej.</p>
-    <button data-id="${esc(event.id)}">Zobacz statystyki</button></article>`).join('') : '<div class="panel">Brak danych dla wybranej daty lub dyscypliny.</div>';
+  const matchSearch = event => `${event.home} ${event.away} ${event.league}`.toLocaleLowerCase('pl').includes(query);
+  const selected = events.filter(event => matchSearch(event) && (status === 'all' || event.state === status));
+  const archive = archiveEvents.filter(matchSearch);
+  $('title').textContent = `${sports[sport]} • mecze i analizy (${selected.length})`;
+  $('cards').innerHTML = selected.length ? selected.map((event, index) => card(event, index < 12)).join('') : '<div class="panel">Brak spotkań pasujących do wybranej daty i filtrów. Dostępne wcześniejsze analizy znajdziesz w archiwum poniżej.</div>';
+  $('archive').hidden = !archiveEvents.length;
+  $('archive-cards').innerHTML = archive.length ? archive.map((event, index) => card(event, index < 12)).join('') : '<p class="small">Brak analiz pasujących do wyszukiwania w tym zestawie.</p>';
   document.querySelectorAll('[data-id]').forEach(button => button.onclick = () => detail(button.dataset.id, button));
+  queuePreviews([...selected.slice(0, 12), ...archive.slice(0, 12)]);
 }
-
+async function loadArchive(signal, scroll = false) {
+  $('archive-status').textContent = 'Pobieranie ostatnich analiz…';
+  try {
+    const end = Date.parse(`${$('date').value}T23:59:59.999Z`);
+    if (!Number.isFinite(end)) throw Error('Wybierz poprawną datę.');
+    const params = new URLSearchParams({ sport, league, cutoff: new Date(Math.min(Date.now(), end)).toISOString(), limit: '12' });
+    const data = await json(`/api/analysis-catalog?${params}`, signal);
+    if (signal?.aborted) return;
+    archiveEvents = data.events || [];
+    $('archive-status').textContent = archiveEvents.length ? `Dostępne analizy: ${archiveEvents.length}. Daty spotkań widoczne na kartach.` : data.reason || 'Brak dostępnego archiwum.';
+    render();
+    if (scroll && archiveEvents.length) $('archive').scrollIntoView({ behavior: 'smooth' });
+  } catch (error) { if (!signal?.aborted) $('archive-status').textContent = `Archiwum jest chwilowo niedostępne: ${error.message}`; }
+}
 async function load() {
-  loadController?.abort();
-  const controller = new AbortController(); loadController = controller;
-  $('info').textContent = 'Ładowanie…'; events = []; render();
+  loadController?.abort(); previewController?.abort();
+  const controller = new AbortController(); loadController = controller; previewController = new AbortController();
+  viewAsOf = Math.floor(Date.now() / 60000) * 60000;
+  previews.clear(); events = []; archiveEvents = []; ++renderVersion;
+  $('archive-status').textContent = ''; $('info').textContent = 'Pobieranie meczów…'; render();
+  if (!$('date').value) { $('info').textContent = 'Wybierz datę spotkań.'; return; }
   try {
     const params = new URLSearchParams({ sport, league, date: $('date').value.replaceAll('-', '') });
     const data = await json(`/api/scores?${params}`, controller.signal);
     if (!Array.isArray(data.events)) throw Error('Nieprawidłowa odpowiedź źródła');
-    events = data.events;
-    $('info').textContent = data.errors?.length ? `Część źródeł niedostępna: ${data.errors.join(', ')}` : `Dane zaktualizowane • ${localDate(data.fetchedAt)}`;
+    events = data.events.map(event => ({ ...event, sport }));
+    $('info').textContent = data.errors?.length ? data.errors.map(message => {
+      if (String(message).startsWith('soccer/pol.1:')) return 'Ekstraklasa: brak danych źródłowych.';
+      const label = leagues[sport].find(([id]) => id !== 'all' && String(message).startsWith(`${sport === 'football' ? 'soccer' : sport === 'nba' ? 'basketball' : sport === 'nhl' ? 'hockey' : 'tennis'}/${id}:`))?.[1];
+      return label ? `${label}: źródło chwilowo niedostępne.` : String(message);
+    }).join(' ') : `Terminarz zaktualizowany • ${localDate(data.fetchedAt)}`;
   } catch (error) {
     if (controller.signal.aborted) return;
-    $('info').textContent = `Błąd pobierania: ${error.message}`;
+    $('info').textContent = `Terminarz jest chwilowo niedostępny: ${error.message}. Dostępne analizy archiwalne poniżej.`;
   }
   render();
+  if (!events.length) await loadArchive(controller.signal);
 }
-
-function formHTML(summary, name, tennis) {
-  const unit = tennis ? 'sety' : sport === 'nba' ? 'punkty' : 'gole';
-  return `<div class="panel"><b>${esc(name)}</b>${summary.sample ? `
-    <p>Próba: ${summary.sample} • zwycięstwa ${summary.wins} / remisy ${summary.draws} / porażki ${summary.losses}</p>
-    <p class="small">Średnio ${unit}: zdobyte ${number(summary.averageFor)}, stracone ${number(summary.averageAgainst)}</p>
-    <p class="small">${summary.recent.map(row => `${esc(row.date.slice(0, 10))}: ${esc(row.opponent)} ${row.scoreFor}:${row.scoreAgainst} (${row.outcome})`).join('<br>')}</p>` : '<p class="small">Brak wcześniejszych spotkań w zapisanej historii.</p>'}</div>`;
+function existingStatsHTML(data, event) {
+  let html = '';
+  if (data.teamStats?.length) html += '<h3>Statystyki drużyn w tym meczu</h3>' + data.teamStats.map(team => `<div class="panel"><b>${esc(team.team)}</b><p class="small">${team.statistics.slice(0, 18).map(stat => `${esc(stat.name)}: ${esc(stat.value)}`).join(' • ')}</p></div>`).join('');
+  if (data.playerAnalysis?.length) html += '<h3>Liderzy tego meczu</h3>' + data.playerAnalysis.map(metric => `<p><b>${esc(metric.title)}</b>: ${metric.leaders.map(player => `${esc(player.name)} — ${player.value}`).join(' • ')}</p>`).join('');
+  if (data.players?.length) html += `<h3>Zawodnicy — statystyki tego meczu</h3><div class="scroll"><table><thead><tr><th>Zawodnik</th><th>Drużyna</th><th>Statystyki</th></tr></thead><tbody>${data.players.map(player => `<tr><td>${esc(player.name)}</td><td>${esc(player.team)}</td><td>${player.didNotPlay ? 'Nie grał(a)' : esc(player.stats.map((value, index) => `${player.labels[index] || ''}: ${value}`).join(' | '))}</td></tr>`).join('')}</tbody></table></div>`;
+  if (data.injuries?.length) html += '<h3>Kontuzje — stan źródła w chwili pobrania</h3>' + data.injuries.map(row => `<p>${esc(row.name)} (${esc(row.team)}) — ${esc(row.status)}</p>`).join('');
+  if (!html) html = `<p class="small">${event.state === 'pre' ? 'Statystyki tego meczu pojawią się po rozpoczęciu. Powyżej jest analiza wcześniejszej formy.' : 'Źródło nie udostępniło dodatkowego boxscore tego meczu.'}</p>`;
+  return html + `<p class="small">${esc(data.note)} • ${esc(data.source)} • ${esc(localDate(data.fetchedAt))}</p>`;
 }
-
 async function detail(id, button) {
-  const event = events.find(item => item.id === id);
+  const event = [...events, ...archiveEvents].find(item => item.id === id);
   if (!event) return;
-  detailController?.abort();
-  const controller = new AbortController(); detailController = controller;
-  lastDetailButton = button;
-  $('modal').classList.add('on'); $('close').focus();
+  detailController?.abort(); const controller = new AbortController(); detailController = controller;
+  lastDetailButton = button; $('modal').classList.add('on'); $('close').focus();
   $('mtitle').textContent = `${event.home} — ${event.away}`;
-  $('detail').innerHTML = '<p>Ładowanie analiz…</p>';
-  const selectedSport = sport;
-  const cutoff = new Date(Math.min(Date.now(), Date.parse(event.date))).toISOString();
-  const analysis = participantId => json(`/api/analysis?${new URLSearchParams({ sport: selectedSport, route: event.route, participantId, cutoff })}`, controller.signal);
-  const results = await Promise.allSettled([
-    json(`/api/details?${new URLSearchParams({ sport: selectedSport, route: event.route, id: event.sourceEventId })}`, controller.signal),
-    analysis(event.homeId), analysis(event.awayId),
-  ]);
-  if (controller.signal.aborted) return;
-  let html = `<h3>${selectedSport === 'tennis' ? 'Forma zawodników' : 'Analiza drużyn'} przed meczem</h3>
-    <p class="small">Wyniki dostępne przed ${esc(localDate(cutoff))}. Próba ostatnich 10 zapisanych meczów danej ligi; niepełna historia nie jest pełnym bilansem sezonu.</p>`;
-  html += results.slice(1).map((result, index) => result.status === 'fulfilled'
-    ? formHTML(result.value, index === 0 ? event.home : event.away, selectedSport === 'tennis')
-    : `<p class="small">Analiza ${esc(index === 0 ? event.home : event.away)} niedostępna.</p>`).join('');
-  if (results[0].status === 'fulfilled') {
-    const data = results[0].value;
-    html += '<h3>Statystyki drużyn w tym meczu</h3>';
-    html += (data.teamStats || []).map(team => `<div class="panel"><b>${esc(team.team)}</b><p class="small">${team.statistics.slice(0, 18).map(s => `${esc(s.name)}: ${esc(s.value)}`).join(' • ')}</p></div>`).join('') || '<p>Brak danych</p>';
-    html += '<h3>Analiza zawodników w tym meczu</h3><p class="small">Liderzy według dostępnych statystyk meczowych; wartości opisowe, bez prognozy. Brakującej wartości nie zastępujemy zerem.</p>';
-    html += (data.playerAnalysis || []).map(metric => `<p><b>${esc(metric.title)}</b> (dostępne dane: ${metric.sample} zawodników): ${metric.leaders.map(p => `${esc(p.name)} — ${p.value}`).join(' • ')}</p>`).join('') || '<p>Brak porównywalnych danych zawodników.</p>';
-    html += '<h3>Zawodnicy — pełne statystyki</h3>';
-    html += data.players?.length ? `<div class="scroll"><table><thead><tr><th>Zawodnik</th><th>Drużyna</th><th>Statystyki</th></tr></thead><tbody>${data.players.map(player => `<tr><td>${esc(player.name)}</td><td>${esc(player.team)}</td><td>${player.didNotPlay ? 'Nie grał(a)' : esc(player.stats.map((value, i) => `${player.labels[i] || ''}: ${value}`).join(' | '))}</td></tr>`).join('')}</tbody></table></div>` : '<p>Brak statystyk zawodników</p>';
-    html += '<h3>Kontuzje — stan źródła w chwili pobrania</h3>';
-    html += data.injuries?.length ? data.injuries.map(injury => `<p>${esc(injury.name)} (${esc(injury.team)}) — ${esc(injury.status)}</p>`).join('') : '<p>Źródło nie zwróciło listy kontuzji.</p>';
-    html += `<p class="small">${esc(data.note)} • ${esc(data.source)} • ${esc(localDate(data.fetchedAt))}</p>`;
-  } else html += `<p>Nie udało się pobrać szczegółów: ${esc(results[0].reason.message)}</p>`;
-  $('detail').innerHTML = html;
+  $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p><div id="match-detail"><p>Pobieranie porównania formy…</p></div>${event.sport !== 'tennis' ? `<h3>Forma zawodników z ostatnich meczów</h3><p class="small">Dostępne statystyki z maksymalnie dwóch wcześniejszych spotkań każdej drużyny. To opis ostatnich występów, a nie potwierdzenie składu na kolejny mecz.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div>` : ''}<details id="game-boxscore" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dostępne informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
+  void previewRequest(event, previewController?.signal).then(data => {
+    if (!controller.signal.aborted) $('match-detail').innerHTML = matchDetailHTML(data, event);
+  }).catch(() => { if (!controller.signal.aborted) $('match-detail').innerHTML = '<p>Analiza wcześniejszych wyników jest chwilowo niedostępna. Spróbuj otworzyć ją ponownie.</p>'; });
+  if (event.sport !== 'tennis') {
+    for (const [side, teamId, name] of [['home', event.homeId, event.home], ['away', event.awayId, event.away]]) {
+      const params = new URLSearchParams({ sport: event.sport, route: event.route, teamId, cutoff: cutoffFor(event), count: '2' });
+      void json(`/api/player-form?${params}`, controller.signal).then(data => { if (!controller.signal.aborted) $(`players-${side}`).innerHTML = playerFormHTML(data, name); })
+        .catch(() => { if (!controller.signal.aborted) $(`players-${side}`).innerHTML = `<p class="small">Forma zawodników ${esc(name)} jest chwilowo niedostępna.</p>`; });
+    }
+  }
+  const params = new URLSearchParams({ sport: event.sport, route: event.route, id: event.sourceEventId });
+  void json(`/api/details?${params}`, controller.signal).then(data => { if (!controller.signal.aborted) $('match-boxscore').innerHTML = existingStatsHTML(data, event); })
+    .catch(() => { if (!controller.signal.aborted) $('match-boxscore').textContent = 'Dodatkowe statystyki tego spotkania nie są dostępne. Analiza wcześniejszej formy jest niezależna od boxscore.'; });
 }
-
 function renderModel() {
   if (!report) return;
   const entry = report.sports?.[sport];
@@ -145,19 +198,26 @@ async function loadModel() {
   catch { $('model').textContent = 'Raport testów niedostępny'; }
 }
 
+
 function closeDetail() {
   detailController?.abort(); $('modal').classList.remove('on');
   if (lastDetailButton?.isConnected) lastDetailButton.focus();
 }
-$('q').oninput = render; $('status').onchange = render; $('date').onchange = load;
-$('refresh').onclick = () => { load(); loadModel(); };
+let searchTimer;
+$('q').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(render, 150); }; $('status').onchange = render; $('date').onchange = () => { closeDetail(); load(); };
+$('refresh').onclick = () => { closeDetail(); load(); loadModel(); };
+$('show-archive').onclick = () => loadArchive(loadController?.signal, true);
 $('close').onclick = closeDetail;
 $('modal').onclick = event => { if (event.target === $('modal')) closeDetail(); };
 document.addEventListener('keydown', event => {
   if (!$('modal').classList.contains('on')) return;
   if (event.key === 'Escape') closeDetail();
-  // The close button is the only interactive element inside this dialog.
-  if (event.key === 'Tab') { event.preventDefault(); $('close').focus(); }
+  if (event.key === 'Tab') {
+    const focusable = [...$('modal').querySelectorAll('button, summary, a[href], input, select, [tabindex="0"]')].filter(node => !node.disabled && node.getClientRects().length);
+    const first = focusable[0], last = focusable.at(-1);
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  }
 });
 nav(); loadModel(); load();
-setInterval(() => { if (!document.hidden) load(); }, 300000);
+setInterval(() => { if (!document.hidden && !$('modal').classList.contains('on')) load(); }, 300000);

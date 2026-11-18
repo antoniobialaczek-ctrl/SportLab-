@@ -1,0 +1,25 @@
+import { isAllowedRoute } from '../src/data/catalog.js';
+import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js';
+import { readHistory } from '../src/server/storage.js';
+import { buildPlayerForm } from '../src/server/player-form.js';
+
+export default async function handler(req, res) {
+  if (!getOnly(req, res)) return;
+  let sport, route, teamId, cutoff, count;
+  try {
+    sport = scalar(req.query.sport); route = scalar(req.query.route); teamId = scalar(req.query.teamId);
+    cutoff = scalar(req.query.cutoff, new Date().toISOString());
+    const requested = scalar(req.query.count, '2');
+    if (!isAllowedRoute(sport, route)) throw new Error('Nieznana liga');
+    if (!/^\d{1,14}$/.test(teamId)) throw new Error('Nieprawidłowe ID drużyny');
+    if (!/^[12]$/.test(requested)) throw new Error('Analiza może obejmować jeden lub dwa ostatnie mecze');
+    if (parseTimestamp(cutoff) > Date.now()) throw new Error('Punkt odcięcia nie może być późniejszy niż teraz');
+    count = Number(requested);
+  } catch (error) { return failure(res, 400, error.message); }
+  try {
+    const history = sport === 'tennis' ? { events: [], updatedAt: null, runtimeData: { origin: 'local', fallback: false } } : await readHistory(sport);
+    const result = await buildPlayerForm(history.events, { sport, route, teamId, cutoff, count });
+    res.setHeader('Cache-Control', result.errors.length ? 'no-store' : 'public, s-maxage=300');
+    res.json({ ...result, historyUpdatedAt: history.updatedAt, updateSource: history.runtimeData });
+  } catch { return failure(res, 503, 'Historia do analizy zawodników jest niedostępna lub uszkodzona'); }
+}
