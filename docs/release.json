@@ -1,0 +1,44 @@
+{
+  "verifiedAt": "2026-11-18T10:48:29.220679+00:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_CHWy5chmZYGUnYhAyis7gssdxNDE",
+  "previewDeploymentId": "dpl_DJWr4a776ccW1vJXdrW1ft2oQd6S",
+  "testedSourceCommit": "fa96741f757b710ea1528b3639b69700f7c08ca1",
+  "repository": "https://github.com/antoniobialaczek-ctrl/SportLab-",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44287594475",
+  "automationRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44287649677",
+  "schedule": "17 */4 * * *",
+  "automatedTests": 73,
+  "allTestsPassed": true,
+  "productionSmoke": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "status": "OK",
+    "reportGeneratedAt": "2026-11-18T10:40:57.732Z",
+    "reportStale": false,
+    "sport": "nba",
+    "date": "2025-11-17",
+    "matches": 8,
+    "detailEvent": "basketball/nba:401810096",
+    "players": 27,
+    "analysisSample": 10
+  },
+  "productionBrowser": {
+    "desktop": "passed",
+    "nbaCards": 8,
+    "teamAnalysis": "10 earlier games",
+    "playerAnalysis": "present",
+    "search": "passed",
+    "modalEscape": "passed",
+    "cs2": "withheld",
+    "tennis": "matches rendered",
+    "mobile": "no page overflow",
+    "pageErrors": []
+  },
+  "runtimeErrorsObserved": 0,
+  "runtimeLogWindow": "15m",
+  "forecastsPublished": false,
+  "unavailable": [
+    "cs2",
+    "soccer/pol.1"
+  ]
+}

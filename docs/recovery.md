@@ -1,5 +1,7 @@
 # Pochodzenie istniejącego projektu
 
+Ten dokument opisuje początkowy etap odzyskania kodu. Późniejsze uruchomienie repozytorium i publikację opisuje [release.md](release.md).
+
 Stan odczytany 18 listopada 2026 przez uwierzytelniony konektor Vercel:
 
 - Projekt: `sportlab-2-analizy`, `prj_RwRNH4UzLmDCfdzVFyhpcq8AfXpz`.

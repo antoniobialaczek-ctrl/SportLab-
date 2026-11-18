@@ -25,10 +25,10 @@ dist/                         wynik builda, pomijany w repozytorium
 
 ## Trwałość i koszt
 
-Nie zapisujemy zbiorów w pamięci funkcji Vercel jako trwałej bazy. Historia jest lokalnym/repozytoryjnym artefaktem, a zadanie GitHub Actions zachowuje kolejne zbiory w artefaktach do przeglądu. Aktualizacja publicznego raportu następuje dopiero przez kolejne przetestowane wdrożenie. Nie dodajemy płatnych baz, schedulerów ani dostawców danych.
+Nie zapisujemy zbiorów w pamięci funkcji Vercel jako trwałej bazy. Historia jest lokalnym/repozytoryjnym artefaktem, a zadanie GitHub Actions zachowuje kolejne zbiory w artefaktach do przeglądu. Po testach workflow publikuje znormalizowaną historię i agregaty raportów na osobnej gałęzi `sportlab-data`. API sprawdza manifest, niezmienny commit, skróty SHA-256 oraz format. Prawidłowe aktualizacje są widoczne bez wdrożenia nowego kodu. Awaria powoduje jawny powrót do danych dołączonych do wdrożenia. Nie dodajemy płatnych baz, schedulerów ani dostawców danych.
 
 Dane z publicznego API mają ograniczenia dostępności i mogą zostać później poprawione. Gdy źródło nie podaje dokładnego historycznego momentu publikacji, wynik otrzymuje jawne przybliżenie `conservative-24h`. Taki zbiór nie stanowi certyfikowanej migawki historycznej i blokuje bieżące prognozy do czasu potwierdzenia pochodzenia danych.
 
 ## Wdrożenie
 
-Node ESM bez bibliotek runtime. Vercel buduje statyczne `dist/` oraz natywne funkcje `api/*.js`, do których dołączane są `src/` i `data/`. Build uruchamia testy; workflow nie wydaje polecenia wdrożenia ani promocji. Obecne ustawienia konta i wdrożenie produkcyjne pozostają poza zmianami kodu.
+Node ESM bez bibliotek runtime. Vercel buduje statyczne `dist/` oraz natywne funkcje `api/*.js`, do których dołączane są `src/`, znormalizowana historia i publiczne raporty; surowe migawki oraz rejestr wektorów prognoz pozostają poza wdrożeniem. Build uruchamia testy; workflow nie wydaje polecenia wdrożenia ani promocji. Wersję produkcyjną przygotowano i przetestowano przed przypisaniem głównej domeny. Identyfikatory i wyniki kontroli są w `docs/release.md`.
