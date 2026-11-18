@@ -40,7 +40,13 @@ jobs:
       - name: Zapisz rzeczywiste migawki i prognozy do walidacji przyszłych meczów
         id: capture
         continue-on-error: true
-        run: npm run data:capture
+        run: |
+          rm -f data/forward/checkpoint.json
+          npm run data:capture
+      - name: Potwierdź integralność nowego punktu kontrolnego
+        id: checkpoint
+        if: always() && steps.restore.outcome == 'success' && steps.capture.outcome != 'skipped'
+        run: node scripts/check-checkpoint.js
       - name: Pobierz zakończone mecze
         env:
           INPUT_FROM: ${{ inputs.from }}
@@ -86,7 +92,7 @@ jobs:
           overwrite: true
       - name: Zachowaj dane i raport do przeglądu
         id: state
-        if: always() && steps.restore.outcome == 'success' && steps.capture.outcome != 'skipped'
+        if: always() && steps.checkpoint.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sportlab-history

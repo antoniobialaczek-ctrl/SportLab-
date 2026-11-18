@@ -20,6 +20,7 @@ const args = process.argv.slice(2);
 const fixture = JSON.parse(fs.readFileSync(process.env.FIXTURE, 'utf8'));
 fs.appendFileSync(process.env.CALLS, JSON.stringify(args) + '\\n');
 if (args[0] === 'run' && args[1] === 'list') process.stdout.write(JSON.stringify(fixture.runs));
+else if (args[0] === 'api' && args[1].includes('/contents/reports/forward.json')) process.stdout.write(JSON.stringify({content:Buffer.from(JSON.stringify(fixture.publishedReport || {})).toString('base64')}));
 else if (args[0] === 'api' && args[1] !== '--method') process.stdout.write(JSON.stringify([{artifacts:fixture.artifacts}]));
 else if (args[0] === 'api' && args[1] === '--method') process.exit(0);
 else if (args[0] === 'run' && args[1] === 'download') {
@@ -75,5 +76,15 @@ test('niedostępne istniejące archiwum zatrzymuje aktualizację zamiast utraci�
   const { result, invocations } = await scenario(t, { runs: [{ databaseId: 100 }], artifacts: [artifact(2), artifact(3)], failedDownloads: ['100'] }, 'restore');
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Zatrzymuję aktualizację/);
+  assert.equal(invocations.some(args => args[1] === '--method'), false);
+});
+
+test('wygaśnięcie wszystkich artefaktów nie zeruje już opublikowanego eksperymentu', async t => {
+  const { result, invocations } = await scenario(t, {
+    runs: [{ databaseId: 100 }], artifacts: [artifact(1, { expired: true })],
+    publishedReport: { sports: { nba: { samples: { recorded: 43 } } } },
+  }, 'restore');
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /nie zerujemy/);
   assert.equal(invocations.some(args => args[1] === '--method'), false);
 });

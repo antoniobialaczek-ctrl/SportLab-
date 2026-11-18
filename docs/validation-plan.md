@@ -1,146 +1,64 @@
-# Plan walidacji prospektywnej SportLab
+# Niezależna walidacja prospektywna
 
-Obecne testy historii służą badaniom. Wynik pobrany dzisiaj z ESPN nie dowodzi,
-że identyczne dane były dostępne przed dawnym spotkaniem. Przyjęcie
-`resultAvailableAt = startTime + 24h` ogranicza przeciek między nakładającymi się
-meczami, ale nie odtwarza czasu publikacji wyniku ani późniejszych korekt.
-Takie rekordy zachowują oznaczenie `conservative-24h`; nie wolno zmieniać go na
-zweryfikowane po ponownym pobraniu ani na podstawie samego hasha.
+Protokół `prospective-1` jest wykonywany przez kod, a jego rejestracja następuje przed przyjęciem pierwszej nowej prognozy do eksperymentu. Data rejestracji, reguły, odcisk kodu modeli i odcisk implementacji walidacji są zapisywane w stanie i raporcie. Zmiana tych parametrów zatrzymuje eksperyment do przeglądu; nie zeruje jego historii.
 
-Publiczne prognozy pozostają wstrzymane. Zbieranie migawek rozpoczyna nowy,
-obserwowany na bieżąco eksperyment. Nie weryfikuje dawnych procentów i nie
-odblokowuje prognoz po jednym uruchomieniu. Zebranie niezależnych okien może
-wymagać wielu miesięcy, szczególnie w ligach z krótkim sezonem.
+Początkowe 43 prognozy pozostają zapisami badawczymi sprzed protokołu. Nie dopisujemy im wstecz metadanych ani nie zaliczamy do niezależnej próby. Retrospektywne rekordy ESPN nadal mają oznaczenie `conservative-24h`; ich historyczna dostępność nie zostaje certyfikowana przez ten eksperyment.
 
-## Rejestracja rzeczywistych obserwacji
+## Próby ustalone z góry
 
-Narzędzie uruchamia się z katalogu projektu, w Node.js, bez płatnych bibliotek:
+Każda liga ma własne okna; NBA, NHL, ligi piłkarskie, ATP i WTA nie uzupełniają sobie próby.
 
-```sh
-node scripts/capture-snapshots.js \
-  --from 2026-11-17 \
-  --to 2026-11-19 \
-  --sports nba,football,nhl,tennis \
-  --routes basketball/nba,soccer/eng.1,hockey/nhl,tennis/atp,tennis/wta \
-  --concurrency 2
-```
+| Etap | Z góry ustalona liczba zapisów | Minimum prawidłowych wyników |
+| --- | ---:| ---:|
+| Dopasowanie kalibracji | 60 | 40 |
+| Wybór kalibracji albo modelu surowego | 45 | 30 |
+| Końcowy test | 150 | 100 |
 
-Daty są dniami UTC. Domyślny zakres to wczoraj–jutro względem dnia uruchomienia.
-Wybór wcześniejszej daty w żądaniu pobiera dane dostępne teraz; nie cofa czasu
-obserwacji. Trasy muszą należeć do obsługiwanej dyscypliny. CS2 pozostaje
-niedostępne do czasu sprawdzenia wiarygodnego, darmowego źródła wyników, map i
-składów.
+Do przyjęcia prognozy wymagamy co najmniej 100 znanych wcześniej meczów treningowych tej ligi. Rejestracja następuje co najmniej pięć minut przed początkiem konkretnego meczu, po odebraniu stanu źródła sprzed meczu. Wektor i dokładny trening są niezmienne. Stan modelu aktualizuje się wyłącznie na wynikach zaobserwowanych przed rejestracją prognozy.
 
-Przy każdej odpowiedzi należy zachować rzeczywistą zawartość odpowiedzi ESPN,
-adres źródła i czas jej odebrania. `observedAt` jest czasem po zakończonym
-pobraniu, nie datą zapisaną w wyniku ani zaplanowaną godziną meczu. Hash SHA-256
-wiąże zapis z utrwaloną treścią; sam hash bez zachowanego pliku nie jest dowodem
-dostępności danych. Błąd HTTP, timeout lub brak danych tworzy informację o
-błędzie i lukę pokrycia, nigdy zastępczy wynik.
+Etap kończy się po rozliczeniu lub jawnym unieważnieniu **całej ustalonej próby**, a nie po pierwszych korzystnych wynikach lub osiągnięciu samego minimum. Maksymalnie 5% jego zapisów może być unieważnione. Nadmiar braków blokuje tę próbę; nie uzupełniamy jej do chwili uzyskania dobrego rezultatu.
 
-Artefakty eksperymentu:
+Temperaturę dopasowuje się wyłącznie na pierwszym oknie. Na następnym pozostaje wybrana tylko przy poprawie Brier i niepogorszeniu log loss. Kolejne okno przyjmuje wyłącznie prognozy wystawione **ściśle po** zamrożeniu wcześniejszej decyzji. Każdy zapis testowy zachowuje wybraną wcześniej temperaturę.
 
-| Ścieżka | Przeznaczenie |
+Wyniki końcowego testu nie są pokazywane w jego trakcie, także pośrednio w agregacie całego rejestru. Widoczne są liczniki postępu. Statystyki testu ujawniamy po zamknięciu wszystkich 150 zapisów.
+
+## Kryteria zamkniętego testu
+
+- Co najmniej 100 prawidłowych wyników z ustalonej próby i co najmniej siedem odrębnych dni UTC.
+- Dodatnia dolna granica 95% przedziału poprawy Brier względem chronologicznego modelu bazowego. Stosowany jest z góry ustalony, deterministyczny bootstrap parami, w blokach dni UTC, z 1000 powtórzeń.
+- Log loss nie gorszy od bazowego oraz oczekiwany błąd kalibracji ECE nie większy niż 0,1.
+- Integralność wszystkich migawek, uczestników, czasów, treningów, prognoz i wyników.
+
+Raport zawiera trafność i przedział Wilsona, Brier, log loss, liczebności oraz porównanie z modelem bazowym. W projekcie Brier jest znormalizowany liczbą klas wyniku. Nie porównujemy bezpośrednio wartości dla dwóch i trzech klas.
+
+Spełnienie kryteriów daje status `completed-awaiting-review`, a niespełnienie — `failed`. Sam licznik ani pozytywny test nie odblokowują automatycznie prawdopodobieństw. Przed publikacją prognoz potrzebny jest przegląd integralności i zakresu, zależności między meczami, niepewności opartej na małej liczbie dni oraz wielokrotnych porównań między ligami. Dla tenisa trzeba również ocenić zakres nawierzchni i formatów. Końcowy test nie służy do dostrajania tej samej wersji modelu.
+
+## Dowody i odtwarzanie
+
+| Artefakt | Zawartość |
 | --- | --- |
-| `data/snapshots/raw/<sha>.json` | Utrwalona odpowiedź źródła powiązana z rzeczywistą obserwacją i hashem. |
-| `data/snapshots/training/<sha>.json` | Dokładny zbiór wejściowy danej rejestracji modelu; hash umożliwia sprawdzenie jego niezmienności. |
-| `data/forward/state.json` | Stan eksperymentu, rejestracje sprzed meczów i późniejsze rozliczenia wyników. |
-| `data/reports/forward.json` | Raport pokrycia i badawczych wyników, wraz z ograniczeniami oraz przyczynami wykluczeń. |
+| `data/snapshots/raw/<sha>.json` | Dokładna odpowiedź ESPN ze skrótem SHA-256 i czasem odebrania całej odpowiedzi. |
+| `data/snapshots/training/<sha>.json` | Dokładny trening, wersja i odcisk kodu danej rejestracji. |
+| `data/forward/state.json` | Niezmienne rejestracje, wyniki, konflikty, unieważnienia i protokół. |
+| `data/forward/checkpoint.json` | Potwierdzenie audytu i skróty spójnego stanu oraz raportu. |
+| `data/reports/forward.json` | Publiczne agregaty i postęp bez wektorów prognoz. |
 
-Te ścieżki są prywatnymi artefaktami, objętymi `.gitignore`. Nie należy dodawać
-ich do publicznego katalogu statycznego ani publikować surowych wektorów przez
-API. Do odtworzenia eksperymentu trzeba zachować razem stan, raport i wszystkie
-wskazane przez nie migawki.
+Surowe dane, treningi i stan pozostają w artefaktach GitHub Actions, poza produkcyjnym API oraz repozytorium kodu. Publiczny raport trafia na osobną gałąź danych. Hash bez odpowiadającej mu zachowanej treści nie jest dowodem.
 
-## Rejestracja prognozy przed spotkaniem
+Audyt sprawdza nie tylko skróty. Ponownie odczytuje stan sprzed meczu, porównuje uczestników, godziny i kategorię tenisa, odtwarza model z treningu oraz sprawdza jego wektor i bazę. Każdy wynik rozliczenia jest porównywany z surową odpowiedzią, także gdy nie posłużył do żadnej późniejszej prognozy. Parametry kalibracji, wybór oraz metryki zamrożonych etapów są ponownie wyliczane na dowodach znanych w zapisanym czasie zamrożenia.
 
-Każda prognoza badawcza musi zostać trwale zapisana przed początkiem meczu i
-przed pierwszą obserwacją jego wyniku. Zapis obejmuje co najmniej identyfikator
-meczu, uczestników, ligę, znaną wówczas godzinę rozpoczęcia, czas rejestracji,
-`modelVersion`, fingerprint historii treningowej i wektor prawdopodobieństw
-obliczony przez zamrożony kod. Wektory pozostają danymi wewnętrznymi, a nie
-zweryfikowanymi prognozami dla użytkownika.
+Korekta wcześniejszego wyniku pozostawia dowód konfliktu. Jeżeli zmienia zamrożoną próbę, jej status przechodzi w `invalidated`, a wcześniejsze metryki testu są ukrywane. Nie przeliczamy po cichu korzystniejszej kalibracji. Raportu z przyszłym stanem etapów nie wolno przedstawić jako wcześniejszej oceny.
 
-Do stanu modelu wolno włączyć wyłącznie wyniki rzeczywiście zaobserwowane przed
-czasem rejestracji. Aktualne bilanse, rankingi, składy, kontuzje i poprawione
-później statystyki nie mogą uzupełniać dawnych wejść. Uczenie stanu drużyn na
-kolejnych obserwowanych wynikach jest dopuszczalne tylko wtedy, gdy zostało
-ustalone przed eksperymentem i każdy zapis zachowuje własny fingerprint.
+## Przerwy, przełożenia i brak wyniku
 
-Ponowne uruchomienie nie może nadpisać wcześniejszego wektora ani stworzyć
-prognozy wstecz. Zmiana modelu rozpoczyna nową wersję eksperymentu; nie wolno
-wybierać wersji po porównaniu jej wyników na końcowym teście.
+Harmonogram co cztery godziny odpytywał dotąd tylko wczoraj–jutro. Teraz dodatkowo pobiera dni źródłowe zapisanych, nierozliczonych spotkań: maksymalnie 64 dodatkowe zapytania w jednym uruchomieniu. Niewykonane dodatkowe pobrania są jawnie liczone.
 
-## Rozliczanie oraz konflikty
+Odwołanie, walkower, krecz lub sprzeczny zapis zakończonego meczu tworzą jawne unieważnienie powiązane z surowym dowodem. Po 14 dniach od zapisanego terminu niezaobserwowany wynik jest wykluczany z ustalonym wcześniej powodem braku danych. Późniejsza obserwacja wyniku nie zmienia tego wykluczenia wstecz ani nie poprawia skuteczności. Ograniczenie unieważnień do 5% nadal obowiązuje.
 
-Rejestrację rozlicza się dopiero po późniejszym pobraniu zakończonego meczu.
-Dostępność wyniku oznacza najwcześniejszą zachowaną, prawidłową obserwację
-wyniku, a nie założone opóźnienie 24 godzin. Trzeba zachować powiązanie
-rozliczenia z migawką źródłową.
+Awaria sieci pozostawia lukę, nie wynik zastępczy. Błąd integralności nie pozwala utworzyć nowego punktu kontrolnego. Workflow może zachować i rotować archiwa wyłącznie po potwierdzeniu spójnego punktu; uszkodzony stan nie wypiera dwóch ostatnich kopii. Jeżeli wszystkie artefakty wygasną, a opublikowany rejestr już istnieje, workflow zatrzymuje się zamiast po cichu wyzerować eksperyment. Potrzebne dowody trzeba zachować przez cały okres testu.
 
-Sprzeczność uczestników, godziny rozpoczęcia wpływająca na poprawność
-rejestracji, odmienne wyniki, walkower, przerwanie, brak jednoznacznego wyniku
-lub utrata migawki wymagają wyłączenia i jawnej przyczyny. Korekta wyniku
-pozostawia ślad; nie wolno bez śladu zastąpić pierwotnej obserwacji. Raport
-podaje liczbę wszystkich rejestracji, rozliczonych meczów, oczekujących,
-błędów i wykluczeń, aby nie przedstawiać wybranej podpróby jako całego sezonu.
+## Uruchomienie i granice
 
-## Oddzielne przyszłe okna oceny
+`npm run data:capture` zapisuje rzeczywiste obserwacje. Opcje `--from`, `--to`, `--sports`, `--routes`, `--concurrency` zawężają pobieranie; żądanie starszej daty nigdy nie cofa czasu obserwacji. `node scripts/check-checkpoint.js` sprawdza spójność ostatniego punktu. `npm run check` uruchamia testy i build.
 
-Przed rozpoczęciem oceny należy zapisać granice dat i reguły liczebności osobno
-dla każdej ligi. NBA, NHL, poszczególne ligi piłkarskie oraz ATP i WTA nie
-uzupełniają sobie brakującej próby. W piłce nożnej ocenia się trzy wyniki
-1/X/2; w pozostałych dyscyplinach dwa rozstrzygnięcia zgodne z definicją meczu.
-
-1. Wcześniejsza historia służy do inicjalizacji modelu i badania jakości danych.
-   Retrospektywne rekordy pozostają oznaczone zgodnie z pochodzeniem.
-2. Pierwsze przyszłe okno z zapisanymi przed meczami wektorami służy do
-   dopasowania kalibracji. Wyniki muszą być znane przed następnym oknem.
-3. Późniejsze, oddzielne okno wybiera kalibrację albo pozostawienie modelu
-   surowego. Nie może jednocześnie służyć do dopasowania temperatury.
-4. Dopiero kolejne, wcześniej niewidziane okno jest końcowym testem zamrożonej
-   wersji, kalibracji i reguł. Nie wolno używać jego wyników do strojenia,
-   zmiany granic ani decyzji o usuwaniu niekorzystnych spotkań.
-
-Końcowy test musi obejmować co najmniej **100 prawidłowo rozliczonych meczów
-danej ligi**. Wcześniejsze okna również muszą mieć dostateczną, niezależną
-próbę; bieżące bramki badawczego silnika to minimum 100 meczów treningowych,
-40 kalibracyjnych i 30 do wyboru kalibracji, przy minimum 400 łącznie. Te minima
-nie zastępują ustalenia granic przed oceną ani analizy niepewności. Przy
-podziale 50/20/10/20% potrzeba co najmniej 500 meczów, aby sam test osiągnął
-100 obserwacji. Nie należy wydłużać testu po obejrzeniu wyniku tylko do chwili,
-gdy model zacznie wyglądać korzystnie.
-
-Raport powinien podawać Brier, log loss, trafność z przedziałem Wilsona,
-przedziały kalibracji, próbę i porównanie z chronologicznym modelem bazowym.
-Znormalizowany Brier w tym projekcie to suma kwadratów błędów podzielona przez
-liczbę klas; przy porównywaniu raportów trzeba używać tej samej definicji.
-Ocena z tego samego okna, na którym dopasowano model lub kalibrację, nie jest
-skutecznością poza próbą.
-
-Raport prospektywny pozostaje obecnie ze statusem `research`. Osiągnięcie progu
-liczebności nie zmienia go automatycznie na `validated`. Niezależny późniejszy
-przegląd musi sprawdzić integralność zapisów, chronologię, wykluczenia,
-świeżość, wiarygodność danych i wyniki każdego modelu. Dla tenisa dodatkowo
-potrzebna jest weryfikacja nawierzchni i formatu spotkań. Dopiero osobna,
-uzasadniona zmiana bramki publikacji może umożliwić publiczne prognozy.
-
-## Darmowe źródła i utrzymanie
-
-ESPN jest nieoficjalnym, bezpłatnie dostępnym źródłem bez gwarancji dostępności
-lub stałego schematu. Pobieranie ma być oszczędne: ograniczony zakres dni,
-obsługiwane trasy, domyślnie dwa równoległe żądania, timeout i ograniczone
-ponowienia. Nie należy obchodzić blokad źródła ani zastępować go płatną usługą.
-
-Lokalne uruchomienie nie wymaga płatnych zależności. Automatyzację GitHub
-Actions i przechowywanie artefaktów należy utrzymać w dostępnych darmowych
-limitach konta. Operator ustala częstotliwość, zakres lig, budżet minut i
-retencję przed aktywowaniem harmonogramu; nie należy automatycznie kupować
-dodatkowego limitu. Ograniczenie częstotliwości oznacza mniej obserwowanych
-meczów, a nie zgodę na dopisanie brakujących prognoz.
-
-Retencja musi obejmować wszystkie okna potrzebne do końcowej oceny. Przed
-wygaśnięciem artefaktów trzeba przenieść je do trwałego, bezpłatnego archiwum
-operatora lub zmniejszyć zakres eksperymentu. Brak pełnego archiwum wyklucza
-potwierdzenie integralności. Harmonogram pobierania nie publikuje produkcji;
-każde późniejsze wdrożenie nadal wymaga przejścia testów projektu.
+Nie włączono płatnych usług ani źródeł. ESPN pozostaje nieoficjalnym API bez gwarancji kompletności. Walidacja wymaga rzeczywistych przyszłych meczów; jej zakończenia nie można zastąpić symulacją, czekaniem w procesie ani zmianą daty zegara. Zmiany kodu produkcji nadal przechodzą osobny build i test wdrożenia.

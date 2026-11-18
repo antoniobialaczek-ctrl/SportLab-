@@ -7,13 +7,15 @@ import { validateEvent, validateHistory } from './schema.js';
 import { mapConcurrent } from './fetch.js';
 import { MODEL_VERSION, recordResearchForecast } from '../models/index.js';
 import { scorePredictions } from '../models/metrics.js';
+import { auditForecastEvidence } from './evidence-audit.js';
+import { advanceValidationProtocol, createValidationProtocol, enrollValidationForecast, publicValidationProgress } from './prospective-validation.js';
 
 const DAY = 86_400_000;
 const SHA = /^[a-f0-9]{64}$/;
 const hash = text => createHash('sha256').update(text).digest('hex');
 const isoNow = clock => new Date(clock()).toISOString();
 const fixtureIdentity = row => `${row.route}:${row.sourceEventId}`;
-const EMPTY = () => ({ schemaVersion: 1, updatedAt: null, snapshots: [], events: [], forecasts: [], conflicts: [] });
+const EMPTY = () => ({ schemaVersion: 1, updatedAt: null, snapshots: [], events: [], forecasts: [], conflicts: [], voids: [] });
 const readJSON = async (path, fallback) => {
   try { return JSON.parse(await readFile(path, 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') return fallback; throw error; }
@@ -107,6 +109,24 @@ export function observedResults(snapshot, { sport, route, day }) {
   })) };
 }
 
+export function terminalVoids(snapshot, { sport, route }, tracked) {
+  const rows = [];
+  for (const event of snapshot.data.events || []) {
+    const competitions = sport === 'tennis'
+      ? (event.groupings || []).filter(group => group.grouping?.slug === (route === 'tennis/atp' ? 'mens-singles' : 'womens-singles')).flatMap(group => group.competitions || [])
+      : event.competitions || [];
+    for (const c of competitions) {
+      const id = `${route}:${c.id || (sport === 'tennis' ? '' : event.id) || ''}`;
+      const type = c.status?.type || (sport === 'tennis' ? undefined : event.status?.type);
+      const text = [type?.name, type?.description, type?.detail, ...(c.notes || []).map(note => note.text)].filter(Boolean).join(' ');
+      if (tracked.has(id) && /cancelled|canceled|abandoned|walkover|walk.over|retired|retirement|defaulted|STATUS_WALKOVER|w\/o|\bret\./i.test(text)) {
+        rows.push({ id, observedAt: snapshot.observedAt, snapshotSha256: snapshot.sha256, reason: 'terminal-source-status', detail: text.slice(0, 300) });
+      }
+    }
+  }
+  return rows;
+}
+
 function validateState(state) {
   if (state?.schemaVersion !== 1 || !['snapshots', 'events', 'forecasts', 'conflicts'].every(key => Array.isArray(state[key]))) throw new Error('Nieprawidłowy rejestr obserwacji');
   const ids = new Set();
@@ -122,6 +142,8 @@ function validateState(state) {
     scorePredictions([{ probabilities: forecast.baseline, outcome: 0 }]);
     forecasts.add(forecast.id);
   }
+  if (state.voids !== undefined && !Array.isArray(state.voids)) throw new Error('Nieprawidłowy rejestr unieważnień');
+  for (const row of state.voids || []) if (!row.id || !Number.isFinite(Date.parse(row.observedAt)) || !row.reason || (row.snapshotSha256 && !SHA.test(row.snapshotSha256))) throw new Error('Nieprawidłowy dowód unieważnienia');
   return state;
 }
 
@@ -132,6 +154,7 @@ async function verifyArchive(root, state) {
     references.set(`raw/${snapshot.sha256}`, snapshot.sha256);
   }
   for (const event of state.events) references.set(`raw/${event.source.snapshotSha256}`, event.source.snapshotSha256);
+  for (const row of state.voids || []) if (row.snapshotSha256) references.set(`raw/${row.snapshotSha256}`, row.snapshotSha256);
   for (const forecast of state.forecasts) {
     references.set(`raw/${forecast.fixtureSnapshotSha256}`, forecast.fixtureSnapshotSha256);
     references.set(`training/${forecast.trainingSnapshotSha256}`, forecast.trainingSnapshotSha256);
@@ -140,14 +163,16 @@ async function verifyArchive(root, state) {
     const bytes = await readFile(join(root, 'snapshots', `${relative}.json`));
     if (hash(bytes) !== sha256) throw new Error(`Uszkodzone archiwum ${relative}`);
   }
+  return auditForecastEvidence(root, state);
 }
 
-function settle(forecast, event, conflicted) {
+function settle(forecast, event, conflicted, voided) {
   if (conflicted.has(forecast.id)) return { status: 'void', reason: 'Sprzeczne obserwacje źródła.' };
+  if (voided.has(forecast.id)) return { status: 'void', reason: voided.get(forecast.id) };
   if (!event) return { status: 'pending' };
   if (Date.parse(event.resultAvailableAt) <= Date.parse(forecast.issuedAt) || forecast.homeId !== event.homeId || forecast.awayId !== event.awayId || forecast.startTime !== event.startTime) return { status: 'void', reason: 'Zmiana terminu/uczestników lub wynik nie pochodzi z późniejszej obserwacji.' };
   const outcome = event.homeScore > event.awayScore ? 0 : event.homeScore === event.awayScore ? 1 : forecast.sport === 'football' ? 2 : 1;
-  return { status: 'settled', outcome, probabilities: forecast.probabilities, baseline: forecast.baseline };
+  return { id: forecast.id, status: 'settled', outcome, probabilities: forecast.probabilities, baseline: forecast.baseline };
 }
 
 export function evaluateForward(state, { now = new Date().toISOString() } = {}) {
@@ -155,13 +180,15 @@ export function evaluateForward(state, { now = new Date().toISOString() } = {}) 
   const cutoff = Date.parse(now);
   if (!Number.isFinite(cutoff)) throw new Error('Nieprawidłowy czas oceny prospektywnej');
   const events = new Map(state.events.filter(event => Date.parse(event.resultAvailableAt) <= cutoff).map(event => [event.id, event]));
-  const conflicted = new Set(state.conflicts.map(row => row.id));
+  const conflicted = new Set(state.conflicts.filter(row => Date.parse(row.observedAt) <= cutoff).map(row => row.id));
+  const voided = new Map((state.voids || []).filter(row => Date.parse(row.observedAt) <= cutoff).map(row => [row.id, row.reason]));
+  const hiddenTest = new Set(Object.values(state.validation?.leagues || {}).filter(row => !['completed-awaiting-review', 'failed'].includes(row.phase)).flatMap(row => row.slots.test.map(slot => slot.id)));
   const makeReport = forecasts => {
-    const settled = forecasts.map(forecast => settle(forecast, events.get(forecast.id), conflicted));
-    const completed = settled.filter(row => row.status === 'settled');
-    return { status: 'research', publication: { eligible: false, reasons: ['Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych.'] }, samples: { recorded: forecasts.length, settled: completed.length, pending: settled.filter(row => row.status === 'pending').length, void: settled.filter(row => row.status === 'void').length }, metrics: completed.length ? scorePredictions(completed) : null, baselineMetrics: completed.length ? scorePredictions(completed.map(row => ({ ...row, probabilities: row.baseline }))) : null, finalTestMetrics: null };
+    const settled = forecasts.map(forecast => settle(forecast, events.get(forecast.id), conflicted, voided));
+    const completed = settled.filter(row => row.status === 'settled' && !hiddenTest.has(row.id));
+    return { status: 'research', publication: { eligible: false, reasons: ['Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych.'] }, samples: { recorded: forecasts.length, settled: settled.filter(row => row.status === 'settled').length, hiddenTestResults: settled.filter(row => row.status === 'settled' && hiddenTest.has(row.id)).length, pending: settled.filter(row => row.status === 'pending').length, void: settled.filter(row => row.status === 'void').length }, metrics: completed.length ? scorePredictions(completed) : null, baselineMetrics: completed.length ? scorePredictions(completed.map(row => ({ ...row, probabilities: row.baseline }))) : null, finalTestMetrics: null };
   };
-  return { schemaVersion: 1, generatedAt: now, kind: 'prospective', modelVersion: MODEL_VERSION, note: 'Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.', sports: Object.fromEntries(SPORTS.map(sport => {
+  return { schemaVersion: 1, generatedAt: now, kind: 'prospective', modelVersion: MODEL_VERSION, validation: publicValidationProgress(state.validation, state, now), audit: state.audit || null, note: 'Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.', sports: Object.fromEntries(SPORTS.map(sport => {
     const forecasts = state.forecasts.filter(row => row.sport === sport && row.modelVersion === MODEL_VERSION && Date.parse(row.issuedAt) <= cutoff);
     return [sport, { sport, modelVersion: MODEL_VERSION, otherVersionRecords: state.forecasts.filter(row => row.sport === sport && row.modelVersion !== MODEL_VERSION).length, ...makeReport(forecasts), leagues: [...Map.groupBy(forecasts, row => row.route)].map(([route, rows]) => ({ route, league: route.split('/').at(-1), ...makeReport(rows) })) }];
   })) };
@@ -179,8 +206,12 @@ export async function captureSnapshots({ root, from, to, sports = ['nba', 'footb
   if (!selected.length || (routes && routes.some(route => !selected.some(item => item.route === route)))) throw new Error('Nieobsługiwana trasa obserwacji');
   const forwardDirectory = join(root, 'forward'), reportDirectory = join(root, 'reports');
   await mkdir(forwardDirectory, { recursive: true }); await mkdir(reportDirectory, { recursive: true });
+  await rm(join(forwardDirectory, 'checkpoint.json'), { force: true });
   const state = validateState(await readJSON(join(forwardDirectory, 'state.json'), EMPTY()));
   await verifyArchive(root, state);
+  state.voids ??= [];
+  state.validation ??= createValidationProtocol(isoNow(clock));
+  advanceValidationProtocol(state.validation, state, isoNow(clock));
   const histories = {};
   for (const sport of sports) {
     const stored = await readJSON(join(root, 'history', `${sport}.json`), { schemaVersion: 1, events: [] });
@@ -189,6 +220,22 @@ export async function captureSnapshots({ root, from, to, sports = ['nba', 'footb
   }
   const jobs = [];
   for (let day = first; day <= last; day += DAY) for (const selection of selected) jobs.push({ ...selection, day: new Date(day).toISOString().slice(0, 10) });
+  const keys = new Set(jobs.map(job => `${job.route}:${job.day}`));
+  const observedIds = new Set([...state.events, ...state.voids, ...state.conflicts].map(row => row.id));
+  const captureTime = Date.parse(isoNow(clock));
+  let catchupJobs = 0, deferredCatchup = 0;
+  for (const forecast of state.forecasts) {
+    if (observedIds.has(forecast.id) || Date.parse(forecast.startTime) > captureTime || !selected.some(row => row.route === forecast.route)) continue;
+    if (captureTime - Date.parse(forecast.startTime) > state.validation.policy.unresolvedAfterDays * DAY) {
+      state.voids.push({ id: forecast.id, observedAt: new Date(captureTime).toISOString(), reason: 'result-not-observed-in-14-days', snapshotSha256: null });
+      continue;
+    }
+    const original = state.snapshots.find(row => row.sha256 === forecast.fixtureSnapshotSha256 && row.route === forecast.route);
+    const day = original?.day || forecast.startTime.slice(0, 10), key = `${forecast.route}:${day}`;
+    if (keys.has(key)) continue;
+    if (catchupJobs >= 64) { deferredCatchup++; continue; }
+    keys.add(key); jobs.push({ sport: forecast.sport, route: forecast.route, day }); catchupJobs++;
+  }
   const captures = await mapConcurrent(jobs, concurrency, async job => {
     try {
       const snapshot = await fetchObservedSnapshot(scoreboardURL(job.route, job.day), { fetchImpl, clock });
@@ -202,12 +249,20 @@ export async function captureSnapshots({ root, from, to, sports = ['nba', 'footb
   const forecastIds = new Set(state.forecasts.map(forecast => forecast.id));
   const added = { snapshots: 0, results: 0, forecasts: 0, conflicts: 0 };
   const errors = [];
+  const warnings = [];
+  const voidIds = new Set(state.voids.map(row => row.id));
   // Merge all actual result observations before issuing new forecasts.
   for (const capture of captures) {
     if (capture.error) { errors.push({ ...capture.job, error: capture.error }); continue; }
     const { snapshot, result, job } = capture;
-    if (result.rejected.length) errors.push({ ...job, error: `${result.rejected.length} odrzuconych rekordów`, rejected: result.rejected });
+    if (result.rejected.length) warnings.push({ ...job, reason: 'invalid-final-records', rejected: result.rejected });
     state.snapshots.push({ sha256: snapshot.sha256, observedAt: snapshot.observedAt, url: snapshot.url, ...job }); added.snapshots++;
+    const voidRows = terminalVoids(snapshot, job, forecastIds);
+    for (const rejected of result.rejected) {
+      const id = `${job.route}:${rejected.id}`;
+      if (forecastIds.has(id)) voidRows.push({ id, observedAt: snapshot.observedAt, snapshotSha256: snapshot.sha256, reason: 'invalid-final-record', detail: rejected.reason });
+    }
+    for (const row of voidRows) if (!voidIds.has(row.id)) { state.voids.push(row); voidIds.add(row.id); }
     for (const event of result.events) {
       const prior = byId.get(event.id);
       if (!prior) { byId.set(event.id, event); added.results++; }
@@ -219,6 +274,7 @@ export async function captureSnapshots({ root, from, to, sports = ['nba', 'footb
     }
   }
   state.events = [...byId.values()].sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime) || a.id.localeCompare(b.id));
+  advanceValidationProtocol(state.validation, state, isoNow(clock));
   const conflicted = new Set(state.conflicts.map(row => row.id));
   for (const capture of captures) {
     if (capture.error) continue;
@@ -230,16 +286,23 @@ export async function captureSnapshots({ root, from, to, sports = ['nba', 'footb
       if (forecastIds.has(fixture.id)) continue;
       try {
         const { record, trainingEvents } = recordResearchForecast(fixture, [...training.values()], { now: issuedAt });
-        const trainingSnapshotSha256 = await contentAddressed(join(root, 'snapshots', 'training'), JSON.stringify({ schemaVersion: 1, sport: fixture.sport, route: fixture.route, modelVersion: MODEL_VERSION, events: trainingEvents }));
-        state.forecasts.push({ ...fixture, ...record, fixtureObservedAt: snapshot.observedAt, fixtureSnapshotSha256: snapshot.sha256, trainingSnapshotSha256 });
+        const trainingSnapshotSha256 = await contentAddressed(join(root, 'snapshots', 'training'), JSON.stringify({ schemaVersion: 1, sport: fixture.sport, route: fixture.route, modelVersion: MODEL_VERSION, modelCodeFingerprint: record.modelCodeFingerprint, events: trainingEvents }));
+        const forecast = { ...fixture, ...record, fixtureObservedAt: snapshot.observedAt, fixtureSnapshotSha256: snapshot.sha256, trainingSnapshotSha256 };
+        state.forecasts.push(forecast);
+        enrollValidationForecast(state.validation, forecast);
         forecastIds.add(fixture.id); added.forecasts++;
       } catch (error) { if (Date.parse(fixture.startTime) - Date.parse(issuedAt) >= 5 * 60_000) errors.push({ ...job, id: fixture.id, error: error.message }); }
     }
   }
   state.updatedAt = isoNow(clock);
   validateState(state);
+  const audit = await verifyArchive(root, state);
+  state.audit = { verified: audit.verifiedIds.length, legacyResearch: audit.legacyIds.length, checkedAt: state.updatedAt };
   const report = evaluateForward(state, { now: state.updatedAt });
   await atomicJSON(join(forwardDirectory, 'state.json'), state);
   await atomicJSON(join(reportDirectory, 'forward.json'), report);
-  return { schemaVersion: 1, capturedAt: state.updatedAt, added, total: { snapshots: state.snapshots.length, results: state.events.length, forecasts: state.forecasts.length, conflicts: state.conflicts.length }, errors, hasErrors: errors.length > 0 };
+  await atomicJSON(join(forwardDirectory, 'checkpoint.json'), { schemaVersion: 1, checkedAt: state.updatedAt, integrityVerified: true,
+    stateSha256: hash(await readFile(join(forwardDirectory, 'state.json'))), reportSha256: hash(await readFile(join(reportDirectory, 'forward.json'))), protocolHash: state.validation.policyHash });
+  return { schemaVersion: 1, capturedAt: state.updatedAt, added, catchup: { requested: catchupJobs, deferred: deferredCatchup }, audit: state.audit,
+    total: { snapshots: state.snapshots.length, results: state.events.length, forecasts: state.forecasts.length, conflicts: state.conflicts.length, voids: state.voids.length }, errors, warnings, hasErrors: errors.length > 0 };
 }

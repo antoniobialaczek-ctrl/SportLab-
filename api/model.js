@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, s-maxage=300');
     res.json({ version: '3.1', generatedAt: report?.generatedAt || null, stale, sports, results,
       updateSource: report?.runtimeData || { origin: 'local', fallback: false },
-      forward: forward ? { generatedAt: forward.generatedAt, kind: forward.kind, sports: forward.sports, note: forward.note, updateSource: forward.runtimeData } : null,
+      forward: forward ? { generatedAt: forward.generatedAt, kind: forward.kind, sports: forward.sports, validation: forward.validation || null, audit: forward.audit || null, note: forward.note, updateSource: forward.runtimeData } : null,
       method: 'Chronologiczny trening, kalibracja, wybór kalibracji i oddzielny test końcowy. Aktualizacja modelu dopiero po udostępnieniu wyniku wcześniejszego meczu.',
       note: 'Metryki pochodzą z testów na zapisanej historii, nie oznaczają skuteczności bieżących typów. Retrospektywne dane ESPN nie są certyfikowanym archiwum informacji przedmeczowych.' });
   } catch { return failure(res, 503, 'Raport testów jest niedostępny lub uszkodzony'); }

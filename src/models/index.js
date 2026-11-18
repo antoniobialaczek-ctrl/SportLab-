@@ -7,6 +7,9 @@ import { nhlDefinition } from './nhl.js';
 import { tennisDefinition } from './tennis.js';
 import { outcome } from './utils.js';
 import { applyTemperature, fitTemperature, scorePredictions } from './metrics.js';
+import { MODEL_CODE_FINGERPRINT } from './fingerprint.js';
+
+export { MODEL_CODE_FINGERPRINT } from './fingerprint.js';
 
 export const MODEL_VERSION = '3.2.0';
 const DEFINITIONS = { nba: nbaDefinition, football: footballDefinition, nhl: nhlDefinition, tennis: tennisDefinition };
@@ -206,7 +209,7 @@ export function recordResearchForecast(fixture, input, { now = new Date().toISOS
   });
   const sum = counts.reduce((a, b) => a + b, 0);
   return {
-    record: { status: 'research-record-only', publish: false, modelVersion: MODEL_VERSION, issuedAt: new Date(issuedAt).toISOString(), outcomes: definition.outcomes, probabilities: state.predict(fixture), baseline: counts.map(count => count / sum), dataFingerprint: fingerprint(known), knownEventCount: known.length, calibration: { method: 'none', temperature: 1 } },
+    record: { status: 'research-record-only', publish: false, modelVersion: MODEL_VERSION, modelCodeFingerprint: MODEL_CODE_FINGERPRINT, issuedAt: new Date(issuedAt).toISOString(), outcomes: definition.outcomes, probabilities: state.predict(fixture), baseline: counts.map(count => count / sum), dataFingerprint: fingerprint(known), knownEventCount: known.length, calibration: { method: 'none', temperature: 1 } },
     trainingEvents: known,
   };
 }

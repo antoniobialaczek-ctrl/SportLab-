@@ -11,9 +11,10 @@ const workflow = 'history.yml';
 if (!repository || !/^[\w.-]+\/[\w.-]+$/.test(repository) || !branch) throw new Error('Brak kontekstu repozytorium i gałęzi GitHub.');
 const command = process.argv[2];
 if (!['restore', 'prune'].includes(command)) throw new Error('Użycie: node scripts/artifact-state.js restore|prune');
-function gh(args, { parse = true, optional = false } = {}) {
+function gh(args, { parse = true, optional = false, allowMissing = false } = {}) {
   const result = spawnSync('gh', args, { encoding: 'utf8', maxBuffer: 5_000_000 });
   if (result.error || result.status !== 0) {
+    if (allowMissing && /HTTP 404/.test(result.stderr || '')) return null;
     if (optional) return null;
     throw new Error(`Polecenie GitHub zakończone błędem: ${result.error?.message || result.stderr.trim()}`);
   }
@@ -48,6 +49,16 @@ if (command === 'restore') {
     } finally { await rm(directory, { recursive: true, force: true }); }
   }
   if (!restored && artifacts.length) throw new Error('Nie udało się przywrócić poprzednich migawek. Zatrzymuję aktualizację, aby nie zastąpić zachowanej historii nowym, niepełnym stanem.');
+  if (!restored && runs.some(run => String(run.databaseId) !== process.env.GITHUB_RUN_ID)) {
+    const published = gh(['api', `repos/${repository}/contents/reports/forward.json?ref=sportlab-data`], { allowMissing: true });
+    if (published) {
+      if (typeof published.content !== 'string') throw new Error('Nie można sprawdzić ciągłości opublikowanego eksperymentu.');
+      const report = JSON.parse(Buffer.from(published.content, 'base64').toString('utf8'));
+      if (report.validation?.registeredAt || Object.values(report.sports || {}).some(sport => sport.samples?.recorded > 0)) {
+        throw new Error('Poprzednie archiwum dowodów wygasło, a opublikowany eksperyment już istnieje. Aktualizacja zatrzymana; nie zerujemy prób ani protokołu.');
+      }
+    }
+  }
   if (!restored) console.log('Brak poprzedniego artefaktu; używam zapisanych zbiorów repozytorium i tworzę nowe migawki.');
 } else {
   const current = Number(process.env.NEW_ARTIFACT_ID);

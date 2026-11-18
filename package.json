@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "description": "SportLab 3.1 — wyniki, statystyki i jawna weryfikacja modeli",
-  "engines": { "node": "24.x" },
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "node scripts/dev.js",
     "lint": "node scripts/check.js",
@@ -14,8 +16,6 @@
     "data:ingest": "node scripts/ingest-history.js",
     "data:capture": "node scripts/capture-snapshots.js",
     "data:publish": "node scripts/publish-data.js",
-    "smoke": "node scripts/smoke-deployment.cjs",
-    "data:capture": "node scripts/capture-snapshots.js",
     "smoke": "node scripts/smoke-deployment.cjs",
     "models:evaluate": "node scripts/evaluate-models.js"
   }

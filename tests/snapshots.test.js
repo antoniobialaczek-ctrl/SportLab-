@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { captureSnapshots, fetchObservedSnapshot, upcomingFixtures } from '../src/data/snapshots.js';
+import { captureSnapshots, evaluateForward, fetchObservedSnapshot, upcomingFixtures } from '../src/data/snapshots.js';
 
 const route = 'basketball/nba', sport = 'nba', day = '2026-01-02';
 function board(completed = false) {
@@ -47,6 +47,41 @@ test('corrupted archived evidence stops further evaluation', async t => {
   const state = JSON.parse(await readFile(join(root, 'forward/state.json')));
   await writeFile(join(root, `snapshots/raw/${state.snapshots[0].sha256}.json`), '{}');
   await assert.rejects(captureSnapshots(options), /Uszkodzone archiwum/);
+  await assert.rejects(readFile(join(root, 'forward/checkpoint.json')), { code: 'ENOENT' });
+});
+
+test('unresolved old fixtures are fetched after a multi-day schedule outage', async t => {
+  const root = await setup(t), options = { root, from: day, to: day, sports: [sport], routes: [route], fetchImpl: async () => new Response(JSON.stringify(board())), clock: () => Date.parse('2026-01-01T12:00:00Z') };
+  await captureSnapshots(options);
+  const requested = [];
+  const result = await captureSnapshots({ ...options, from: '2026-01-06', to: '2026-01-06', clock: () => Date.parse('2026-01-07T12:00:00Z'), fetchImpl: async url => {
+    requested.push(url); return new Response(JSON.stringify(url.includes('dates=20260102') ? board(true) : { events: [] }));
+  } });
+  assert.equal(result.catchup.requested, 1);
+  assert.ok(requested.some(url => url.includes('dates=20260102')));
+  const report = JSON.parse(await readFile(join(root, 'reports/forward.json')));
+  assert.equal(report.sports.nba.samples.settled, 1);
+});
+
+test('cancelled matches become evidenced voids, not permanent pending or invented losses', async t => {
+  const root = await setup(t), options = { root, from: day, to: day, sports: [sport], routes: [route], fetchImpl: async () => new Response(JSON.stringify(board())), clock: () => Date.parse('2026-01-01T12:00:00Z') };
+  await captureSnapshots(options);
+  const cancelled = board(); cancelled.events[0].competitions[0].status.type = { state: 'post', completed: false, name: 'STATUS_CANCELED' };
+  await captureSnapshots({ ...options, fetchImpl: async () => new Response(JSON.stringify(cancelled)), clock: () => Date.parse('2026-01-03T12:00:00Z') });
+  const report = JSON.parse(await readFile(join(root, 'reports/forward.json')));
+  assert.equal(report.sports.nba.samples.void, 1);
+  assert.equal(report.sports.nba.samples.pending, 0);
+  assert.equal(report.sports.nba.metrics, null);
+});
+
+test('later source corrections cannot leak into an earlier as-of research evaluation', async t => {
+  const root = await setup(t), options = { root, from: day, to: day, sports: [sport], routes: [route], fetchImpl: async () => new Response(JSON.stringify(board())), clock: () => Date.parse('2026-01-01T12:00:00Z') };
+  await captureSnapshots(options);
+  await captureSnapshots({ ...options, fetchImpl: async () => new Response(JSON.stringify(board(true))), clock: () => Date.parse('2026-01-03T12:00:00Z') });
+  const state = JSON.parse(await readFile(join(root, 'forward/state.json')));
+  state.conflicts.push({ id: state.forecasts[0].id, observedAt: '2026-01-04T12:00:00.000Z' });
+  assert.equal(evaluateForward(state, { now: '2026-01-03T13:00:00.000Z' }).sports.nba.samples.settled, 1);
+  assert.equal(evaluateForward(state, { now: '2026-01-04T13:00:00.000Z' }).sports.nba.samples.void, 1);
 });
 test('tennis tour filtering never turns a WTA match into ATP', () => {
   const competition = board().events[0].competitions[0];

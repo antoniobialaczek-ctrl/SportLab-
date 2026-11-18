@@ -64,3 +64,7 @@ Więcej: [architektura](docs/architecture.md), [kontrakt danych](docs/data-contr
 Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszły 73 testy i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
 
 Bieżące prawdopodobieństwa nadal są wstrzymane. Ani rozpoczęcie zbierania migawek, ani dodatni wynik badawczego testu retrospektywnego nie zastępują niezależnej walidacji przedmeczowej. CS2 pozostaje wyłączone z powodów opisanych w [audycie źródeł](docs/cs2-sources.md).
+
+## Niezależny protokół walidacji
+
+Nowe prognozy są badane w odrębnych, zamrożonych próbach każdej ligi: 60 zapisów do kalibracji, 45 do wyboru i 150 do końcowego testu (minimum 100 prawidłowych wyników testowych). Postęp widać w panelu „Postęp niezależnego testu”. Starsze zapisy badawcze nie są dopisywane wstecz do tego eksperymentu. Kontrole odtwarzają model i sprawdzają wszystkie dowody wyników, a workflow chroni archiwa także przy przerwie lub błędzie. Szczegóły: [protokół](docs/validation-plan.md).
