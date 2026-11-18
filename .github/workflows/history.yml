@@ -1,0 +1,118 @@
+name: Historia i walidacja modeli
+on:
+  schedule:
+    - cron: '17 */4 * * *'
+  workflow_dispatch:
+    inputs:
+      from:
+        description: 'Pierwszy dzień UTC (RRRR-MM-DD); puste: aktualizacja przyrostowa'
+        type: string
+      to:
+        description: 'Ostatni dzień UTC (RRRR-MM-DD); puste: wczoraj'
+        type: string
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: sportlab-history
+  cancel-in-progress: false
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - id: preflight
+        run: npm run check
+      - name: Przywróć poprzednie zbiory (bez publikacji)
+        id: restore
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: node scripts/artifact-state.js restore
+      - name: Zapisz rzeczywiste migawki i prognozy do walidacji przyszłych meczów
+        id: capture
+        continue-on-error: true
+        run: npm run data:capture
+      - name: Pobierz zakończone mecze
+        env:
+          INPUT_FROM: ${{ inputs.from }}
+          INPUT_TO: ${{ inputs.to }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=()
+          if [ -n "$INPUT_FROM" ]; then
+            args+=(--from "$INPUT_FROM")
+          else
+            # Include any gap after a disabled/failed schedule, plus overlap for corrections.
+            resume_from="$(node --input-type=module <<'JS'
+          import { readFile } from 'node:fs/promises';
+          const timestamps = await Promise.all(['nba', 'football', 'nhl', 'tennis'].map(async sport => {
+            try {
+              const data = JSON.parse(await readFile(`data/history/${sport}.json`, 'utf8'));
+              const timestamp = Date.parse(data.updatedAt);
+              if (!Number.isFinite(timestamp)) throw new Error(`Brak daty aktualizacji: ${sport}`);
+              return timestamp - 7 * 86400000;
+            } catch (error) {
+              if (error.code !== 'ENOENT') throw error;
+              return Date.now() - 365 * 86400000;
+            }
+          }));
+          console.log(new Date(Math.min(...timestamps)).toISOString().slice(0, 10));
+          JS
+            )"
+            args+=(--from "$resume_from")
+          fi
+          if [ -n "$INPUT_TO" ]; then args+=(--to "$INPUT_TO"); fi
+          node scripts/ingest-history.js "${args[@]}"
+      - run: npm run models:evaluate
+      - run: npm run check
+      - name: Zachowaj diagnostykę pobierania także po błędzie
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sportlab-ingestion-diagnostics
+          path: data/history/ingestion.json
+          retention-days: 30
+          if-no-files-found: warn
+          overwrite: true
+      - name: Zachowaj dane i raport do przeglądu
+        id: state
+        if: always() && steps.restore.outcome == 'success' && steps.capture.outcome != 'skipped'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sportlab-history
+          path: |
+            data/history/
+            data/reports/
+            data/snapshots/
+            data/forward/
+          retention-days: 7
+          overwrite: true
+          if-no-files-found: error
+      - name: Zachowaj dwie ostatnie kopie bez mnożenia zajętego miejsca
+        if: always() && steps.state.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NEW_ARTIFACT_ID: ${{ steps.state.outputs.artifact-id }}
+        run: node scripts/artifact-state.js prune
+      - name: Opublikuj sprawdzone dane bez zmiany kodu produkcji
+        if: success() && steps.capture.outcome == 'success' && steps.state.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: node scripts/publish-data.js
+      - name: Zgłoś częściową lub całkowitą awarię pobierania migawek
+        if: always() && steps.capture.outcome == 'failure'
+        run: |
+          echo '::error::Migawki nie zostały pobrane ze wszystkich źródeł. Zapisane dane i diagnostyka pozostają dostępne; nie jest to kompletny aktualny zbiór.'
+          exit 1

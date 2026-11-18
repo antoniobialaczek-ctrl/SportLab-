@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-11-18T10:23:55.811Z",
+  "from": "2025-01-01",
+  "to": "2026-11-17",
+  "dryRun": false,
+  "sports": {
+    "football": {
+      "status": "ok",
+      "routes": [
+        "soccer/esp.1",
+        "soccer/ger.1",
+        "soccer/ita.1",
+        "soccer/fra.1",
+        "soccer/uefa.champions",
+        "soccer/uefa.europa",
+        "soccer/eng.2",
+        "soccer/ned.1",
+        "soccer/por.1"
+      ],
+      "requests": 6174,
+      "events": 5998,
+      "skipped": 22,
+      "receivedCompleted": 5326,
+      "newExclusions": 0,
+      "excluded": 0,
+      "exclusions": [],
+      "errors": [],
+      "reason": null,
+      "downloaded": 5326
+    }
+  },
+  "hasErrors": false,
+  "hasExclusions": false,
+  "completedAt": "2026-11-18T10:26:26.668Z"
+}
