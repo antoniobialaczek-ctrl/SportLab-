@@ -130,7 +130,7 @@ export function createStorage({ root = new URL('../../data/', import.meta.url), 
   };
 }
 
-const storage = createStorage({ remoteEnabled: Boolean(process.env.VERCEL) || process.env.SPORTLAB_REMOTE_DATA === '1' });
+const storage = createStorage({ remoteEnabled: process.env.SPORTLAB_REMOTE_DATA !== '0' && (Boolean(process.env.VERCEL) || process.env.SPORTLAB_REMOTE_DATA === '1') });
 export const readHistory = sport => storage.readHistory(sport);
 export const readReports = () => storage.readReports();
 export const readForwardReport = () => storage.readForwardReport();

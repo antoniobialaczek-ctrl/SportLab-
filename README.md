@@ -4,7 +4,7 @@ Rozbudowa istniejącego SportLab. Zachowany polski interfejs, filtry dyscyplin i
 
 ## Uruchomienie i sprawdzenie
 
-Wymagany Node.js 22 lub nowszy. Projekt nie ma zewnętrznych zależności npm.
+Wymagany Node.js 24. Projekt nie ma zewnętrznych zależności npm.
 
 ```sh
 npm ci --ignore-scripts
