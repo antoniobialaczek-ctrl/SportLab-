@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-18T10:34:00.044Z",
+  "kind": "prospective",
+  "modelVersion": "3.2.0",
+  "note": "Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.",
+  "sports": {
+    "nba": {
+      "sport": "nba",
+      "modelVersion": "3.2.0",
+      "otherVersionRecords": 0,
+      "status": "research",
+      "publication": {
+        "eligible": false,
+        "reasons": [
+          "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+        ]
+      },
+      "samples": {
+        "recorded": 16,
+        "settled": 0,
+        "pending": 16,
+        "void": 0
+      },
+      "metrics": null,
+      "baselineMetrics": null,
+      "finalTestMetrics": null,
+      "leagues": [
+        {
+          "route": "basketball/nba",
+          "league": "nba",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 16,
+            "settled": 0,
+            "pending": 16,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        }
+      ]
+    },
+    "nhl": {
+      "sport": "nhl",
+      "modelVersion": "3.2.0",
+      "otherVersionRecords": 0,
+      "status": "research",
+      "publication": {
+        "eligible": false,
+        "reasons": [
+          "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+        ]
+      },
+      "samples": {
+        "recorded": 15,
+        "settled": 0,
+        "pending": 15,
+        "void": 0
+      },
+      "metrics": null,
+      "baselineMetrics": null,
+      "finalTestMetrics": null,
+      "leagues": [
+        {
+          "route": "hockey/nhl",
+          "league": "nhl",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 15,
+            "settled": 0,
+            "pending": 15,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        }
+      ]
+    },
+    "football": {
+      "sport": "football",
+      "modelVersion": "3.2.0",
+      "otherVersionRecords": 0,
+      "status": "research",
+      "publication": {
+        "eligible": false,
+        "reasons": [
+          "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+        ]
+      },
+      "samples": {
+        "recorded": 0,
+        "settled": 0,
+        "pending": 0,
+        "void": 0
+      },
+      "metrics": null,
+      "baselineMetrics": null,
+      "finalTestMetrics": null,
+      "leagues": []
+    },
+    "tennis": {
+      "sport": "tennis",
+      "modelVersion": "3.2.0",
+      "otherVersionRecords": 0,
+      "status": "research",
+      "publication": {
+        "eligible": false,
+        "reasons": [
+          "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+        ]
+      },
+      "samples": {
+        "recorded": 12,
+        "settled": 0,
+        "pending": 12,
+        "void": 0
+      },
+      "metrics": null,
+      "baselineMetrics": null,
+      "finalTestMetrics": null,
+      "leagues": [
+        {
+          "route": "tennis/atp",
+          "league": "atp",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 4,
+            "settled": 0,
+            "pending": 4,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        },
+        {
+          "route": "tennis/wta",
+          "league": "wta",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 8,
+            "settled": 0,
+            "pending": 8,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        }
+      ]
+    },
+    "cs2": {
+      "sport": "cs2",
+      "modelVersion": "3.2.0",
+      "otherVersionRecords": 0,
+      "status": "research",
+      "publication": {
+        "eligible": false,
+        "reasons": [
+          "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+        ]
+      },
+      "samples": {
+        "recorded": 0,
+        "settled": 0,
+        "pending": 0,
+        "void": 0
+      },
+      "metrics": null,
+      "baselineMetrics": null,
+      "finalTestMetrics": null,
+      "leagues": []
+    }
+  }
+}
