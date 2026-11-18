@@ -1,4 +1,5 @@
 import { previewHTML, matchDetailHTML, playerFormHTML } from '/analysis-view.js';
+import { assessBetting, bettingHTML, bettingDetailHTML } from '/betting-view.js';
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
 const leagues = {
   football: [['all', 'Wszystkie ligi'], ['eng.1', 'Premier League'], ['esp.1', 'La Liga'], ['ger.1', 'Bundesliga'], ['ita.1', 'Serie A'], ['fra.1', 'Ligue 1'], ['pol.1', 'Ekstraklasa'], ['uefa.champions', 'Liga Mistrzów'], ['uefa.europa', 'Liga Europy'], ['eng.2', 'Championship'], ['ned.1', 'Eredivisie'], ['por.1', 'Portugalia']],
@@ -9,7 +10,7 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;
 const number = value => Number.isFinite(value) ? value.toFixed(3) : '—';
 const percent = value => Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : '—';
 const localDate = value => value ? new Date(value).toLocaleString('pl-PL') : '—';
-let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = null;
+let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = null, detailEvent = null;
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
 const previews = new Map();
@@ -46,12 +47,32 @@ function previewRequest(event, signal) {
 }
 function previewContent(event) {
   const entry = previews.get(previewKey(event));
-  if (entry?.data) return previewHTML(entry.data, event);
+  if (entry?.data) return previewHTML(entry.data, event) + bettingHTML(entry.data, event);
   if (entry?.status === 'error') return '<p class="small">Podsumowanie chwilowo niedostępne. Otwórz analizę, aby spróbować ponownie.</p>';
   return '<p class="small">Pobieranie porównania ostatnich wyników…</p>';
 }
 function updatePreviewNodes(event) {
   document.querySelectorAll('[data-preview]').forEach(node => { if (node.dataset.preview === event.id) node.innerHTML = previewContent(event); });
+  renderBetting();
+}
+function renderBetting() {
+  const query = $('q').value.toLocaleLowerCase('pl'), status = $('status').value;
+  const upcoming = events.filter(event => event.state === 'pre' && Date.parse(event.date) > Date.now()
+    && (status === 'all' || status === 'pre')
+    && `${event.home} ${event.away} ${event.league}`.toLocaleLowerCase('pl').includes(query));
+  const assessed = upcoming.flatMap(event => {
+    const entry = previews.get(previewKey(event));
+    return entry?.data ? [{ event, assessment: assessBetting(entry.data, event) }] : [];
+  });
+  const watch = assessed.filter(row => row.assessment.status === 'watch');
+  const failed = upcoming.filter(event => previews.get(previewKey(event))?.status === 'error').length;
+  const pending = upcoming.length - assessed.length - failed;
+  $('betting-summary').innerHTML = !upcoming.length
+    ? '<p class="small">Brak nadchodzących spotkań w wybranej dacie i filtrach. Dla meczów rozpoczętych i archiwalnych nie podajemy typów przedmeczowych.</p>'
+    : `<p><b>Na teraz: odpuść zakłady.</b> Brakuje zweryfikowanej prognozy przedmeczowej i aktualnych kursów, więc nie ma podstaw do potwierdzenia opłacalności.</p>
+      <p class="small">Sprawdzone mecze: ${assessed.length}/${upcoming.length}. Kierunki do obserwacji: ${watch.length}.${pending ? ` Pozostałe ${pending}: porównanie w trakcie pobierania lub dostępne po otwarciu analizy.` : ''}${failed ? ` Nie udało się pobrać porównania dla ${failed} spotkań.` : ''}</p>
+      ${watch.length ? `<ul class="betting-watchlist">${watch.map(({ event, assessment }) => `<li><div><b>${esc(assessment.candidate.label)}</b><span class="small">${esc(event.home)} — ${esc(event.away)} • ${esc(localDate(event.date))}<br>Kierunek z formy; opłacalność niepotwierdzona.</span></div><button data-bet-id="${esc(event.id)}">Zobacz dlaczego</button></li>`).join('')}</ul>` : `<p class="small">${pending ? 'Kierunki pojawią się po sprawdzeniu porównań.' : 'Żaden ze sprawdzonych meczów nie spełnia reguł listy obserwacyjnej.'}</p>`}`;
+  document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
 }
 function queuePreviews(selected) {
   const controller = previewController;
@@ -88,6 +109,7 @@ function render() {
   $('archive').hidden = !archiveEvents.length;
   $('archive-cards').innerHTML = archive.length ? archive.map((event, index) => card(event, index < 12)).join('') : '<p class="small">Brak analiz pasujących do wyszukiwania w tym zestawie.</p>';
   document.querySelectorAll('[data-id]').forEach(button => button.onclick = () => detail(button.dataset.id, button));
+  renderBetting();
   queuePreviews([...selected.slice(0, 12), ...archive.slice(0, 12)]);
 }
 async function loadArchive(signal, scroll = false) {
@@ -140,13 +162,17 @@ function existingStatsHTML(data, event) {
 async function detail(id, button) {
   const event = [...events, ...archiveEvents].find(item => item.id === id);
   if (!event) return;
+  detailEvent = event;
   detailController?.abort(); const controller = new AbortController(); detailController = controller;
   lastDetailButton = button; $('modal').classList.add('on'); $('close').focus();
   $('mtitle').textContent = `${event.home} — ${event.away}`;
-  $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p><div id="match-detail"><p>Pobieranie porównania formy…</p></div>${event.sport !== 'tennis' ? `<h3>Forma zawodników z ostatnich meczów</h3><p class="small">Dostępne statystyki z maksymalnie dwóch wcześniejszych spotkań każdej drużyny. To opis ostatnich występów, a nie potwierdzenie składu na kolejny mecz.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div>` : ''}<details id="game-boxscore" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dostępne informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
+  $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p><div id="betting-detail"><p class="small">Co warto obstawić? Sprawdzanie danych…</p></div><div id="match-detail"><p>Pobieranie porównania formy…</p></div>${event.sport !== 'tennis' ? `<h3>Forma zawodników z ostatnich meczów</h3><p class="small">Dostępne statystyki z maksymalnie dwóch wcześniejszych spotkań każdej drużyny. To opis ostatnich występów, a nie potwierdzenie składu na kolejny mecz.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div>` : ''}<details id="game-boxscore" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dostępne informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
   void previewRequest(event, previewController?.signal).then(data => {
-    if (!controller.signal.aborted) $('match-detail').innerHTML = matchDetailHTML(data, event);
-  }).catch(() => { if (!controller.signal.aborted) $('match-detail').innerHTML = '<p>Analiza wcześniejszych wyników jest chwilowo niedostępna. Spróbuj otworzyć ją ponownie.</p>'; });
+    if (!controller.signal.aborted) {
+      $('betting-detail').innerHTML = bettingDetailHTML(data, event);
+      $('match-detail').innerHTML = matchDetailHTML(data, event);
+    }
+  }).catch(() => { if (!controller.signal.aborted) { $('betting-detail').innerHTML = '<section class="betting-box"><h3>Co warto obstawić?</h3><p><b>Odpuść — dane chwilowo niedostępne.</b></p></section>'; $('match-detail').innerHTML = '<p>Analiza wcześniejszych wyników jest chwilowo niedostępna. Spróbuj otworzyć ją ponownie.</p>'; } });
   if (event.sport !== 'tennis') {
     for (const [side, teamId, name] of [['home', event.homeId, event.home], ['away', event.awayId, event.away]]) {
       const params = new URLSearchParams({ sport: event.sport, route: event.route, teamId, cutoff: cutoffFor(event), count: '2' });
@@ -200,7 +226,7 @@ async function loadModel() {
 
 
 function closeDetail() {
-  detailController?.abort(); $('modal').classList.remove('on');
+  detailController?.abort(); detailEvent = null; $('modal').classList.remove('on');
   if (lastDetailButton?.isConnected) lastDetailButton.focus();
 }
 let searchTimer;
@@ -220,4 +246,13 @@ document.addEventListener('keydown', event => {
   }
 });
 nav(); loadModel(); load();
+setInterval(() => {
+  renderBetting();
+  document.querySelectorAll('[data-preview]').forEach(node => {
+    const event = [...events, ...archiveEvents].find(item => item.id === node.dataset.preview);
+    if (event && previews.get(previewKey(event))?.data) node.innerHTML = previewContent(event);
+  });
+  const data = detailEvent && previews.get(previewKey(detailEvent))?.data;
+  if (data && $('betting-detail')) $('betting-detail').innerHTML = bettingDetailHTML(data, detailEvent);
+}, 30000);
 setInterval(() => { if (!document.hidden && !$('modal').classList.contains('on')) load(); }, 300000);

@@ -61,7 +61,7 @@ Więcej: [architektura](docs/architecture.md), [kontrakt danych](docs/data-contr
 
 ## Stan przygotowanej wersji
 
-Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszły 123 testy i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
+Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 130 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
 
 Bieżące prawdopodobieństwa nadal są wstrzymane. Ani rozpoczęcie zbierania migawek, ani dodatni wynik badawczego testu retrospektywnego nie zastępują niezależnej walidacji przedmeczowej. CS2 pozostaje wyłączone z powodów opisanych w [audycie źródeł](docs/cs2-sources.md).
 
@@ -78,3 +78,9 @@ Na kartach meczów automatycznie pojawia się podsumowanie ostatnich wyników ob
 Jeżeli wybranego dnia nie ma meczów, strona pokazuje osobno podpisane analizy ostatnich zakończonych spotkań, z ich rzeczywistymi datami. Archiwum można otworzyć również przyciskiem. Raport modeli jest dostępny pod rozwijaną sekcją, a dostępne analizy opisowe działają podczas dalszej walidacji prognoz.
 
 Nowe endpointy: `/api/match-analysis`, `/api/player-form`, `/api/analysis-catalog`. Dotychczasowe adresy API pozostają obsługiwane.
+
+## Co warto obstawić
+
+Sekcja nad meczami i na każdej karcie pokazuje decyzję oraz uzasadnienie. Do czasu niezależnej walidacji prognoz i podłączenia aktualnych kursów werdykt pozostaje „Odpuść zakład — brak potwierdzonej przewagi”. Nie wyliczamy prawdopodobieństwa z liczby zwycięstw ani nie udajemy, że znamy opłacalny kurs.
+
+Osobno działa jawna, opisowa lista rynków do sprawdzenia dla NBA, NHL i piłki. Wymaga po 10 wcześniejszych meczów, różnicy minimum 3 zwycięstw, zgodnych średnich różnic wyniku, prób dom/wyjazd po minimum 3 mecze i świeżych danych. Rynki mają określony zakres rozliczenia: NBA z dogrywką, NHL z dogrywką i karnymi, piłka 1X/X2 w 90 minutach. To niezweryfikowana reguła obserwacyjna, nie rekomendacja zakładu. Tenis wymaga dodatkowego kontekstu nawierzchni. Mecze rozpoczęte i archiwalne nie otrzymują kierunku; interfejs odświeża tę ocenę co 30 sekund. Zamrożone modele i protokół walidacji pozostają niezależne.
