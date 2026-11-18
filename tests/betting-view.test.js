@@ -21,7 +21,7 @@ test('strong descriptive form may suggest a market to check but never unlocks a 
   const result = assess();
   assert.equal(result.status, 'watch');
   assert.equal(result.candidate.label, 'Test A — zwycięstwo (z dogrywką)');
-  assert.equal(result.verdict, 'Odpuść zakład — brak potwierdzonej przewagi');
+  assert.equal(result.verdict, 'Kierunek z formy');
   assert.ok(result.limitations.some(line => line.includes('aktualnego kursu')));
   assert.equal(result.probability, undefined);
   assert.equal(result.probabilities, undefined);
@@ -82,17 +82,36 @@ test('tennis and missing histories explain why no market is selected', () => {
   assert.equal(assess({ ...analysis(), status: 'partial' }).candidate, null);
 });
 
-test('card and detail display the same verdict and escape participant names', () => {
+test('card and detail foreground the same actual market and escape participant names', () => {
   const fixture = { ...event, home: '<img src=x onerror=alert(1)>' };
   const card = bettingHTML(analysis(), fixture, { now });
   const detail = bettingDetailHTML(analysis(), fixture, { now });
   for (const html of [card, detail]) {
-    assert.match(html, /Co warto obstawić/);
-    assert.match(html, /Odpuść zakład — brak potwierdzonej przewagi/);
-    assert.match(html, /Rynek do sprawdzenia/);
+    assert.match(html, /zwycięstwo \(z dogrywką\)/);
+    assert.ok(!html.includes('Odpuść zakład'));
+    assert.ok(!html.includes('brak potwierdzonej przewagi'));
     assert.ok(!html.includes('<img'));
     assert.match(html, /&lt;img/);
     assert.ok(!html.includes('%'));
   }
+  assert.match(card, /Typ z formy/);
+  assert.match(detail, /Rynek na wynik/);
+  assert.match(detail, /<details>/);
   assert.match(detail, /bez potwierdzonej skuteczności/);
+});
+
+test('balanced form uses a compact neutral message without inventing a team pick', () => {
+  const data = analysis(); data.home = form('1', 6, 110, 100); data.comparison.formWinsDifference = 2;
+  const assessment = assess(data);
+  assert.equal(assessment.status, 'pass');
+  assert.equal(assessment.candidate, null);
+  assert.equal(assessment.verdict, 'Brak wyraźnego kierunku z formy');
+  const card = bettingHTML(data, event, { now });
+  assert.match(card, /Zobacz rynki zawodników/);
+  assert.ok(!card.includes('Odpuść'));
+  assert.ok(!card.includes('<h4>'));
+  assert.ok(!card.includes('betting-candidate'));
+  const archive = bettingHTML(data, { ...event, state: 'post' }, { now });
+  assert.match(archive, /Analiza archiwalna/);
+  assert.ok(!archive.includes('rynki zawodników'));
 });

@@ -61,7 +61,7 @@ Więcej: [architektura](docs/architecture.md), [kontrakt danych](docs/data-contr
 
 ## Stan przygotowanej wersji
 
-Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 168 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
+Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 181 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
 
 Bieżące prawdopodobieństwa nadal są wstrzymane. Ani rozpoczęcie zbierania migawek, ani dodatni wynik badawczego testu retrospektywnego nie zastępują niezależnej walidacji przedmeczowej. CS2 pozostaje wyłączone z powodów opisanych w [audycie źródeł](docs/cs2-sources.md).
 
@@ -73,18 +73,21 @@ Bieżące potwierdzenie uruchomienia niezależnego protokołu i testów: [docs/v
 
 ## Widoczne analizy meczów
 
-Na kartach meczów automatycznie pojawia się podsumowanie ostatnich wyników obu stron. „Otwórz analizę meczu” pokazuje średnie zdobyte i stracone punkty/gole/sety, serię wyników, podział dom/wyjazd i ostatnie bezpośrednie spotkania. Dla sportów drużynowych widoczna jest także forma dostępnych zawodników z maksymalnie dwóch wcześniejszych boxscore, z liczebnością każdej próby. Dane nie potwierdzają przyszłego składu.
+Na kartach meczów automatycznie pojawia się podsumowanie ostatnich wyników obu stron. „Otwórz analizę meczu” pokazuje średnie zdobyte i stracone punkty/gole/sety, serię wyników, podział dom/wyjazd i ostatnie bezpośrednie spotkania. Dla sportów drużynowych widoczna jest także forma dostępnych zawodników z maksymalnie dziesięciu wcześniejszych boxscore, z liczebnością każdej próby. Dane nie potwierdzają przyszłego składu.
 
 Jeżeli wybranego dnia nie ma meczów, strona pokazuje osobno podpisane analizy ostatnich zakończonych spotkań, z ich rzeczywistymi datami. Archiwum można otworzyć również przyciskiem. Raport modeli jest dostępny pod rozwijaną sekcją, a dostępne analizy opisowe działają podczas dalszej walidacji prognoz.
 
 Nowe endpointy: `/api/match-analysis`, `/api/player-form`, `/api/analysis-catalog`. Dotychczasowe adresy API pozostają obsługiwane.
 
-## Co warto obstawić
+## Typy statystyczne na zawodników
 
-Sekcja nad meczami i na każdej karcie pokazuje decyzję oraz uzasadnienie. Do czasu niezależnej walidacji prognoz i podłączenia aktualnych kursów werdykt pozostaje „Odpuść zakład — brak potwierdzonej przewagi”. Nie wyliczamy prawdopodobieństwa z liczby zwycięstw ani nie udajemy, że znamy opłacalny kurs.
+Główna sekcja pokazuje konkretne linie analityczne na punkty, asysty i zbiórki NBA, strzały na bramkę NHL oraz strzały w piłce. To przesiew rzeczywistych wcześniejszych wyników, nie oferta bukmachera ani zweryfikowane prawdopodobieństwo przyszłego zdarzenia. Wspólne wyjaśnienie zastępuje powtarzany na każdej karcie werdykt „odpuść”. Typy na wynik meczu są dostępne w oddzielnej rozwijanej sekcji.
 
-Osobno działa jawna, opisowa lista rynków do sprawdzenia dla NBA, NHL i piłki. Wymaga po 10 wcześniejszych meczów, różnicy minimum 3 zwycięstw, zgodnych średnich różnic wyniku, prób dom/wyjazd po minimum 3 mecze i świeżych danych. Rynki mają określony zakres rozliczenia: NBA z dogrywką, NHL z dogrywką i karnymi, piłka 1X/X2 w 90 minutach. To niezweryfikowana reguła obserwacyjna, nie rekomendacja zakładu. Tenis wymaga dodatkowego kontekstu nawierzchni. Mecze rozpoczęte i archiwalne nie otrzymują kierunku; interfejs odświeża tę ocenę co 30 sekund. Zamrożone modele i protokół walidacji pozostają niezależne.
+API zawodników domyślnie analizuje 10 wcześniejszych meczów. Wskazanie wymaga co najmniej 8 różnych występów z porównywalną statystyką oraz udziału w ostatnim dostępnym meczu drużyny. Jawna reguła wybiera najwyższą z analizowanych linii połówkowych przekroczoną w co najmniej 70% tej wcześniejszej próby, przy medianie i średniej ostatnich pięciu występów powyżej linii. Interfejs pokazuje liczby występów, średnią, medianę i poszczególne wyniki; nie przedstawia tej częstości jako prawdopodobieństwa. Użytkownik może porównać własną linię połówkową powyżej lub poniżej z tą samą historią.
 
+Bieżący raport źródła wyklucza oznaczonych jako Out, Doubtful, Inactive lub Suspended; źródło i potwierdzony skład nadal trzeba sprawdzić przed decyzją. Braki statystyk, DNP i sprzeczne grupy źródłowe nie stają się zerami ani występami. Publiczne obserwacje wymagają dokładnego potwierdzenia zakończonego meczu i uczestników w odpowiedzi ESPN. Mecze rozpoczęte i archiwalne nie otrzymują aktywnych typów.
+
+Pierwsze dwa nadchodzące mecze wczytują formę zawodników automatycznie; przycisk wczytuje kolejne. Główny widok filtruje punkty, asysty, zbiórki i strzały. Pobrania są ograniczone do dwóch równoległych żądań API i trzech równoległych pobrań boxscore; udane dane mają 15-minutowy cache. Pełna forma pozostaje dostępna w analizie, a krótsze historie są oddzielnie rozwijane. Modele i protokół walidacji nie zostały zmienione.
 
 ## Kursy, własny dziennik i kontekst
 

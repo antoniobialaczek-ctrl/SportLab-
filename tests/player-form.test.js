@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregatePlayerForm, buildPlayerForm, selectPreviousMatches } from '../src/server/player-form.js';
+import { aggregatePlayerForm, buildPlayerForm, selectPreviousMatches, createSummaryLoader } from '../src/server/player-form.js';
 import playerForm from '../api/player-form.js';
 
 const route = 'basketball/nba', sport = 'nba', teamId = '1', cutoff = '2026-01-10T12:00:00.000Z';
@@ -14,6 +14,7 @@ const athlete = (id, name, stats, changes = {}) => ({ athlete: { id, displayName
 const category = (athletes, labels = ['PTS', 'AST', 'REB']) => ({ labels, athletes });
 const group = (id, statistics) => ({ team: { id, displayName: id === '1' ? 'Test Home' : 'Test Away' }, statistics });
 const summary = (groups) => ({ boxscore: { players: groups } });
+const bound = (data, game) => ({ ...data, header: { id: game.sourceEventId, competitions: [{ id: game.sourceEventId, date: game.startTime, status: { type: { state: 'post', completed: true } }, competitors: [{ id: game.homeId, homeAway: 'home' }, { id: game.awayId, homeAway: 'away' }] }] } });
 const record = (id, data) => ({ match: match(id, Number(id.slice(-1)) || 1), data, url: `https://site.api.espn.com/summary?event=${id}` });
 
 test('player form selects only the latest two available completed games of the requested team and league', () => {
@@ -22,7 +23,8 @@ test('player form selects only the latest two available completed games of the r
     match('100005', 5, { homeId: '8', awayId: '9' }), match('100004', 4, { status: 'in' }), match('100007', 7)];
   assert.deepEqual(selectPreviousMatches(records, query).map(e => e.sourceEventId), ['100007', '100006']);
   assert.equal(selectPreviousMatches(records, { ...query, count: 1 }).length, 1);
-  assert.throws(() => selectPreviousMatches(records, { ...query, count: 3 }));
+  assert.throws(() => selectPreviousMatches(records, { ...query, count: 11 }));
+  assert.throws(() => selectPreviousMatches(records, { ...query, count: 0 }));
 });
 
 test('player averages have independent metric samples, retain actual zero and deduplicate repeated groups and games', () => {
@@ -33,9 +35,17 @@ test('player averages have independent metric samples, retain actual zero and de
   const result = aggregatePlayerForm(records, query);
   assert.equal(result.players.length, 1);
   assert.equal(result.players[0].games, 2);
-  assert.deepEqual(result.players[0].metrics.PTS, { label: 'Punkty', average: 25, sample: 2 });
-  assert.deepEqual(result.players[0].metrics.AST, { label: 'Asysty', average: 5, sample: 1 });
-  assert.deepEqual(result.players[0].metrics.REB, { label: 'Zbiórki', average: 5, sample: 2 });
+  assert.equal(result.players[0].metrics.PTS.average, 25);
+  assert.equal(result.players[0].metrics.PTS.sample, 2);
+  assert.equal(result.players[0].metrics.PTS.median, 25);
+  assert.equal(result.players[0].metrics.PTS.last5Average, 25);
+  assert.deepEqual(result.players[0].metrics.PTS.observations.map(row => row.value), [20, 30]);
+  assert.equal(result.players[0].metrics.AST.average, 5);
+  assert.equal(result.players[0].metrics.AST.sample, 1);
+  assert.equal(result.players[0].metrics.REB.average, 5);
+  assert.equal(result.players[0].metrics.REB.sample, 2);
+  assert.equal(result.players[0].metrics.REB.minimum, 0);
+  assert.equal(result.players[0].metrics.REB.maximum, 10);
   assert.equal(result.sampledMatches.length, 2);
 });
 
@@ -60,7 +70,12 @@ test('conflicting duplicate statistics are excluded instead of silently selectin
   const result = aggregatePlayerForm([record('100007', data)], query);
   assert.equal(result.conflicts, 1);
   assert.equal(result.players[0].metrics.PTS, undefined);
-  assert.deepEqual(result.players[0].metrics.AST, { label: 'Asysty', average: 2, sample: 1 });
+  assert.equal(result.players[0].metrics.AST.average, 2);
+  assert.equal(result.players[0].metrics.AST.sample, 1);
+  const repeatedLabels = summary([group('1', [category([athlete('10', 'Player A', ['20', '21', '2'])], ['PTS', 'POINTS', 'AST'])])]);
+  const conflict = aggregatePlayerForm([record('100007', repeatedLabels)], query);
+  assert.equal(conflict.conflicts, 1);
+  assert.equal(conflict.players[0].metrics.PTS, undefined);
 });
 
 test('each sport uses its own recognized metric definitions without inferring goals from saves', () => {
@@ -75,17 +90,17 @@ test('each sport uses its own recognized metric definitions without inferring go
   assert.equal(goalkeepers.players.length, 0);
 });
 
-test('only five observed leaders are returned and names break score ties deterministically', () => {
+test('up to ten observed leaders are returned and names break score ties deterministically', () => {
   const players = Array.from({ length: 9 }, (_, index) => athlete(String(100 + index), `Player ${index}`, [String(index), '0', '0']));
   const result = aggregatePlayerForm([record('100007', summary([group('1', [category(players)])]))], query);
-  assert.equal(result.players.length, 5);
-  assert.deepEqual(result.players.map(p => p.metrics.PTS.average), [8, 7, 6, 5, 4]);
+  assert.equal(result.players.length, 9);
+  assert.deepEqual(result.players.map(p => p.metrics.PTS.average), [8, 7, 6, 5, 4, 3, 2, 1, 0]);
 });
 
 test('partial upstream failure returns real available observations with explicit coverage and errors', async () => {
   const urls = [];
   const result = await buildPlayerForm([match('100007', 7), match('100006', 6), match('100005', 5)], query, {
-    fetchSummary: async url => { urls.push(url); if (url.endsWith('100006')) throw new Error('upstream'); return summary([group('1', [category([athlete('10', 'Player A', ['20', '2', '4'])])])]); },
+    fetchSummary: async url => { urls.push(url); if (url.endsWith('100006')) throw new Error('upstream'); return bound(summary([group('1', [category([athlete('10', 'Player A', ['20', '2', '4'])])])]), match(new URL(url).searchParams.get('event'), Number(new URL(url).searchParams.get('event').slice(-1)))); },
   });
   assert.equal(urls.length, 2);
   assert.equal(result.status, 'partial');
@@ -97,7 +112,7 @@ test('partial upstream failure returns real available observations with explicit
 });
 
 test('missing boxscores or the wrong team remain unavailable rather than using another roster or fake zero averages', async () => {
-  const result = await buildPlayerForm([match('100007', 7)], query, { fetchSummary: async () => summary([group('2', [category([athlete('99', 'Wrong Team', ['70', '4', '3'])])])]) });
+  const result = await buildPlayerForm([match('100007', 7)], query, { fetchSummary: async () => bound(summary([group('2', [category([athlete('99', 'Wrong Team', ['70', '4', '3'])])])]), match('100007', 7)) });
   assert.equal(result.status, 'unavailable');
   assert.equal(result.successfulMatches, 0);
   assert.deepEqual(result.players, []);
@@ -116,10 +131,10 @@ test('empty history and tennis do not make needless boxscore requests', async ()
 
 test('partially malformed nested boxscores stay an honest lack of comparable data', async () => {
   const data = summary([null, group('1', [null, { labels: ['PTS'], athletes: [null, {}, athlete('10', 'Player A', ['12'])] }])]);
-  const result = await buildPlayerForm([match('100007', 7)], query, { fetchSummary: async () => data });
+  const result = await buildPlayerForm([match('100007', 7)], query, { fetchSummary: async () => bound(data, match('100007', 7)) });
   assert.equal(result.status, 'partial');
   assert.equal(result.players[0].metrics.PTS.average, 12);
-  const missing = await buildPlayerForm([match('100007', 7)], query, { fetchSummary: async () => summary([null]) });
+  const missing = await buildPlayerForm([match('100007', 7)], query, { fetchSummary: async () => bound(summary([null]), match('100007', 7)) });
   assert.equal(missing.status, 'unavailable');
 });
 
@@ -128,7 +143,7 @@ function response() {
 }
 test('player API rejects invalid input, future dates and non-GET before reading history', async t => {
   const fetch = t.mock.method(globalThis, 'fetch', () => { throw new Error('Unexpected network'); });
-  for (const change of [{ route: 'https://other.example/' }, { teamId: ['1', '2'] }, { teamId: 'abc' }, { count: '3' }, { cutoff: '2099-01-01T00:00:00.000Z' }, { cutoff: '2026-02-30T00:00:00.000Z' }]) {
+  for (const change of [{ route: 'https://other.example/' }, { teamId: ['1', '2'] }, { teamId: 'abc' }, { count: '11' }, { cutoff: '2099-01-01T00:00:00.000Z' }, { cutoff: '2026-02-30T00:00:00.000Z' }]) {
     const res = response(); await playerForm({ method: 'GET', query: { ...query, count: '2', ...change } }, res);
     assert.equal(res.statusCode, 400);
   }
@@ -136,4 +151,125 @@ test('player API rejects invalid input, future dates and non-GET before reading 
   assert.equal(res.statusCode, 405);
   assert.equal(res.headers.allow, 'GET');
   assert.equal(fetch.mock.callCount(), 0);
+});
+
+
+test('ten-game form exposes real observations and missing appearances stay missing', async () => {
+  const rows = Array.from({ length: 12 }, (_, index) => match(String(100000 + index), index + 1));
+  const expanded = { ...query, cutoff: '2026-02-01T00:00:00.000Z' };
+  delete expanded.count;
+  const result = await buildPlayerForm(rows, expanded, {
+    fetchSummary: async url => {
+      const index = Number(new URL(url).searchParams.get('event')) - 100000;
+      const main = athlete('10', 'Player A', [String(index), '2', '4', '32:30']);
+      const second = athlete('11', 'Player B', ['10', '1', '1', index >= 10 ? '0:00' : '20:00']);
+      return bound(summary([group('1', [category([main, second], ['PTS', 'AST', 'REB', 'MIN'])])]), rows[index]);
+    },
+  });
+  assert.equal(result.requestedMatches, 10);
+  assert.equal(result.successfulMatches, 10);
+  assert.equal(result.attemptedMatches.length, 10);
+  const main = result.players.find(player => player.id === '10');
+  const metric = main.metrics.PTS;
+  assert.equal(metric.sample, 10);
+  assert.deepEqual(metric.observations.map(row => row.value), [11, 10, 9, 8, 7, 6, 5, 4, 3, 2]);
+  assert.equal(metric.average, 6.5);
+  assert.equal(metric.median, 6.5);
+  assert.equal(metric.last5Average, 9);
+  assert.equal(main.minutes.average, 32.5);
+  assert.equal(main.minutes.sample, 10);
+  assert.equal(result.players.find(player => player.id === '11').games, 8);
+});
+
+test('ten-game fetches remain bounded to three upstream requests at a time', async () => {
+  let active = 0, maximum = 0;
+  const rows = Array.from({ length: 10 }, (_, index) => match(String(110000 + index), index + 1));
+  const result = await buildPlayerForm(rows, { ...query, count: 10, cutoff: '2026-02-01T00:00:00.000Z' }, {
+    fetchSummary: async url => {
+      active++; maximum = Math.max(maximum, active);
+      await new Promise(resolve => setTimeout(resolve, 2));
+      active--;
+      return bound(summary([group('1', [category([athlete('10', 'Player A', ['20', '2', '4'])])])]), rows.find(row => row.sourceEventId === new URL(url).searchParams.get('event')));
+    },
+  });
+  assert.equal(maximum, 3);
+  assert.equal(result.successfulMatches, 10);
+});
+
+test('a source header cannot bind statistics from a different match, date or participant', async () => {
+  const game = match('100007', 7);
+  const valid = () => ({ ...summary([group('1', [category([athlete('10', 'Player A', ['20', '2', '4'])])])]),
+    header: { id: game.sourceEventId, competitions: [{ id: game.sourceEventId, date: game.startTime,
+      status: { type: { state: 'post', completed: true } }, competitors: [{ id: '1', homeAway: 'home' }, { id: '2', homeAway: 'away' }] }] } });
+  const accepted = await buildPlayerForm([game], { ...query, count: 1 }, { fetchSummary: async () => valid() });
+  assert.equal(accepted.status, 'available');
+  for (const mutate of [
+    value => value.header.id = '999999',
+    value => value.header.competitions[0].date = '2026-01-08T12:00:00.000Z',
+    value => value.header.competitions[0].competitors[1].id = '3',
+    value => value.header.competitions[0].status.type.completed = false,
+    value => value.header.competitions[0].competitors[0] = null,
+    value => delete value.header.id,
+    value => delete value.header.competitions[0].status,
+    value => value.header.competitions.push(structuredClone(value.header.competitions[0])),
+  ]) {
+    const data = valid(); mutate(data);
+    const result = await buildPlayerForm([game], { ...query, count: 1 }, { fetchSummary: async () => data });
+    assert.equal(result.status, 'unavailable');
+    assert.equal(result.players.length, 0);
+    assert.equal(result.errors.length, 1);
+  }
+});
+
+test('shared boxscore loader coalesces duplicates, bounds requests and retries failures or expired data', async () => {
+  let stamp = 0, calls = 0, active = 0, maximum = 0;
+  const url = id => `https://site.api.espn.com/apis/site/v2/sports/${route}/summary?event=${id}`;
+  const load = createSummaryLoader({ clock: () => stamp, ttl: 100, fetchImpl: async input => {
+    calls++; active++; maximum = Math.max(maximum, active);
+    await new Promise(resolve => setTimeout(resolve, 2)); active--;
+    const id = new URL(input).searchParams.get('event');
+    if (id === '100005' && calls < 7) throw new Error('temporary');
+    return bound(summary([group('1', [category([athlete('10', 'Player A', ['20', '2', '4'])])])]), match(id, 1));
+  } });
+  await Promise.all([load(url('100001')), load(url('100001')), load(url('100002')), load(url('100003')), load(url('100004'))]);
+  assert.equal(calls, 4);
+  assert.equal(maximum, 3);
+  await load(url('100001')); assert.equal(calls, 4);
+  await assert.rejects(load(url('100005'))); await assert.rejects(load(url('100005')));
+  await load(url('100005')); assert.equal(calls, 7);
+  stamp = 101; await load(url('100001')); assert.equal(calls, 8);
+  let empties = 0;
+  const missing = createSummaryLoader({ fetchImpl: async () => { empties++; return {}; } });
+  await missing('missing'); await missing('missing');
+  assert.equal(empties, 2);
+});
+
+test('anonymous boxscores cannot become public player observations or cached source evidence', async () => {
+  const game = match('100007', 7);
+  const anonymous = summary([group('1', [category([athlete('10', 'Player A', ['20', '2', '4'])])])]);
+  const result = await buildPlayerForm([game], { ...query, count: 1 }, { fetchSummary: async () => anonymous });
+  assert.equal(result.status, 'unavailable');
+  assert.equal(result.successfulMatches, 0);
+  assert.deepEqual(result.players, []);
+  assert.equal(result.errors.length, 1);
+  let calls = 0;
+  const load = createSummaryLoader({ fetchImpl: async () => { calls++; return anonymous; } });
+  await load('https://site.api.espn.com/summary?event=100007');
+  await load('https://site.api.espn.com/summary?event=100007');
+  assert.equal(calls, 2);
+});
+
+
+test('an explicit DNP vetoes statistics for the same player across duplicate source categories', () => {
+  const played = category([athlete('10', 'Player A', ['20', '2', '4'])]);
+  const didNotPlay = category([athlete('10', 'Player A', undefined, { didNotPlay: true })]);
+  for (const categories of [[played, didNotPlay], [didNotPlay, played]]) {
+    const result = aggregatePlayerForm([record('100007', summary([group('1', categories)]))], query);
+    assert.deepEqual(result.players, []);
+    assert.equal(result.sampledMatches.length, 0);
+  }
+  const wrongTeamDNP = category([athlete('10', 'Player A', undefined, { didNotPlay: true, athlete: { id: '10', displayName: 'Player A', team: { id: '2' } } })]);
+  const bound = aggregatePlayerForm([record('100007', summary([group('1', [played, wrongTeamDNP]), group('2', [didNotPlay])]))], query);
+  assert.equal(bound.players[0].games, 1);
+  assert.equal(bound.players[0].metrics.PTS.average, 20);
 });
