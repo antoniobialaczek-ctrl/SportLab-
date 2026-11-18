@@ -1,8 +1,588 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-18T10:40:53.783Z",
+  "generatedAt": "2026-11-18T11:55:26.698Z",
   "kind": "prospective",
   "modelVersion": "3.2.0",
+  "validation": {
+    "version": "prospective-1",
+    "registeredAt": "2026-11-18T11:55:25.577Z",
+    "policyHash": "adfd4f9658868362decb088b3bf2bd0a357c3b8fbec382562bd8f6231fda934f",
+    "modelVersion": "3.2.0",
+    "policy": {
+      "slots": {
+        "calibration": 60,
+        "selection": 45,
+        "test": 150
+      },
+      "minimumValid": {
+        "calibration": 40,
+        "selection": 30,
+        "test": 100
+      },
+      "minimumKnownTrainingEvents": 100,
+      "maximumVoidRate": 0.05,
+      "minimumTestDays": 7,
+      "unresolvedAfterDays": 14,
+      "bootstrapReplicates": 1000,
+      "calibrationMaximumECE": 0.1
+    },
+    "publication": {
+      "eligible": false
+    },
+    "leagues": [
+      {
+        "route": "basketball/nba",
+        "league": "nba",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "hockey/nhl",
+        "league": "nhl",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/eng.1",
+        "league": "eng.1",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/esp.1",
+        "league": "esp.1",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/ger.1",
+        "league": "ger.1",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/ita.1",
+        "league": "ita.1",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/fra.1",
+        "league": "fra.1",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/uefa.champions",
+        "league": "uefa.champions",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/uefa.europa",
+        "league": "uefa.europa",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/eng.2",
+        "league": "eng.2",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/ned.1",
+        "league": "ned.1",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "soccer/por.1",
+        "league": "por.1",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "tennis/atp",
+        "league": "atp",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      },
+      {
+        "route": "tennis/wta",
+        "league": "wta",
+        "phase": "calibration",
+        "reason": null,
+        "stages": {
+          "calibration": {
+            "target": 60,
+            "minimumValid": 40,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "selection": {
+            "target": 45,
+            "minimumValid": 30,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          },
+          "test": {
+            "target": 150,
+            "minimumValid": 100,
+            "recorded": 0,
+            "settled": 0,
+            "pending": 0,
+            "void": 0,
+            "frozenAt": null
+          }
+        },
+        "finalTestMetrics": null,
+        "baselineMetrics": null,
+        "brierImprovementInterval": null,
+        "checks": null
+      }
+    ]
+  },
+  "audit": {
+    "verified": 0,
+    "legacyResearch": 43,
+    "checkedAt": "2026-11-18T11:55:26.698Z"
+  },
   "note": "Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.",
   "sports": {
     "nba": {
@@ -19,6 +599,7 @@
       "samples": {
         "recorded": 16,
         "settled": 0,
+        "hiddenTestResults": 0,
         "pending": 16,
         "void": 0
       },
@@ -39,6 +620,7 @@
           "samples": {
             "recorded": 16,
             "settled": 0,
+            "hiddenTestResults": 0,
             "pending": 16,
             "void": 0
           },
@@ -62,6 +644,7 @@
       "samples": {
         "recorded": 15,
         "settled": 0,
+        "hiddenTestResults": 0,
         "pending": 15,
         "void": 0
       },
@@ -82,6 +665,7 @@
           "samples": {
             "recorded": 15,
             "settled": 0,
+            "hiddenTestResults": 0,
             "pending": 15,
             "void": 0
           },
@@ -105,6 +689,7 @@
       "samples": {
         "recorded": 0,
         "settled": 0,
+        "hiddenTestResults": 0,
         "pending": 0,
         "void": 0
       },
@@ -127,6 +712,7 @@
       "samples": {
         "recorded": 12,
         "settled": 0,
+        "hiddenTestResults": 0,
         "pending": 12,
         "void": 0
       },
@@ -147,6 +733,7 @@
           "samples": {
             "recorded": 4,
             "settled": 0,
+            "hiddenTestResults": 0,
             "pending": 4,
             "void": 0
           },
@@ -167,6 +754,7 @@
           "samples": {
             "recorded": 8,
             "settled": 0,
+            "hiddenTestResults": 0,
             "pending": 8,
             "void": 0
           },
@@ -190,6 +778,7 @@
       "samples": {
         "recorded": 0,
         "settled": 0,
+        "hiddenTestResults": 0,
         "pending": 0,
         "void": 0
       },
