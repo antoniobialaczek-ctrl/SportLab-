@@ -97,3 +97,5 @@ Dziennik działa lokalnie w tej przeglądarce, z importem i eksportem JSON. Nie 
 Kontekst spotkania obejmuje znane obciążenie terminarza, czas od ostatniego meczu oraz wcześniejsze bilanse przeciwników mierzone przed każdym wcześniejszym spotkaniem. Kontuzje i zgłoszeni starterzy są powiązani z danym meczem; brak raportu nie oznacza zdrowego składu. Bieżące raporty są ukryte w analizach archiwalnych. Historia nie zawiera zweryfikowanych nawierzchni tenisa — nie tworzymy zastępczych oznaczeń.
 
 `/api/readiness` i panel „Gotowość prognoz i aktualność danych” pokazują rzeczywiste etapy i liczebności prób oraz aktualność raportów. Nie ujawniają przedwcześnie testu końcowego. Zarejestrowany eksperyment, modele i workflow pozostają niezmienione; zakończenie niezależnej walidacji wymaga kolejnych rzeczywistych spotkań i późniejszego przeglądu dowodów.
+
+Potwierdzenie publikacji i testów tej rozbudowy: [docs/journal-release.json](docs/journal-release.json).

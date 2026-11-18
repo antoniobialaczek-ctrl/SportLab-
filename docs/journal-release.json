@@ -1,0 +1,45 @@
+{
+  "verifiedAt": "2026-11-18T16:20:27.237364+00:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_Cm2iQENgjs3GosJtvwcdEEydwhPU",
+  "previewDeploymentId": "dpl_729rgfobA6Q9mgyTVmQ8cwtthBgA",
+  "sourceCommit": "542e999fd77c0d2d95936e5e9ba5205f610f8d87",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44345269700",
+  "automatedTests": 168,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "manualCommaOdds": true,
+    "breakEven": "40%",
+    "personalPersistence": true,
+    "authoritativeSettlement": true,
+    "roiExcludesPending": true,
+    "importExport": true,
+    "archiveNoEntry": true,
+    "contextAndAvailability": true,
+    "observedSourceOdds": true,
+    "protocolPreserved": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "isolatedJournalBrowser": [
+    "Polish decimal input",
+    "source correction conflict excluded from ROI",
+    "corrupt local storage preserved",
+    "private manual selections not uploaded"
+  ],
+  "protocolPolicyHash": "adfd4f9658868362decb088b3bf2bd0a357c3b8fbec382562bd8f6231fda934f",
+  "frozenScientificSourcesChanged": false,
+  "forecastsPublished": false,
+  "errorLogsObserved": 0,
+  "personalJournal": "Device-local, user-provided selections; not independently certified model performance.",
+  "excludedByUser": [
+    "cs2",
+    "soccer/pol.1"
+  ],
+  "limitations": [
+    "Independent model validation requires subsequent real fixtures and evidence review.",
+    "ESPN observed prices lack confirmed freshness or settlement scope and are informational only.",
+    "Historical tennis surface metadata is not verified.",
+    "Cancellations or rescheduled fixtures remain pending without matching normalized evidence."
+  ]
+}
