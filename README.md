@@ -115,3 +115,5 @@ Suma punktów korzysta z po 8–10 wcześniejszych meczów każdej drużyny, zna
 W analizie można wpisać własną linię połówkową, np. 224,5. Liczniki, wyróżnienie i poziom na wykresie przeliczają się dla tej linii. Zakres sum NBA obejmuje wynik końcowy z dogrywką; nie dodano sum goli NHL o niejednoznacznych zasadach rozliczenia.
 
 Wykresy pokazują rzeczywiste sumy obu drużyn w ich wcześniejszych spotkaniach, z datami, rywalem, wynikiem, średnią i ostatnimi pięcioma meczami. Mają wspólną skalę od zera i nie łączą różnych spotkań w jedną fikcyjną serię. Błędne i sprzeczne wyniki są pomijane, a brak danych nie staje się zerem. Widok mobilny układa wykresy pionowo. Wskazanie jest usuwane także w otwartym oknie po utracie aktualności analizy lub rozpoczęciu meczu. Zamrożone źródła i protokół nie zostały zmienione.
+
+Potwierdzenie publikacji porównania rynków i wykresów: [docs/match-markets-release.json](docs/match-markets-release.json).

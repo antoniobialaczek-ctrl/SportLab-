@@ -1,0 +1,38 @@
+{
+  "verifiedAt": "2026-11-18T22:15:57.012563+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_HXZhuwvYfxhpVhMCGdGtduaC9toj",
+  "previewDeploymentId": "dpl_LDV15BqVYVZEzGouUox8HU7Tt3Kp",
+  "sourceCommit": "d7358b1de15d0cb90c5494a4faee91d6a580ad80",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44399008823",
+  "automatedTests": 196,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "bestExamples": [
+      "Los Angeles Lakers — zwycięstwo (z dogrywką)",
+      "Powyżej 235,5 punktu w meczu (z dogrywką)",
+      "Powyżej 233,5 punktu w meczu (z dogrywką)"
+    ],
+    "resultVersusTotal": true,
+    "manualHalfPointLine": true,
+    "chartsFromActualResults": true,
+    "zeroBaseline": true,
+    "playerPicksPreserved": true,
+    "staleModalSignalRemoved": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "charts": [
+    "actual earlier match totals",
+    "shared zero baseline",
+    "chronological dates",
+    "opponents and exact scores",
+    "manual line overlay",
+    "reversed H2H conflict handling"
+  ],
+  "analyticalLinesAreBookmakerOffers": false,
+  "futureProbabilitiesPublished": false,
+  "profitabilityComparison": false,
+  "frozenScientificSourcesChanged": false,
+  "errorLogsObserved": 0
+}
