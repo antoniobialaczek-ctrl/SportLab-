@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-11-18T21:44:42.593994+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_5bCMdRU8vBgyuy83unw3MxQZaqxB",
+  "previewDeploymentId": "dpl_J8ugCHTdJwAH1aMT5fhrJeHPjCuL",
+  "sourceCommit": "99b4411b27e1fbf9e36aea8e9601d55c3caae8ad",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44393553456",
+  "automatedTests": 181,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "examples": [
+      "Donovan Mitchell — powyżej 14,5 punktu",
+      "Donovan Mitchell — powyżej 3,5 asysty",
+      "Mario Hezonja — powyżej 3,5 zbiórki",
+      "Cameron Boozer — powyżej 9,5 punktu",
+      "Pascal Siakam — powyżej 14,5 punktu",
+      "Jarace Walker — powyżej 3,5 zbiórki"
+    ],
+    "tenMatchHistory": true,
+    "minimumEightAppearances": true,
+    "pointsAssistsRebounds": true,
+    "ownUnderLine": true,
+    "noRepeatedNoEdge": true,
+    "moreGames": true,
+    "maxConcurrentPlayerRequests": 2,
+    "journalPreserved": true,
+    "archiveNoHindsightPicks": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "upstreamIdentityChecks": [
+    "unique matching completed competition",
+    "exact start and participant identities",
+    "explicit DNP veto across categories"
+  ],
+  "analyticalLinesAreBookmakerOffers": false,
+  "futureProbabilitiesPublished": false,
+  "frozenScientificSourcesChanged": false,
+  "errorLogsObserved": 0
+}

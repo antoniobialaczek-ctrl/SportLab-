@@ -102,3 +102,5 @@ Kontekst spotkania obejmuje znane obciążenie terminarza, czas od ostatniego me
 `/api/readiness` i panel „Gotowość prognoz i aktualność danych” pokazują rzeczywiste etapy i liczebności prób oraz aktualność raportów. Nie ujawniają przedwcześnie testu końcowego. Zarejestrowany eksperyment, modele i workflow pozostają niezmienione; zakończenie niezależnej walidacji wymaga kolejnych rzeczywistych spotkań i późniejszego przeglądu dowodów.
 
 Potwierdzenie publikacji i testów tej rozbudowy: [docs/journal-release.json](docs/journal-release.json).
+
+Potwierdzenie widocznych typów zawodników i sprawdzenia produkcji: [docs/player-picks-release.json](docs/player-picks-release.json).
