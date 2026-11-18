@@ -1,0 +1,64 @@
+{
+  "verifiedAt": "2026-11-18T12:04:45.674604+00:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "sourceCommit": "89e0805cec8740d265b74c5f1ca8cc3a0bf55a9f",
+  "productionDeploymentId": "dpl_BGtMwpqFpusHqa3VkFRfGZ4Ty5ME",
+  "previewDeploymentId": "dpl_HyacVAL1wrGR4hcVrfP1s1AG2c6R",
+  "automatedTests": 100,
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44298987463",
+  "workflowRuns": [
+    "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44299030227",
+    "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44299613122"
+  ],
+  "registeredAt": "2026-11-18T11:55:25.577Z",
+  "policyHash": "adfd4f9658868362decb088b3bf2bd0a357c3b8fbec382562bd8f6231fda934f",
+  "policy": {
+    "slots": {
+      "calibration": 60,
+      "selection": 45,
+      "test": 150
+    },
+    "minimumValid": {
+      "calibration": 40,
+      "selection": 30,
+      "test": 100
+    },
+    "minimumKnownTrainingEvents": 100,
+    "maximumVoidRate": 0.05,
+    "minimumTestDays": 7,
+    "unresolvedAfterDays": 14,
+    "bootstrapReplicates": 1000,
+    "calibrationMaximumECE": 0.1
+  },
+  "leagueCount": 14,
+  "audit": {
+    "verified": 0,
+    "legacyResearch": 43,
+    "checkedAt": "2026-11-18T11:55:26.698Z"
+  },
+  "publicSmoke": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "status": "OK",
+    "reportGeneratedAt": "2026-11-18T11:55:29.934Z",
+    "reportStale": false,
+    "sport": "nba",
+    "date": "2025-11-17",
+    "matches": 8,
+    "detailEvent": "basketball/nba:401810096",
+    "players": 27,
+    "analysisSample": 10
+  },
+  "publicBrowser": {
+    "desktop": "passed",
+    "nbaCards": 8,
+    "teamAnalysis": "10 earlier games",
+    "playerAnalysis": "present",
+    "search": "passed",
+    "modalEscape": "passed",
+    "cs2": "withheld",
+    "tennis": "matches rendered",
+    "mobile": "no page overflow",
+    "pageErrors": []
+  },
+  "forecastsPublished": false
+}
