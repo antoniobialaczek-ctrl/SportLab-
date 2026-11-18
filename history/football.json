@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-18T10:23:55.811Z",
+  "updatedAt": "2026-11-18T10:38:53.554Z",
   "events": [
     {
       "id": "soccer/eng.2:707917",
@@ -149955,11 +149955,21 @@
   ],
   "errors": [],
   "exclusions": [],
+  "unavailableSources": [
+    {
+      "route": "soccer/pol.1",
+      "provider": "ESPN",
+      "status": "unavailable",
+      "checkedAt": "2026-11-18",
+      "reason": "ESPN nie udostępnia historii Ekstraklasy pod trasą soccer/pol.1 (HTTP 400)."
+    }
+  ],
   "coverage": {
     "lastFetch": {
-      "from": "2025-01-01",
+      "from": "2026-11-11",
       "to": "2026-11-17",
       "routes": [
+        "soccer/eng.1",
         "soccer/esp.1",
         "soccer/ger.1",
         "soccer/ita.1",
