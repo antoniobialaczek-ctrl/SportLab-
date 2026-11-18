@@ -2,6 +2,7 @@ import { analyzePlayers } from '../src/server/analysis.js';
 import { ROUTES, isAllowedRoute } from '../src/data/catalog.js';
 import { fetchJSON } from '../src/data/fetch.js';
 import { failure, getOnly, scalar } from '../src/server/http.js';
+import { extractAvailability } from '../src/server/match-context.js';
 
 export default async function handler(req, res) {
   if (!getOnly(req, res)) return;
@@ -22,7 +23,9 @@ export default async function handler(req, res) {
     }))));
     const teamStats = (data.boxscore?.teams || []).map(t => ({ team: t.team?.displayName || '', statistics: (t.statistics || []).map(s => ({ name: s.label || s.name, value: s.displayValue ?? s.value })) }));
     const injuries = (data.injuries || []).flatMap(t => (t.injuries || []).map(i => ({ team: t.team?.displayName || '', name: i.athlete?.displayName || '', status: i.status || '' })));
+    const fetchedAt = new Date().toISOString();
+    const availability = extractAvailability(data, { id, sport, fetchedAt });
     res.setHeader('Cache-Control', 'public, s-maxage=300');
-    res.json({ players, teamStats, injuries, playerAnalysis: analyzePlayers(players, sport), source: 'ESPN', fetchedAt: new Date().toISOString(), note: 'Statystyki opisowe. Lista kontuzji odzwierciedla stan źródła w chwili pobrania, nie historyczny stan przed meczem.' });
+    res.json({ players, teamStats, injuries, availability, playerAnalysis: analyzePlayers(players, sport), source: 'ESPN', fetchedAt, note: 'Statystyki opisowe. Lista kontuzji odzwierciedla stan źródła w chwili pobrania, nie historyczny stan przed meczem.' });
   } catch { return failure(res, 502, 'Nie udało się pobrać szczegółów z ESPN'); }
 }

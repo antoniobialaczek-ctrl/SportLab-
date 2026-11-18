@@ -1,5 +1,9 @@
 import { previewHTML, matchDetailHTML, playerFormHTML } from '/analysis-view.js';
 import { assessBetting, bettingHTML, bettingDetailHTML } from '/betting-view.js';
+import { createJournalUI } from '/journal-ui.js';
+import { contextHTML, availabilityHTML } from '/context-view.js';
+import { readinessHTML } from '/readiness-view.js';
+import { oddsHTML } from '/odds-view.js';
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
 const leagues = {
   football: [['all', 'Wszystkie ligi'], ['eng.1', 'Premier League'], ['esp.1', 'La Liga'], ['ger.1', 'Bundesliga'], ['ita.1', 'Serie A'], ['fra.1', 'Ligue 1'], ['pol.1', 'Ekstraklasa'], ['uefa.champions', 'Liga Mistrzów'], ['uefa.europa', 'Liga Europy'], ['eng.2', 'Championship'], ['ned.1', 'Eredivisie'], ['por.1', 'Portugalia']],
@@ -10,7 +14,7 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;
 const number = value => Number.isFinite(value) ? value.toFixed(3) : '—';
 const percent = value => Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : '—';
 const localDate = value => value ? new Date(value).toLocaleString('pl-PL') : '—';
-let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = null, detailEvent = null;
+let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = null, readinessReport = null, detailEvent = null;
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
 const previews = new Map();
@@ -90,8 +94,8 @@ function queuePreviews(selected) {
 function nav() {
   $('sports').innerHTML = Object.entries(sports).map(([key, title]) => `<button data-s="${key}" class="${key === sport ? 'active' : ''}" aria-pressed="${key === sport}">${title}</button>`).join('');
   $('leagues').innerHTML = leagues[sport].map(([key, title]) => `<button data-l="${key}" class="${key === league ? 'active' : ''}" aria-pressed="${key === league}">${title}</button>`).join('');
-  document.querySelectorAll('[data-s]').forEach(button => button.onclick = () => { sport = button.dataset.s; league = 'all'; closeDetail(); nav(); renderModel(); load(); });
-  document.querySelectorAll('[data-l]').forEach(button => button.onclick = () => { league = button.dataset.l; closeDetail(); nav(); renderModel(); load(); });
+  document.querySelectorAll('[data-s]').forEach(button => button.onclick = () => { sport = button.dataset.s; league = 'all'; closeDetail(); nav(); renderModel(); renderReadiness(); load(); });
+  document.querySelectorAll('[data-l]').forEach(button => button.onclick = () => { league = button.dataset.l; closeDetail(); nav(); renderModel(); renderReadiness(); load(); });
 }
 function card(event, eager) {
   return `<article class="card"><div class="row small"><span>${esc(event.league)}</span><span>${esc(event.state === 'post' ? `${localDate(event.date)} • zakończony` : event.state === 'in' ? 'Na żywo' : localDate(event.date))}</span></div>
@@ -155,7 +159,6 @@ function existingStatsHTML(data, event) {
   if (data.teamStats?.length) html += '<h3>Statystyki drużyn w tym meczu</h3>' + data.teamStats.map(team => `<div class="panel"><b>${esc(team.team)}</b><p class="small">${team.statistics.slice(0, 18).map(stat => `${esc(stat.name)}: ${esc(stat.value)}`).join(' • ')}</p></div>`).join('');
   if (data.playerAnalysis?.length) html += '<h3>Liderzy tego meczu</h3>' + data.playerAnalysis.map(metric => `<p><b>${esc(metric.title)}</b>: ${metric.leaders.map(player => `${esc(player.name)} — ${player.value}`).join(' • ')}</p>`).join('');
   if (data.players?.length) html += `<h3>Zawodnicy — statystyki tego meczu</h3><div class="scroll"><table><thead><tr><th>Zawodnik</th><th>Drużyna</th><th>Statystyki</th></tr></thead><tbody>${data.players.map(player => `<tr><td>${esc(player.name)}</td><td>${esc(player.team)}</td><td>${player.didNotPlay ? 'Nie grał(a)' : esc(player.stats.map((value, index) => `${player.labels[index] || ''}: ${value}`).join(' | '))}</td></tr>`).join('')}</tbody></table></div>`;
-  if (data.injuries?.length) html += '<h3>Kontuzje — stan źródła w chwili pobrania</h3>' + data.injuries.map(row => `<p>${esc(row.name)} (${esc(row.team)}) — ${esc(row.status)}</p>`).join('');
   if (!html) html = `<p class="small">${event.state === 'pre' ? 'Statystyki tego meczu pojawią się po rozpoczęciu. Powyżej jest analiza wcześniejszej formy.' : 'Źródło nie udostępniło dodatkowego boxscore tego meczu.'}</p>`;
   return html + `<p class="small">${esc(data.note)} • ${esc(data.source)} • ${esc(localDate(data.fetchedAt))}</p>`;
 }
@@ -166,11 +169,18 @@ async function detail(id, button) {
   detailController?.abort(); const controller = new AbortController(); detailController = controller;
   lastDetailButton = button; $('modal').classList.add('on'); $('close').focus();
   $('mtitle').textContent = `${event.home} — ${event.away}`;
-  $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p><div id="betting-detail"><p class="small">Co warto obstawić? Sprawdzanie danych…</p></div><div id="match-detail"><p>Pobieranie porównania formy…</p></div>${event.sport !== 'tennis' ? `<h3>Forma zawodników z ostatnich meczów</h3><p class="small">Dostępne statystyki z maksymalnie dwóch wcześniejszych spotkań każdej drużyny. To opis ostatnich występów, a nie potwierdzenie składu na kolejny mecz.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div>` : ''}<details id="game-boxscore" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dostępne informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
+  $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p><div id="betting-detail"><p class="small">Co warto obstawić? Sprawdzanie danych…</p></div><div id="source-odds"></div><div id="journal-form"></div><div id="match-detail"><p>Pobieranie porównania formy…</p></div><div id="availability"><p class="small">Sprawdzanie informacji o składach i kontuzjach…</p></div>${event.sport !== 'tennis' ? `<h3>Forma zawodników z ostatnich meczów</h3><p class="small">Dostępne statystyki z maksymalnie dwóch wcześniejszych spotkań każdej drużyny. To opis ostatnich występów, a nie potwierdzenie składu na kolejny mecz.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div>` : ''}<details id="game-boxscore" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dostępne informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
+  journal.open(event, $('journal-form'));
+  if (['nba', 'nhl', 'football'].includes(event.sport) && event.state === 'pre' && Date.parse(event.date) > Date.now()) {
+    const params = new URLSearchParams({ sport: event.sport, route: event.route, id: event.id, homeId: event.homeId, awayId: event.awayId, startTime: new Date(event.date).toISOString() });
+    void json(`/api/odds?${params}`, controller.signal).then(data => {
+      if (!controller.signal.aborted) $('source-odds').innerHTML = oddsHTML(data, event);
+    }).catch(() => { if (!controller.signal.aborted) $('source-odds').innerHTML = '<p class="small">Kursy źródłowe są chwilowo niedostępne. Możesz ręcznie wpisać kurs w kalkulatorze.</p>'; });
+  }
   void previewRequest(event, previewController?.signal).then(data => {
     if (!controller.signal.aborted) {
       $('betting-detail').innerHTML = bettingDetailHTML(data, event);
-      $('match-detail').innerHTML = matchDetailHTML(data, event);
+      $('match-detail').innerHTML = matchDetailHTML(data, event) + contextHTML(data, event);
     }
   }).catch(() => { if (!controller.signal.aborted) { $('betting-detail').innerHTML = '<section class="betting-box"><h3>Co warto obstawić?</h3><p><b>Odpuść — dane chwilowo niedostępne.</b></p></section>'; $('match-detail').innerHTML = '<p>Analiza wcześniejszych wyników jest chwilowo niedostępna. Spróbuj otworzyć ją ponownie.</p>'; } });
   if (event.sport !== 'tennis') {
@@ -181,8 +191,13 @@ async function detail(id, button) {
     }
   }
   const params = new URLSearchParams({ sport: event.sport, route: event.route, id: event.sourceEventId });
-  void json(`/api/details?${params}`, controller.signal).then(data => { if (!controller.signal.aborted) $('match-boxscore').innerHTML = existingStatsHTML(data, event); })
-    .catch(() => { if (!controller.signal.aborted) $('match-boxscore').textContent = 'Dodatkowe statystyki tego spotkania nie są dostępne. Analiza wcześniejszej formy jest niezależna od boxscore.'; });
+  void json(`/api/details?${params}`, controller.signal).then(data => { if (!controller.signal.aborted) {
+    $('availability').innerHTML = availabilityHTML(data, event);
+    $('match-boxscore').innerHTML = existingStatsHTML(data, event);
+  } }).catch(() => { if (!controller.signal.aborted) {
+    $('availability').innerHTML = '<p class="small">Nie udało się potwierdzić składów i kontuzji. Brak danych nie oznacza pełnej dostępności zawodników.</p>';
+    $('match-boxscore').textContent = 'Dodatkowe statystyki tego spotkania nie są dostępne. Analiza wcześniejszej formy jest niezależna od boxscore.';
+  } });
 }
 function renderModel() {
   if (!report) return;
@@ -224,6 +239,14 @@ async function loadModel() {
   catch { $('model').textContent = 'Raport testów niedostępny'; }
 }
 
+function renderReadiness() {
+  if (readinessReport) $('readiness').innerHTML = readinessHTML(readinessReport, sport, league);
+}
+async function loadReadiness() {
+  try { readinessReport = await json('/api/readiness'); renderReadiness(); }
+  catch { $('readiness').textContent = 'Stan walidacji chwilowo niedostępny. Nie oznacza to dopuszczenia prognoz.'; }
+}
+
 
 function closeDetail() {
   detailController?.abort(); detailEvent = null; $('modal').classList.remove('on');
@@ -231,7 +254,7 @@ function closeDetail() {
 }
 let searchTimer;
 $('q').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(render, 150); }; $('status').onchange = render; $('date').onchange = () => { closeDetail(); load(); };
-$('refresh').onclick = () => { closeDetail(); load(); loadModel(); };
+$('refresh').onclick = () => { closeDetail(); load(); loadModel(); loadReadiness(); };
 $('show-archive').onclick = () => loadArchive(loadController?.signal, true);
 $('close').onclick = closeDetail;
 $('modal').onclick = event => { if (event.target === $('modal')) closeDetail(); };
@@ -245,7 +268,9 @@ document.addEventListener('keydown', event => {
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }
 });
-nav(); loadModel(); load();
+const journal = createJournalUI({ root: $('journal-root'), fetchJSON: json });
+nav(); loadModel(); loadReadiness(); load();
+void journal.refresh();
 setInterval(() => {
   renderBetting();
   document.querySelectorAll('[data-preview]').forEach(node => {
@@ -256,3 +281,4 @@ setInterval(() => {
   if (data && $('betting-detail')) $('betting-detail').innerHTML = bettingDetailHTML(data, detailEvent);
 }, 30000);
 setInterval(() => { if (!document.hidden && !$('modal').classList.contains('on')) load(); }, 300000);
+setInterval(() => { if (!document.hidden) { void journal.refresh(); loadReadiness(); } }, 300000);

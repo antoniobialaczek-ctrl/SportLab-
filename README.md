@@ -61,7 +61,7 @@ Więcej: [architektura](docs/architecture.md), [kontrakt danych](docs/data-contr
 
 ## Stan przygotowanej wersji
 
-Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 130 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
+Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 168 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
 
 Bieżące prawdopodobieństwa nadal są wstrzymane. Ani rozpoczęcie zbierania migawek, ani dodatni wynik badawczego testu retrospektywnego nie zastępują niezależnej walidacji przedmeczowej. CS2 pozostaje wyłączone z powodów opisanych w [audycie źródeł](docs/cs2-sources.md).
 
@@ -84,3 +84,16 @@ Nowe endpointy: `/api/match-analysis`, `/api/player-form`, `/api/analysis-catalo
 Sekcja nad meczami i na każdej karcie pokazuje decyzję oraz uzasadnienie. Do czasu niezależnej walidacji prognoz i podłączenia aktualnych kursów werdykt pozostaje „Odpuść zakład — brak potwierdzonej przewagi”. Nie wyliczamy prawdopodobieństwa z liczby zwycięstw ani nie udajemy, że znamy opłacalny kurs.
 
 Osobno działa jawna, opisowa lista rynków do sprawdzenia dla NBA, NHL i piłki. Wymaga po 10 wcześniejszych meczów, różnicy minimum 3 zwycięstw, zgodnych średnich różnic wyniku, prób dom/wyjazd po minimum 3 mecze i świeżych danych. Rynki mają określony zakres rozliczenia: NBA z dogrywką, NHL z dogrywką i karnymi, piłka 1X/X2 w 90 minutach. To niezweryfikowana reguła obserwacyjna, nie rekomendacja zakładu. Tenis wymaga dodatkowego kontekstu nawierzchni. Mecze rozpoczęte i archiwalne nie otrzymują kierunku; interfejs odświeża tę ocenę co 30 sekund. Zamrożone modele i protokół walidacji pozostają niezależne.
+
+
+## Kursy, własny dziennik i kontekst
+
+„Twój kurs i własny typ” w szczegółach nadchodzącego meczu pozwala wpisać kurs dziesiętny i stawkę w umownych jednostkach. Kalkulator pokazuje matematyczny próg rentowności `1 / kurs`; nie utożsamia go z prognozą. Porównanie z modelem pozostaje niedostępne do niezależnego zatwierdzenia publikacji. `/api/forecast` nie ujawnia badawczych prawdopodobieństw.
+
+Dziennik działa lokalnie w tej przeglądarce, z importem i eksportem JSON. Nie ma wpłat ani wysyłania typów do bukmachera. Własne zapisy nie są niezależnie potwierdzonym rejestrem modeli. Automatyczne sprawdzenie przy wejściu i co pięć minut oraz przycisk „Sprawdź wyniki” korzystają z `/api/journal-results` i istniejącej historii. Czekają na potwierdzony wynik; brak danych nie oznacza przegranej. Korekta źródła oznacza konflikt i wyłączenie wpisu ze statystyk. Zysk, ROI i trafność odnoszą się wyłącznie do rozliczonych własnych typów, bez podatków i opłat. Anulowania i zmiany terminu wymagają dodatkowego dowodu — przy jego braku wpis pozostaje oczekujący.
+
+`/api/odds` odczytuje bezpłatne dane istniejącego ESPN API po otwarciu meczu. Dokładnie wiąże kurs z uczestnikami i terminem. Brak czasu aktualizacji lub zasad rozliczenia jest jawny; takich odczytów nie traktujemy jako aktualnej oferty i nie podstawiamy do EV ani dziennika. Nie dodano płatnej usługi ani klucza. CS2 i Ekstraklasa pozostają poza zakresem tej rozbudowy.
+
+Kontekst spotkania obejmuje znane obciążenie terminarza, czas od ostatniego meczu oraz wcześniejsze bilanse przeciwników mierzone przed każdym wcześniejszym spotkaniem. Kontuzje i zgłoszeni starterzy są powiązani z danym meczem; brak raportu nie oznacza zdrowego składu. Bieżące raporty są ukryte w analizach archiwalnych. Historia nie zawiera zweryfikowanych nawierzchni tenisa — nie tworzymy zastępczych oznaczeń.
+
+`/api/readiness` i panel „Gotowość prognoz i aktualność danych” pokazują rzeczywiste etapy i liczebności prób oraz aktualność raportów. Nie ujawniają przedwcześnie testu końcowego. Zarejestrowany eksperyment, modele i workflow pozostają niezmienione; zakończenie niezależnej walidacji wymaga kolejnych rzeczywistych spotkań i późniejszego przeglądu dowodów.

@@ -1,5 +1,6 @@
 import { leagueLabel } from '../data/catalog.js';
 import { summarizeParticipant } from './analysis.js';
+import { buildMatchContext } from './match-context.js';
 
 const DAY = 86400000;
 const fixed = value => Number(value.toFixed(2));
@@ -112,7 +113,7 @@ export function buildMatchAnalysis(events, { sport, route, homeId, awayId, cutof
   if (headToHead.sample) narrative.push(`Bezpośrednie spotkania (próba: ${headToHead.sample}): zwycięstwa ${homeLabel} — ${headToHead.homeWins}, remisy — ${headToHead.draws}, zwycięstwa ${awayLabel} — ${headToHead.awayWins}.`);
   const notes = [
     'To analiza opisowa zapisanych wyników, bez przewidywania zwycięzcy i bez prawdopodobieństw.',
-    'Próba może być niepełna; porównanie nie uwzględnia siły rywali i nie jest pełnym bilansem sezonu.',
+    'Próba może być niepełna i nie jest pełnym bilansem sezonu. Dodatkowy kontekst pokazuje wcześniejsze bilanse rywali; nie jest korektą prognozy.',
     'Podział gospodarze/goście odzwierciedla oznaczenia źródła, a czas od ostatniego meczu liczymy od jego rozpoczęcia.',
   ];
   if (home.sample !== away.sample) notes.push('Próby uczestników mają różną liczebność, dlatego nie porównujemy bezpośrednio liczby zwycięstw.');
@@ -121,6 +122,7 @@ export function buildMatchAnalysis(events, { sport, route, homeId, awayId, cutof
     status: home.sample && away.sample ? 'available' : home.sample || away.sample ? 'partial' : 'unavailable',
     sport, route, league: leagueLabel(route), cutoff, fixtureId,
     home, away, headToHead, comparison, narrative, notes,
+    context: buildMatchContext(history, { sport, route, homeId, awayId, cutoff, fixtureId }),
     historyRange: { availableMatches: history.length, firstMatchAt: history.at(-1)?.startTime || null, lastMatchAt: history[0]?.startTime || null },
   };
 }
