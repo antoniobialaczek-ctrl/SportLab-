@@ -1,0 +1,43 @@
+{
+  "verifiedAt": "2026-11-19T20:16:52.280329+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_5fvMDfBfee1p4YfN5CbP4sKoHD8p",
+  "sourceCommit": "04bdb83842000f94e29c35572a8a89cdef291197",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44596047550",
+  "automatedTests": 277,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "iconFromUploadedImage": true,
+    "iconSHA256": "44af16b7642ffa15625db63814e898b28ef1cea9ae44f2ef5fcf9ce8e4239571",
+    "faviconAndAppleIcon": true,
+    "manifest": true,
+    "mlsFixture": "soccer/usa.1:401933535",
+    "teams": [
+      "Orlando City SC",
+      "FC Cincinnati"
+    ],
+    "samples": [
+      10,
+      10
+    ],
+    "playerShotsHistory": true,
+    "goals90Comparison": true,
+    "mlsJournalSave": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "mls": {
+    "completedRegulationResults": 1039,
+    "clubs": 30,
+    "excludedRecords": 42,
+    "coverageComplete": false,
+    "runtimeRefreshSeconds": 600,
+    "modelExperimentEligible": false,
+    "firstObservedAt": "2026-11-19T19:05:37.431Z"
+  },
+  "iconOriginalSHA256": "1344ea1eb48abde48fa1f7812c2f4fcd35957dd55dd491f583984375501afd55",
+  "iconOnlyResized": true,
+  "frozenScientificSourcesChanged": false,
+  "futureProbabilitiesPublished": false,
+  "paidServicesAdded": false
+}
