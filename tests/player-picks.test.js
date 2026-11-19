@@ -117,3 +117,34 @@ test('verified source milestones choose an offered qualifying line and never bor
   const expired = build(fixture(), event, { oddsData: { ...oddsData, fetchedAt: new Date(now - 360000).toISOString() } }).picks.find(pick => pick.playerId === '101' && pick.metric === 'PTS');
   assert.equal(expired.lineOrigin, 'analytical'); assert.equal(expired.priceAvailable, false);
 });
+
+test('an old open player analysis stops publishing picks and manual comparisons until refreshed', () => {
+  const data = fixture(); data.fetchedAt = new Date(now).toISOString();
+  assert.ok(build(data).picks.length > 0);
+  const later = now + 4 * 3600000;
+  const stale = build(data, event, { now: later });
+  assert.equal(stale.status, 'unavailable'); assert.deepEqual(stale.picks, []);
+  assert.match(stale.reason, /wymagają odświeżenia/);
+  assert.equal(evaluatePlayerLine(data, event, '101', 'PTS', 24.5, { now: later }).comparison, undefined);
+  assert.equal(build(data, { ...event, state: 'post' }, { now: later }).status, 'closed');
+  const legacy = fixture();
+  assert.deepEqual(build(legacy, event, { now: later }).picks, []);
+});
+
+test('freshness allows rounded cutoffs but rejects expired, impossible and malformed observation times', () => {
+  const rounded = fixture();
+  rounded.cutoff = new Date(now - 29 * 60000).toISOString();
+  rounded.fetchedAt = new Date(now - 14 * 60000).toISOString();
+  assert.ok(build(rounded).picks.length > 0);
+  const cutoffBoundary = { ...rounded, cutoff: new Date(now - 30 * 60000).toISOString(), fetchedAt: new Date(now).toISOString() };
+  assert.ok(build(cutoffBoundary).picks.length > 0);
+  assert.deepEqual(build(cutoffBoundary, event, { now: now + 1 }).picks, []);
+  const fetchedBoundary = { ...rounded, cutoff: new Date(now - 20 * 60000).toISOString(), fetchedAt: new Date(now - 15 * 60000).toISOString() };
+  assert.ok(build(fetchedBoundary).picks.length > 0);
+  assert.deepEqual(build(fetchedBoundary, event, { now: now + 1 }).picks, []);
+  for (const fetchedAt of ['bad', '2026-02-30T12:00:00.000Z', new Date(now + 60001).toISOString(), new Date(now - 31 * 60000).toISOString()]) {
+    assert.deepEqual(build({ ...rounded, fetchedAt }).picks, []);
+  }
+  assert.ok(build({ ...rounded, fetchedAt: new Date(now + 60000).toISOString() }).picks.length > 0);
+  assert.deepEqual(build({ ...rounded, fetchedAt: new Date(now - 30 * 60000).toISOString() }).picks, []);
+});

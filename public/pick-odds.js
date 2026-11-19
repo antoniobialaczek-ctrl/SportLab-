@@ -122,6 +122,7 @@ export function matchPickQuote(data, event, pick, options = {}) {
     const candidate = { status: 'matched', decimal: values.get(wanted.selection), provider, providerId,
       ...timing, observedAt: iso(observed), source: text(data.source, 200), reason: null, readOnly: true, usableForComparison: false,
       market: wanted.market, selection: wanted.selection, line: wanted.line, scope: wanted.scope,
+      ...(wanted.market === 'player_prop' ? { playerId: wanted.playerId, teamId: wanted.teamId, metric: wanted.metric } : {}),
       scopeBasis: quote.scopeBasis || null, fixtureId: event.id, signature };
     if (!previous || observed > Date.parse(previous.observedAt) || candidate.freshness === 'fresh' && previous.freshness !== 'fresh') groups.set(key, candidate);
   }

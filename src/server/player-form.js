@@ -71,6 +71,65 @@ function summaryMatches(data, match, { allowMissingHeader = false } = {}) {
   return status?.state === 'post' && status.completed === true;
 }
 
+const FOOTBALL_STATS = { totalGoals: 'G', goalAssists: 'A', totalShots: 'SH' };
+function namedStatValue(stat) {
+  const value = numeric(stat?.value);
+  if (value === null || !Number.isInteger(value) || value > 1000) return null;
+  if (stat.displayValue != null && numeric(stat.displayValue) !== value) return null;
+  return value;
+}
+
+/** Football summaries use named per-match roster stats, rather than the
+ * positional boxscore arrays returned for NBA and NHL. An appearance needs
+ * both APP=1 and a starter/substitute entry; a bench's zero is not an outing.
+ */
+function footballRosterGroups(data, match) {
+  if (!summaryMatches(data, match) || !Array.isArray(data.rosters)
+    || match.route != null && !match.route.startsWith('soccer/')) return [];
+  const groups = data.rosters.filter(group => Array.isArray(group?.roster) && group.roster.length <= 100
+    && (group.homeAway === 'home' && String(group.team?.id) === match.homeId
+      || group.homeAway === 'away' && String(group.team?.id) === match.awayId));
+  const teams = new Map(), ambiguous = new Set();
+  for (const group of groups) for (const row of group.roster) {
+    const id = String(row?.athlete?.id || '');
+    if (!/^\d{1,14}$/.test(id)) continue;
+    if (teams.has(id) && teams.get(id) !== String(group.team.id)) ambiguous.add(id);
+    else teams.set(id, String(group.team.id));
+  }
+  return groups.map(group => ({ team: group.team, statistics: group.roster.flatMap(row => {
+    const id = String(row?.athlete?.id || '');
+    if (!/^\d{1,14}$/.test(id) || ambiguous.has(id) || row.athlete?.team?.id != null && String(row.athlete.team.id) !== String(group.team.id)
+      || typeof row.athlete?.displayName !== 'string' || !row.athlete.displayName.trim() || !Array.isArray(row.stats)) return [];
+    const appearances = row.stats.filter(stat => stat?.name === 'appearances').map(namedStatValue);
+    const denied = row.didNotPlay === true || appearances.some(value => value === 0)
+      || appearances.length > 0 && new Set(appearances).size > 1;
+    const played = !denied && appearances.length > 0 && appearances.every(value => value === 1)
+      && (row.starter === true || row.subbedIn === true);
+    if (!played && !denied) return [];
+    const stats = row.stats.filter(stat => Object.hasOwn(FOOTBALL_STATS, stat?.name));
+    return [{ labels: stats.map(stat => FOOTBALL_STATS[stat.name]), athletes: [{ athlete: row.athlete,
+      stats: stats.map(namedStatValue), didNotPlay: !played, footballParticipationVerified: played }] }];
+  }) }));
+}
+
+/** Shared participation proof for callers settling an exact observed stat.
+ * It deliberately does not infer minutes or an unused substitute's result.
+ */
+export function footballPlayedPlayerIds(data, match, teamId) {
+  const groups = footballRosterGroups(data, match).filter(group => String(group.team.id) === teamId);
+  const played = new Set(), denied = new Set();
+  for (const group of groups) for (const category of group.statistics) for (const row of category.athletes) {
+    if (row.didNotPlay) denied.add(String(row.athlete.id));
+    else if (row.footballParticipationVerified) played.add(String(row.athlete.id));
+  }
+  return new Set([...played].filter(id => !denied.has(id)));
+}
+
+function sourcePlayerGroups(data, sport, match) {
+  const boxscores = Array.isArray(data?.boxscore?.players) ? data.boxscore.players : [];
+  return sport === 'football' ? [...boxscores, ...footballRosterGroups(data, match)] : boxscores;
+}
+
 /** Shared bounded cache for successful historical boxscores. Failed requests
  * and empty payloads are retried, and simultaneous consumers share one fetch.
  */
@@ -82,15 +141,17 @@ export function createSummaryLoader({ fetchImpl = fetchJSON, clock = Date.now, t
     else active++;
     try {
       const data = await fetchImpl(url, { timeoutMs: 3500, retries: 0 });
-      let validHeader = false;
+      let validHeader = false, sourceMatch = null;
       if (data?.header) {
         let wanted; try { wanted = new URL(url).searchParams.get('event'); } catch { /* Not a provider URL; cannot cache its header. */ }
         const competition = data.header.competitions?.find?.(row => String(row?.id) === wanted);
         const home = competition?.competitors?.find?.(row => row?.homeAway === 'home');
         const away = competition?.competitors?.find?.(row => row?.homeAway === 'away');
-        validHeader = Boolean(wanted && competition && summaryMatches(data, { sourceEventId: wanted, startTime: competition.date, homeId: String(home?.id), awayId: String(away?.id) }));
+        sourceMatch = { sourceEventId: wanted, startTime: competition?.date, homeId: String(home?.id), awayId: String(away?.id) };
+        validHeader = Boolean(wanted && competition && summaryMatches(data, sourceMatch));
       }
-      if (validHeader && Array.isArray(data?.boxscore?.players) && data.boxscore.players.some(group => /^\d{1,14}$/.test(String(group?.team?.id || ''))
+      const groups = validHeader ? sourcePlayerGroups(data, String(url).includes('/soccer/') ? 'football' : null, sourceMatch) : [];
+      if (validHeader && groups.some(group => /^\d{1,14}$/.test(String(group?.team?.id || ''))
         && Array.isArray(group.statistics) && group.statistics.some(category => Array.isArray(category?.athletes) && category.athletes.some(row => Array.isArray(row?.stats) && row.stats.length)))) {
         cache.set(url, { data, expiresAt: clock() + ttl });
         while (cache.size > maxEntries) cache.delete(cache.keys().next().value);
@@ -137,7 +198,7 @@ export function aggregatePlayerForm(records, { sport, teamId, limit = 10 }) {
     if (seenMatches.has(match.id) || !summaryMatches(data, match, { allowMissingHeader: true })) continue;
     seenMatches.add(match.id);
     const perGame = new Map(), deniedPlayers = new Set();
-    const groups = Array.isArray(data?.boxscore?.players) ? data.boxscore.players : [];
+    const groups = sourcePlayerGroups(data, sport, match);
     for (const group of groups) {
       // A name or the other team's roster does not establish team identity.
       if (String(group?.team?.id || '') !== teamId) continue;
@@ -222,7 +283,7 @@ export async function buildPlayerForm(events, query, { fetchSummary = defaultSum
       const url = `https://site.api.espn.com/apis/site/v2/sports/${route}/summary?event=${encodeURIComponent(match.sourceEventId)}`;
       try {
         const data = await fetchSummary(url);
-        const hasTeam = Array.isArray(data?.boxscore?.players) && data.boxscore.players.some(group => String(group?.team?.id || '') === teamId);
+        const hasTeam = sourcePlayerGroups(data, sport, match).some(group => String(group?.team?.id || '') === teamId);
         results[index] = !summaryMatches(data, match) ? { match, url, error: 'Dane źródłowe nie potwierdzają właściwego zakończonego meczu.' }
           : hasTeam ? { match, url, data } : { match, url, error: 'Źródło nie zwróciło statystyk zawodników tej drużyny.' };
       } catch { results[index] = { match, url, error: 'Nie udało się pobrać statystyk zawodników z ESPN.' }; }

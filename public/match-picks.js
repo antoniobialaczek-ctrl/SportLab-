@@ -1,6 +1,7 @@
 import { escapeHTML as esc } from './analysis-view.js';
 import { assessBetting } from './betting-view.js';
 import { matchPickQuote, pickOddsHTML } from './pick-odds.js';
+import { journalPickButtonHTML } from './pick-actions.js';
 
 const DAY = 86400000;
 const NOTE = 'Porównanie opisuje wcześniejsze wyniki. Linia analityczna nie jest ofertą bukmachera, a liczniki nie są prognozą prawdopodobieństwa ani potwierdzeniem opłacalności.';
@@ -163,7 +164,7 @@ export function matchPicksHTML(analysis, event, options = {}) {
   const config = totalConfiguration(event), totalName = config?.market === 'total_goals' ? 'goli' : 'punktów';
   const unit = config?.unit || 'pkt', settlement = config?.settlement || 'z dogrywką';
   const sourceMarkets = observedMarkets(options, event);
-  const best = data.best ? `<div class="match-best"><span class="small">Najmocniejszy sygnał z historii · pierwszy do sprawdzenia</span><div class="pick-title-row"><${compact ? 'h4' : 'h3'}>${esc(data.best.label)}</${compact ? 'h4' : 'h3'}>${pickOddsHTML(options.oddsData, event, data.best, options)}</div>${supportHTML(data.best, event)}</div>` : `<p class="small">${esc(data.reason)}</p>`;
+  const best = data.best ? `<div class="match-best"><span class="small">Najmocniejszy sygnał z historii · pierwszy do sprawdzenia</span><div class="pick-title-row"><${compact ? 'h4' : 'h3'}>${esc(data.best.label)}</${compact ? 'h4' : 'h3'}>${pickOddsHTML(options.oddsData, event, data.best, options)}</div>${supportHTML(data.best, event)}${journalPickButtonHTML(event, data.best)}</div>` : `<p class="small">${esc(data.reason)}</p>`;
   if (compact) return `<section class="match-picks compact">${best}${!data.best || data.best.kind !== 'result' ? sourceMarkets.winnerPrices : ''}${sourceMarkets.totalPrices}${data.totals ? `<p class="small">Linia ${data.totals.lineOrigin === 'source' ? 'ze źródła' : data.totals.lineOrigin === 'manual' ? 'wpisana' : 'analityczna'}: ${number(data.totals.line)} ${unit} • ${settlement}.</p>` : ''}</section>`;
   const winner = data.candidates.find(row => row.kind === 'result'), total = data.candidates.find(row => row.kind === 'total');
   const totals = data.totals;

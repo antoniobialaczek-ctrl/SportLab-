@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregatePlayerForm, buildPlayerForm, selectPreviousMatches, createSummaryLoader } from '../src/server/player-form.js';
+import { aggregatePlayerForm, buildPlayerForm, selectPreviousMatches, createSummaryLoader, footballPlayedPlayerIds } from '../src/server/player-form.js';
 import playerForm from '../api/player-form.js';
 
 const route = 'basketball/nba', sport = 'nba', teamId = '1', cutoff = '2026-01-10T12:00:00.000Z';
@@ -294,4 +294,74 @@ test('an explicit DNP vetoes statistics for the same player across duplicate sou
   const bound = aggregatePlayerForm([record('100007', summary([group('1', [played, wrongTeamDNP]), group('2', [didNotPlay])]))], query);
   assert.equal(bound.players[0].games, 1);
   assert.equal(bound.players[0].metrics.PTS.average, 20);
+});
+
+const footballMatch = (id = '100007', day = 7) => match(id, day, { id: `soccer/eng.1:${id}`, sport: 'football', route: 'soccer/eng.1', league: 'eng.1', homeScore: 1, awayScore: 0 });
+const namedStat = (name, value) => ({ name, value, displayValue: String(value) });
+const footballPlayer = (id, shots, extra = {}) => ({ athlete: { id, displayName: `Football Player ${id}` }, starter: true, subbedIn: false,
+  stats: [namedStat('appearances', 1), namedStat('totalShots', shots), namedStat('totalGoals', 0), namedStat('goalAssists', 0)], ...extra });
+function footballSummary(game, home, away = []) {
+  return bound({ rosters: [{ team: { id: game.homeId, displayName: game.home }, homeAway: 'home', roster: home },
+    { team: { id: game.awayId, displayName: game.away }, homeAway: 'away', roster: away }] }, game);
+}
+
+test('football named roster stats require a real appearance and keep a played zero distinct from an unused substitute', () => {
+  const game = footballMatch();
+  const starter = footballPlayer('10', 6), substitute = footballPlayer('11', 0, { starter: false, subbedIn: true });
+  const bench = footballPlayer('12', 0, { starter: false, stats: [namedStat('appearances', 0), namedStat('totalShots', 0)] });
+  const noRole = footballPlayer('13', 5, { starter: false });
+  const noAppearance = footballPlayer('14', 5, { stats: [namedStat('totalShots', 5)] });
+  const wrongTeam = footballPlayer('15', 5, { athlete: { id: '15', displayName: 'Foreign Player', team: { id: game.awayId } } });
+  const data = footballSummary(game, [starter, substitute, bench, noRole, noAppearance, wrongTeam]);
+  const result = aggregatePlayerForm([{ match: game, data, url: 'https://site.api.espn.com/summary?event=100007' }], { sport: 'football', teamId });
+  assert.equal(result.sampledMatches.length, 1); assert.equal(result.players.length, 2);
+  assert.equal(result.players.find(row => row.id === '10').metrics.SH.average, 6);
+  assert.equal(result.players.find(row => row.id === '11').metrics.SH.average, 0);
+  assert.equal(result.players.find(row => row.id === '11').metrics.SH.sample, 1);
+  assert.equal(result.players.find(row => row.id === '10').metrics.G.average, 0);
+  assert.deepEqual([...footballPlayedPlayerIds(data, game, teamId)], ['10', '11']);
+  assert.deepEqual([...footballPlayedPlayerIds(data, game, game.awayId)], []);
+});
+
+test('football roster identities, named shot semantics and conflicting values remain fail closed', () => {
+  const game = footballMatch(), valid = footballPlayer('10', 6);
+  const parse = data => aggregatePlayerForm([{ match: game, data, url: 'https://site.api.espn.com/summary?event=100007' }], { sport: 'football', teamId });
+  const onlyTarget = footballPlayer('10', 0, { stats: [namedStat('appearances', 1), namedStat('shotsOnTarget', 5), namedStat('totalGoals', 0)] });
+  assert.equal(parse(footballSummary(game, [onlyTarget])).players[0].metrics.SH, undefined);
+  const conflict = structuredClone(valid); conflict.stats.push(namedStat('totalShots', 7));
+  const conflicted = parse(footballSummary(game, [conflict]));
+  assert.equal(conflicted.conflicts, 1); assert.equal(conflicted.players[0].metrics.SH, undefined);
+  assert.equal(conflicted.players[0].metrics.G.average, 0);
+  const ambiguous = footballSummary(game, [valid], [valid]);
+  assert.deepEqual(parse(ambiguous).players, []); assert.deepEqual([...footballPlayedPlayerIds(ambiguous, game, teamId)], []);
+  const duplicate = footballSummary(game, [valid, valid]);
+  assert.equal(parse(duplicate).players[0].metrics.SH.sample, 1);
+  for (const mutate of [
+    data => { delete data.header; }, data => { data.header.id = '999999'; },
+    data => { data.rosters[0].homeAway = 'away'; },
+    data => { data.rosters[0].team.id = '3'; },
+    data => { data.rosters[0].roster[0].stats[1].displayValue = '7'; },
+  ]) {
+    const data = footballSummary(game, [structuredClone(valid)]); mutate(data);
+    const result = parse(data);
+    assert.equal(result.players.find(player => player.id === '10')?.metrics.SH, undefined);
+  }
+  const explicitDNP = footballSummary(game, [valid, { ...valid, didNotPlay: true }]);
+  assert.deepEqual(parse(explicitDNP).players, []);
+  assert.deepEqual([...footballPlayedPlayerIds(explicitDNP, game, teamId)], []);
+});
+
+test('public football form and its shared cache accept exact final roster-only summaries', async () => {
+  const game = footballMatch(), data = footballSummary(game, [footballPlayer('10', 6)]);
+  const result = await buildPlayerForm([game], { sport: 'football', route: game.route, teamId, count: 1, cutoff }, { fetchSummary: async () => data });
+  assert.equal(result.status, 'available'); assert.equal(result.successfulMatches, 1);
+  assert.equal(result.players[0].metrics.SH.average, 6); assert.deepEqual(result.errors, []);
+  let calls = 0;
+  const load = createSummaryLoader({ fetchImpl: async () => { calls++; return data; } });
+  const url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/summary?event=100007';
+  await load(url); await load(url); assert.equal(calls, 1);
+  const noProof = footballSummary(game, [footballPlayer('10', 6, { stats: [namedStat('totalShots', 6)] })]);
+  let missing = 0;
+  const missingLoad = createSummaryLoader({ fetchImpl: async () => { missing++; return noProof; } });
+  await missingLoad(url); await missingLoad(url); assert.equal(missing, 2);
 });

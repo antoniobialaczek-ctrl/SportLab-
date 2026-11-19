@@ -133,3 +133,11 @@ Oddzielny workflow pobiera ostatnie siedem zakończonych dni raz dziennie, o 06:
 Zakładka CS2 odróżnia brak podłączonego źródła od braku meczów i daje link do zewnętrznego terminarza. Nie znaleziono źródła z potwierdzonym darmowym dostępem i prawem do tego zastosowania; nie pokazujemy fikcyjnych meczów, kursów ani wskazań CS2. [Ponowny audyt](docs/cs2-sources.md) opisuje wymagany dostęp i ograniczenia usług.
 
 Potwierdzenie publikacji zdjęć, kursów zawodników, Ekstraklasy i pierwszego udanego uruchomienia jej automatyzacji: [docs/player-portraits-ekstraklasa-release.json](docs/player-portraits-ekstraklasa-release.json).
+
+## Dziennik linii i aktualność otwartej analizy
+
+Przycisk „Zapisz własny typ” przenosi dokładny rynek, zawodnika, kierunek, linię i zakres rozliczenia do lokalnego formularza. Dziennik obejmuje teraz wynik meczu, sumę punktów NBA, sumę goli Ekstraklasy oraz obsługiwane statystyki zawodników NBA, NHL i piłki. Odczyt ceny może wypełnić pole po kliknięciu; zapis wymaga potwierdzenia własnego kursu i stawki. Starsze wpisy v1 są zachowywane i migrowane do v2, z tym samym identyfikatorem i rozliczeniem.
+
+Sprawdzenie wysyła tylko identyfikatory rozpoczętych meczów, w partiach po dwa i maksymalnie dziesięć spotkań na cykl. Korzysta ze zweryfikowanych zakończonych wyników i boxscore; brak statystyki lub występu nie jest zerem ani przegraną. Rzeczywista zmiana rozliczanej wartości tworzy konflikt także wtedy, gdy kierunek nadal byłby wygrany. Starsze spotkania są sprawdzane rotacyjnie. Kurs, stawka i wybór pozostają na urządzeniu; to osobisty dziennik, nie niezależna skuteczność modeli.
+
+Otwarta analiza odnawia punkt odcięcia i dane. Typy zawodników wymagają odczytu nie starszego niż 15 minut i punktu odcięcia nie starszego niż 30 minut. Aktualizacja ceny zachowuje wpisaną linię i kierunek; wynik własnego porównania po aktualizacji wymaga ponownego sprawdzenia. Znane wykluczenie kontuzjowanego zawodnika pozostaje do nowej, jawnej informacji, a brak raportu nie oznacza zdrowego składu. Piłkarska forma obsługuje również nazwane statystyki rosterów ESPN, z potwierdzeniem występu; niewykorzystana ławka nie jest liczona jako mecz.
