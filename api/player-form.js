@@ -3,12 +3,15 @@ import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js'
 import { readSiteHistory } from '../src/server/site-history.js';
 import { buildPlayerForm } from '../src/server/player-form.js';
 import { isEkstraklasaId } from '../src/server/ekstraklasa-source.js';
+import { loadRecentPlayerMatches } from '../src/server/recent-player-matches.js';
 
 export default async function handler(req, res) {
   if (!getOnly(req, res)) return;
-  let sport, route, teamId, cutoff, count;
+  let sport, route, teamId, cutoff, count, view;
   try {
     sport = scalar(req.query.sport); route = scalar(req.query.route); teamId = scalar(req.query.teamId);
+    view = scalar(req.query.view, 'history');
+    if (!['history', 'latest'].includes(view)) throw new Error('Nieznany widok formy zawodnika');
     cutoff = scalar(req.query.cutoff, new Date().toISOString());
     const requested = scalar(req.query.count, '10');
     if (!isAllowedRoute(sport, route)) throw new Error('Nieznana liga');
@@ -21,8 +24,12 @@ export default async function handler(req, res) {
     if (route === 'soccer/pol.1') return res.json({ status: 'unavailable', sport, route, teamId, cutoff, players: [], sampledMatches: [], attemptedMatches: [], errors: [],
       fetchedAt: new Date().toISOString(), source: 'TheSportsDB', reason: 'Darmowe źródło Ekstraklasy nie udostępnia statystyk zawodników. Dostępna jest forma drużyn i porównanie wcześniejszych wyników.' });
     const history = sport === 'tennis' ? { events: [], updatedAt: null, runtimeData: { origin: 'local', fallback: false } } : await readSiteHistory(sport, { route });
-    const result = await buildPlayerForm(history.events, { sport, route, teamId, cutoff, count });
-    res.setHeader('Cache-Control', result.errors.length || result.status !== 'available' ? 'no-store' : 'public, s-maxage=900');
-    res.json({ ...result, historyUpdatedAt: history.updatedAt, updateSource: history.runtimeData });
+    const currentDescriptive = view === 'latest';
+    if (currentDescriptive) cutoff = new Date().toISOString();
+    const query = { sport, route, teamId, cutoff, count, currentDescriptive };
+    const recent = currentDescriptive ? await loadRecentPlayerMatches(history.events, query) : null;
+    const result = await buildPlayerForm(recent?.events || history.events, query);
+    res.setHeader('Cache-Control', result.errors.length || result.status !== 'available' || recent?.coverage?.status === 'fallback' ? 'no-store' : `public, s-maxage=${currentDescriptive ? 60 : 900}`);
+    res.json({ ...result, historyUpdatedAt: history.updatedAt, updateSource: history.runtimeData, ...(recent ? { recentHistory: { ...recent, events: undefined } } : {}) });
   } catch { return failure(res, 503, 'Historia do analizy zawodników jest niedostępna lub uszkodzona'); }
 }

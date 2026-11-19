@@ -365,3 +365,19 @@ test('public football form and its shared cache accept exact final roster-only s
   const missingLoad = createSummaryLoader({ fetchImpl: async () => { missing++; return noProof; } });
   await missingLoad(url); await missingLoad(url); assert.equal(missing, 2);
 });
+
+test('current descriptive form includes a freshly completed game without changing historical availability', async () => {
+  const recent = match('100010', 10, { startTime: '2026-01-10T06:00:00.000Z', resultAvailableAt: '2026-01-11T06:00:00.000Z' });
+  const future = match('100011', 11);
+  assert.equal(selectPreviousMatches([recent, future], query).length, 0);
+  assert.deepEqual(selectPreviousMatches([recent, future], { ...query, currentDescriptive: true }).map(row => row.id), [recent.id]);
+  const valid = bound(summary([group('1', [category([athlete('10', 'Current Player', ['23', '4', '5'])])])]), recent);
+  const result = await buildPlayerForm([recent, future], { ...query, currentDescriptive: true }, { fetchSummary: async () => valid });
+  assert.equal(result.view, 'latest');
+  assert.equal(result.modelExperimentEligible, false);
+  assert.equal(result.players[0].metrics.PTS.observations[0].matchId, recent.id);
+  const unfinished = structuredClone(valid); unfinished.header.competitions[0].status.type = { state: 'in', completed: false };
+  const rejected = await buildPlayerForm([recent], { ...query, currentDescriptive: true }, { fetchSummary: async () => unfinished });
+  assert.equal(rejected.status, 'unavailable');
+  assert.deepEqual(rejected.players, []);
+});

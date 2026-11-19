@@ -40,9 +40,16 @@ export function playerFormHTML(data, name, options = {}) {
   const metric = player.metrics[metricKey];
   const observations = Array.isArray(metric.observations) ? metric.observations : [];
   const validDates = observations.map(row => row.date).filter(value => Number.isFinite(Date.parse(value))).sort();
+  const latestDate = validDates.at(-1);
+  const latestTeamDate = (data.attemptedMatches || []).map(row => row.date).filter(value => Number.isFinite(Date.parse(value))).sort().at(-1);
+  const newerTeamMatch = latestTeamDate && latestDate && Date.parse(latestTeamDate) > Date.parse(latestDate);
   return `<section class="panel player-explorer" data-player-explorer data-team-id="${esc(data.teamId)}" data-event-id="${esc(options.eventId || '')}">
     <div class="pe-team">${esc(name)}</div><div class="pe-controls"><label>Zawodnik<select data-player-inspector>${players.map(p => `<option value="${esc(p.id)}" ${p.id === player.id ? 'selected' : ''}>${esc(p.name)} · ${esc(p.games)} występów</option>`).join('')}</select></label><label>Statystyka<select data-player-metric>${metrics.map(([key, value]) => `<option value="${esc(key)}" ${key === metricKey ? 'selected' : ''}>${esc(value.label || key)}</option>`).join('')}</select></label></div>
     <div class="player-identity pe-identity">${playerPhotoHTML(player, data.sport)}<div><h4>${esc(player.name)}</h4><span class="small">${esc(metric.label || metricKey)} · ${esc(metric.sample)} wcześniejszych występów</span></div></div>
+    <p class="pe-latest">Ostatni dostępny występ w tej lidze: <b>${latestDate ? esc(date(latestDate)) : 'brak potwierdzonej statystyki'}</b></p>
+    ${data.view === 'latest' ? `<p class="small pe-freshness">Bieżąca forma · odczyt ${esc(new Date(data.fetchedAt).toLocaleString('pl-PL'))}. Nie jest to stan sprzed wybranego meczu.</p>` : ''}
+    ${newerTeamMatch ? `<p class="small pe-coverage">Nowszy mecz drużyny: ${esc(date(latestTeamDate))}. Brak potwierdzonej statystyki tego gracza z tego spotkania; nie wpisujemy zera.</p>` : ''}
+    ${data.recentHistory?.coverage?.status === 'fallback' ? '<p class="small pe-coverage">Nie udało się sprawdzić nowszych meczów. Powyższa data dotyczy ostatniego dostępnego występu, nie potwierdza pełnej aktualności historii.</p>' : ''}
     <div class="pe-stats"><div><span>Średnia</span><b>${decimal(metric.average)}</b></div><div><span>Ostatnie 5</span><b>${decimal(metric.last5Average)}</b></div><div><span>Mediana</span><b>${decimal(metric.median)}</b></div></div>
     ${playerMetricChartHTML(metric, { label: `${player.name} — ${metric.label || metricKey}` })}
     <p class="small pe-dates">${validDates.length ? `${esc(date(validDates[0]))} — ${esc(date(validDates.at(-1)))}. ` : ''}Każdy słupek to rzeczywisty występ; brak danych nie jest zerem. Historia nie potwierdza przyszłego składu.</p>

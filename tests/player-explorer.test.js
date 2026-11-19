@@ -62,3 +62,15 @@ test('missing observations show chart unavailability while an actual zero remain
   assert.match(available, /class="pc-bar"[^>]*height="0"/);
   assert.deepEqual(values(available), [0]);
 });
+
+test('profile labels the latest available outing and warns about a newer team game or stale schedule', () => {
+  const data = fixture();
+  data.view = 'latest'; data.fetchedAt = '2024-11-04T12:00:00.000Z';
+  data.attemptedMatches = [{ date: '2024-11-03T12:00:00.000Z' }];
+  data.recentHistory = { coverage: { status: 'fallback' } };
+  const html = playerFormHTML(data, 'Test Team');
+  assert.match(html, /Ostatni dostępny występ w tej lidze: <b>2\.11\.2024<\/b>/);
+  assert.match(html, /Nie jest to stan sprzed wybranego meczu/);
+  assert.match(html, /Nowszy mecz drużyny: 3\.11\.2024/);
+  assert.match(html, /nie potwierdza pełnej aktualności historii/);
+});

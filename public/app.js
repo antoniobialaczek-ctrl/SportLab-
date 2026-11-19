@@ -80,10 +80,10 @@ function cutoffFor(event) {
   return time.toISOString();
 }
 function previewKey(event) { return `${event.id}:${cutoffFor(event)}`; }
-function playerCutoffFor(event) { if (event.route === 'soccer/usa.1') return cutoffFor(event); return new Date(Math.floor(Date.parse(cutoffFor(event)) / 900000) * 900000).toISOString(); }
+function playerCutoffFor() { return new Date(Math.floor(viewAsOf / 300000) * 300000).toISOString(); }
 function playerKey(event, teamId) { return `${event.route}:${teamId}:${playerCutoffFor(event)}`; }
 function playerEntryFresh(entry) {
-  return entry?.data && Number.isFinite(Date.parse(entry.data.fetchedAt)) && Date.now() - Date.parse(entry.data.fetchedAt) < 15 * 60000;
+  return entry?.data && Number.isFinite(Date.parse(entry.data.fetchedAt)) && Date.now() - Date.parse(entry.data.fetchedAt) < 5 * 60000;
 }
 function renderPlayerPickNode(node, data, event) {
   const key = `${event.id}:${data.teamId}`, drafts = playerDrafts.get(key) || new Map();
@@ -178,7 +178,7 @@ function requestPlayerForm(event, teamId, signal) {
   if (playerEntryFresh(existing)) return Promise.resolve(existing.data);
   const entry = { status: 'loading', ...(existing?.data ? { data: existing.data } : {}) };
   playerForms.set(key, entry);
-  const params = new URLSearchParams({ sport: event.sport, route: event.route, teamId, cutoff: playerCutoffFor(event), count: '10' });
+  const params = new URLSearchParams({ sport: event.sport, route: event.route, teamId, cutoff: playerCutoffFor(event), count: '10', view: 'latest' });
   entry.promise = json(`/api/player-form?${params}`, signal).then(data => {
     entry.status = 'ready'; entry.data = data; delete entry.promise; updatePlayerViews(event); return data;
   }).catch(error => { entry.status = signal?.aborted ? 'idle' : 'error'; delete entry.promise; updatePlayerViews(event); throw error; });
@@ -412,9 +412,9 @@ async function detail(id, button) {
   lastDetailButton = button; $('modal').classList.add('on'); $('close').focus();
   $('mtitle').textContent = `${event.home} — ${event.away}`;
   $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p>
-    ${event.sport !== 'tennis' ? `<section class="player-analysis-section"><h3>Zawodnicy — forma i wykresy</h3><p class="small">Wybierz zawodnika i statystykę. Wykres pokazuje jego wcześniejsze występy, także gdy nie ma aktywnego typu.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div></section>` : ''}
+    ${event.sport !== 'tennis' ? `<section class="player-analysis-section"><h3>Zawodnicy — forma i wykresy</h3><p class="small">Aktualna historia zawodników w tej lidze, również po wybraniu starszego meczu. Wybierz gracza i statystykę; data ostatniego dostępnego występu jest podana przy profilu.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div></section>` : ''}
     <div id="betting-detail"><p class="small">Porównywanie wyniku i sumy punktów…</p></div>
-    ${event.sport !== 'tennis' ? `<section class="match-player-picks"><h3>Typy na zawodników</h3><p class="small">Linie źródłowe lub analityczne porównane z wcześniejszymi występami. Sprawdź ofertę i dostępność zawodnika przed decyzją.</p><div class="analysis-sides"><div id="player-picks-home"><h4>${esc(event.home)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Poniżej pozostaje analiza archiwalna.'}</p></div><div id="player-picks-away"><h4>${esc(event.away)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Poniżej pozostaje analiza archiwalna.'}</p></div></div></section>` : ''}
+    ${event.sport !== 'tennis' ? `<section class="match-player-picks"><h3>Typy na zawodników</h3><p class="small">Linie źródłowe lub analityczne porównane z wcześniejszymi występami. Sprawdź ofertę i dostępność zawodnika przed decyzją.</p><div class="analysis-sides"><div id="player-picks-home"><h4>${esc(event.home)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Powyżej pozostaje aktualny profil zawodnika.'}</p></div><div id="player-picks-away"><h4>${esc(event.away)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Powyżej pozostaje aktualny profil zawodnika.'}</p></div></div></section>` : ''}
     <div id="availability"><p class="small">Sprawdzanie dostępności zawodników…</p></div>
     <details class="panel detail-section"><summary>Pełna forma drużyn i bezpośrednie spotkania</summary><div id="match-detail"><p>Wczytywanie porównania…</p></div></details>
     <details class="panel detail-section"><summary>Kursy i linie ze źródła</summary><div id="source-odds"></div></details>

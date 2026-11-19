@@ -175,14 +175,15 @@ export function createSummaryLoader({ fetchImpl = fetchJSON, clock = Date.now, t
 const defaultSummaryLoader = createSummaryLoader();
 
 /** Retrospective, descriptive form only. A missing match/statistic is never 0. */
-export function selectPreviousMatches(events, { sport, route, teamId, cutoff, count = 10 }) {
+export function selectPreviousMatches(events, { sport, route, teamId, cutoff, count = 10, currentDescriptive = false }) {
   const before = Date.parse(cutoff);
   if (!Number.isFinite(before) || !Number.isInteger(count) || count < 1 || count > 10) throw new Error('Nieprawidłowy zakres formy zawodników');
   const unique = new Map();
   for (const event of events) {
     if (event.sport !== sport || event.route !== route || event.status !== 'completed'
       || (event.homeId !== teamId && event.awayId !== teamId)
-      || !(Date.parse(event.startTime) < before) || !(Date.parse(event.resultAvailableAt) < before)) continue;
+      || !(Date.parse(event.startTime) < before) || !Number.isFinite(Date.parse(event.resultAvailableAt))
+      || (!currentDescriptive && !(Date.parse(event.resultAvailableAt) < before))) continue;
     if (!unique.has(event.id)) unique.set(event.id, event);
   }
   return [...unique.values()].sort((a, b) => b.startTime.localeCompare(a.startTime) || a.id.localeCompare(b.id)).slice(0, count);
@@ -272,6 +273,7 @@ export function aggregatePlayerForm(records, { sport, teamId, limit = 10 }) {
 export async function buildPlayerForm(events, query, { fetchSummary = defaultSummaryLoader, now = () => new Date().toISOString() } = {}) {
   const { sport, route, teamId, cutoff, count = 10 } = query;
   const base = { sport, route, teamId, cutoff, requestedMatches: count, source: 'ESPN — zakończone mecze', fetchedAt: now(),
+    view: query.currentDescriptive ? 'latest' : 'history', modelExperimentEligible: false,
     note: 'Średnie i mediany dotyczą wyłącznie dostępnych występów w ostatnich zapisanych meczach. Dane są opisowe; nie potwierdzają przyszłego składu ani udziału zawodnika. Boxscore pobrano obecnie i nie odtwarza on archiwalnego stanu informacji przed dawnym meczem. Brak występu lub statystyki nie jest zerem.' };
   if (!DEFINITIONS[sport]) return { ...base, status: 'unavailable', reason: sport === 'tennis' ? 'Formę tenisistów pokazuje analiza ich wcześniejszych spotkań.' : 'Brak porównywalnego źródła statystyk zawodników.', availableHistoryMatches: 0, successfulMatches: 0, sampledMatches: [], attemptedMatches: [], players: [], primaryMetric: null, errors: [] };
   const matches = selectPreviousMatches(events, { ...query, count });
