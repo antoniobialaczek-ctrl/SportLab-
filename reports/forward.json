@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-18T20:59:59.423Z",
+  "generatedAt": "2026-11-19T01:20:48.627Z",
   "kind": "prospective",
   "modelVersion": "3.2.0",
   "validation": {
@@ -39,9 +39,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 9,
             "settled": 0,
-            "pending": 0,
+            "pending": 9,
             "void": 0,
             "frozenAt": null
           },
@@ -156,9 +156,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 1,
             "settled": 0,
-            "pending": 0,
+            "pending": 1,
             "void": 0,
             "frozenAt": null
           },
@@ -195,9 +195,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 1,
             "settled": 0,
-            "pending": 0,
+            "pending": 1,
             "void": 0,
             "frozenAt": null
           },
@@ -273,9 +273,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 1,
             "settled": 0,
-            "pending": 0,
+            "pending": 1,
             "void": 0,
             "frozenAt": null
           },
@@ -507,9 +507,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 2,
             "settled": 0,
-            "pending": 0,
+            "pending": 2,
             "void": 0,
             "frozenAt": null
           },
@@ -546,9 +546,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 4,
             "settled": 0,
-            "pending": 0,
+            "pending": 4,
             "void": 0,
             "frozenAt": null
           },
@@ -579,9 +579,9 @@
     ]
   },
   "audit": {
-    "verified": 0,
+    "verified": 18,
     "legacyResearch": 43,
-    "checkedAt": "2026-11-18T20:59:59.423Z"
+    "checkedAt": "2026-11-19T01:20:48.627Z"
   },
   "note": "Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.",
   "sports": {
@@ -597,10 +597,10 @@
         ]
       },
       "samples": {
-        "recorded": 16,
+        "recorded": 25,
         "settled": 0,
         "hiddenTestResults": 0,
-        "pending": 16,
+        "pending": 25,
         "void": 0
       },
       "metrics": null,
@@ -618,10 +618,10 @@
             ]
           },
           "samples": {
-            "recorded": 16,
+            "recorded": 25,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 16,
+            "pending": 25,
             "void": 0
           },
           "metrics": null,
@@ -687,16 +687,80 @@
         ]
       },
       "samples": {
-        "recorded": 0,
+        "recorded": 3,
         "settled": 0,
         "hiddenTestResults": 0,
-        "pending": 0,
+        "pending": 3,
         "void": 0
       },
       "metrics": null,
       "baselineMetrics": null,
       "finalTestMetrics": null,
-      "leagues": []
+      "leagues": [
+        {
+          "route": "soccer/esp.1",
+          "league": "esp.1",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 1,
+            "settled": 0,
+            "hiddenTestResults": 0,
+            "pending": 1,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        },
+        {
+          "route": "soccer/ger.1",
+          "league": "ger.1",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 1,
+            "settled": 0,
+            "hiddenTestResults": 0,
+            "pending": 1,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        },
+        {
+          "route": "soccer/fra.1",
+          "league": "fra.1",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 1,
+            "settled": 0,
+            "hiddenTestResults": 0,
+            "pending": 1,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        }
+      ]
     },
     "tennis": {
       "sport": "tennis",
@@ -710,11 +774,11 @@
         ]
       },
       "samples": {
-        "recorded": 12,
+        "recorded": 18,
         "settled": 0,
         "hiddenTestResults": 0,
-        "pending": 8,
-        "void": 4
+        "pending": 12,
+        "void": 6
       },
       "metrics": null,
       "baselineMetrics": null,
@@ -731,11 +795,11 @@
             ]
           },
           "samples": {
-            "recorded": 4,
+            "recorded": 6,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 3,
-            "void": 1
+            "pending": 4,
+            "void": 2
           },
           "metrics": null,
           "baselineMetrics": null,
@@ -752,11 +816,11 @@
             ]
           },
           "samples": {
-            "recorded": 8,
+            "recorded": 12,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 5,
-            "void": 3
+            "pending": 8,
+            "void": 4
           },
           "metrics": null,
           "baselineMetrics": null,
