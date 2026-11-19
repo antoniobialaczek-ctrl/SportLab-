@@ -1,0 +1,32 @@
+{
+  "verifiedAt": "2026-11-19T20:34:40.350068+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_3CcradUBw4xAvPoVKFUpJAeTcBDz",
+  "sourceCommit": "7f07ab671aeed764d65445552ad249ec120925b3",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44599371329",
+  "automatedTests": 288,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "playerNames": [
+      "Antoine Griezmann",
+      "Iván Angulo"
+    ],
+    "playerCount": 10,
+    "availableMetrics": [
+      "G",
+      "A",
+      "SH"
+    ],
+    "visibleCharts": true,
+    "athleteAndMetricSelection": true,
+    "noExtraFetchOnSelection": true,
+    "mainPlayerTab": true,
+    "desktop": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "runtimeErrorsDuringVerification": 0,
+  "frozenScientificSourcesChanged": false,
+  "futureProbabilitiesPublished": false,
+  "paidServicesAdded": false
+}
