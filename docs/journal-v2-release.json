@@ -1,0 +1,30 @@
+{
+  "verifiedAt": "2026-11-19T15:28:19.746614+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "sourceCommit": "fda2ffae730d5472ba7b1affdb6ce01e356191a5",
+  "productionDeploymentId": "dpl_G6Wkb3BtaU6qgamTcB276s7de5PJ",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44543599903",
+  "automatedTests": 268,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "playerPickSave": true,
+    "totalPickSave": true,
+    "exactCustomLine": true,
+    "typedLineSurvivesPriceRefresh": true,
+    "settlementFixture": "basketball/nba:401910007",
+    "actualStatValue": 34,
+    "settledStatus": "won",
+    "realFinalStatSettlement": true,
+    "privatePriceAndStakeStayLocal": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "settlementTestEntrySyntheticAndDeviceLocal": true,
+  "settlementFactsFromActualFinalBoxscore": true,
+  "legacyV1Preserved": true,
+  "missingPlayerStatsRemainPending": true,
+  "changedValuesExcludedFromStatistics": true,
+  "personalJournalIsModelPerformance": false,
+  "frozenScientificSourcesChanged": false,
+  "paidServicesAdded": false
+}
