@@ -18,6 +18,7 @@ const fixtureIdPattern = event => separateSource(event) ? /^tsdb-\d{4,14}$/ : /^
 const participantIdPattern = event => separateSource(event) ? /^tsdb-\d{1,14}$/ : /^\d{1,14}$/;
 function totalConfiguration(event) {
   if (event.sport === 'nba') return { market: 'total_points', scope: 'including_overtime', unit: 'pkt', labelUnit: 'punktu', minimum: 1.5, maximum: 599.5, defaultLine: null, settlement: 'z dogrywką' };
+  if (event.sport === 'nhl' && event.route === 'hockey/nhl') return { market: 'total_goals', scope: 'including_overtime_shootout', unit: 'gola', labelUnit: 'gola', minimum: 0.5, maximum: 25.5, defaultLine: 5.5, settlement: 'wynik końcowy z dogrywką i karnymi' };
   if (regulationTotals(event)) return { market: 'total_goals', scope: 'regulation_90', unit: 'gola', labelUnit: 'gola', minimum: 0.5, maximum: 15.5, defaultLine: 2.5, settlement: '90 minut' };
   return null;
 }
@@ -52,8 +53,8 @@ function observations(form, event, cutoff, now) {
       || separateSource(event) && row.sourceEventId !== row.id.slice(event.route.length + 1)
       || row.id === event.id || seen.has(row.id)
       || row.route !== event.route || !timestamp(row.date) || Date.parse(row.date) >= cutoff
-      || ![row.scoreFor, row.scoreAgainst].every(value => integer(value) && value <= (separateSource(event) ? 30 : 300))
-      || event.sport === 'nba' && row.scoreFor === row.scoreAgainst) return null;
+      || ![row.scoreFor, row.scoreAgainst].every(value => integer(value) && value <= (separateSource(event) || event.sport === 'nhl' ? 30 : 300))
+      || ['nba', 'nhl'].includes(event.sport) && row.scoreFor === row.scoreAgainst) return null;
     seen.add(row.id);
     rows.push({ id: row.id, matchId: row.id, date: row.date, total: row.scoreFor + row.scoreAgainst,
       scoreFor: row.scoreFor, scoreAgainst: row.scoreAgainst, opponent: row.opponent || '' });
@@ -151,10 +152,11 @@ function observedMarkets(options, event) {
   const winners = winnerQuote ? sides.map(side => ({ kind: 'result', market: 'winner', side, scope: winnerQuote.scope })) : [];
   const winnerPrices = winners.length && winners.every(pick => matchPickQuote(options.oddsData, event, pick, options).status === 'matched')
     ? `<div class="observed-market"><span class="small">Rynek wyniku — odczyt źródła</span><div class="observed-price-options">${winners.map(pick => `<div><span>${esc(pick.side === 'home' ? event.home : pick.side === 'away' ? event.away : 'Remis')}</span>${pickOddsHTML(options.oddsData, event, pick, options)}</div>`).join('')}</div></div>` : '';
-  const totalQuote = quotes.find(quote => quote?.market === 'total_points' && quote.scope === 'including_overtime');
-  const totalPicks = totalQuote ? ['over', 'under'].map(direction => ({ kind: 'total', market: 'total_points', direction, line: totalQuote.line, scope: totalQuote.scope })) : [];
+  const config = totalConfiguration(event);
+  const totalQuote = config && quotes.find(quote => quote?.market === config.market && quote.scope === config.scope);
+  const totalPicks = totalQuote ? ['over', 'under'].map(direction => ({ kind: 'total', market: config.market, direction, line: totalQuote.line, scope: totalQuote.scope })) : [];
   const totalPrices = totalPicks.length && totalPicks.every(pick => matchPickQuote(options.oddsData, event, pick, options).status === 'matched')
-    ? `<div class="observed-market"><span class="small">Linia z odczytu źródła: ${number(totalQuote.line)} pkt</span><div class="observed-price-options">${totalPicks.map(pick => `<div><span>${pick.direction === 'over' ? 'Powyżej' : 'Poniżej'} ${number(pick.line)}</span>${pickOddsHTML(options.oddsData, event, pick, options)}</div>`).join('')}</div><button type="button" data-use-source-line data-odds-event="${esc(event.id)}" data-line="${totalQuote.line}">Porównaj typ dla tej linii</button></div>` : '';
+    ? `<div class="observed-market"><span class="small">Linia z odczytu źródła: ${number(totalQuote.line)} ${config.unit}</span><div class="observed-price-options">${totalPicks.map(pick => `<div><span>${pick.direction === 'over' ? 'Powyżej' : 'Poniżej'} ${number(pick.line)}</span>${pickOddsHTML(options.oddsData, event, pick, options)}</div>`).join('')}</div><button type="button" data-use-source-line data-odds-event="${esc(event.id)}" data-line="${totalQuote.line}">Porównaj typ dla tej linii</button></div>` : '';
   return { winnerPrices, totalPrices };
 }
 
@@ -174,8 +176,8 @@ export function matchPicksHTML(analysis, event, options = {}) {
   const totalPrices = matchedTotals ? `<div class="total-odds-grid">${totalSelections.map(pick => `<div><span>${pick.direction === 'over' ? 'Powyżej' : 'Poniżej'} ${number(pick.line)}</span>${pickOddsHTML(options.oddsData, event, pick, options)}</div>`).join('')}</div>` : '';
   const lineExplanation = totals?.lineOrigin === 'source' ? 'Porównujesz dokładną linię z odczytu źródła; sprawdź jej dostępność przed decyzją.'
     : totals?.lineOrigin === 'manual' ? 'Porównujesz własną linię.'
-      : config?.defaultLine != null ? 'Stała linia analityczna 2,5 gola nie jest wybierana pod wcześniejszą trafność ani pobierana z oferty.'
+      : config?.defaultLine != null ? `Stała linia analityczna ${number(config.defaultLine)} gola nie jest wybierana pod wcześniejszą trafność ani pobierana z oferty.`
         : 'Linia analityczna jest najbliższą połówką średniej wcześniejszych sum; nie jest linią pobraną z oferty.';
-  const scopeExplanation = regulationTotals(event) ? '90 minut, bez dogrywki i karnych' : 'wynik końcowy NBA z dogrywką';
+  const scopeExplanation = regulationTotals(event) ? '90 minut, bez dogrywki i karnych' : event.sport === 'nhl' ? 'oficjalny wynik końcowy NHL z dogrywką; po karnych zawiera jeden gol przypisany zwycięzcy, nie sumę trafionych karnych. To nie jest rynek 60 minut ani suma bez karnych' : 'wynik końcowy NBA z dogrywką';
   return `<section class="match-picks"><h3>Wynik czy suma ${totalName}?</h3>${best}<div class="match-market-grid"><section class="match-market-option"><h4>Wynik</h4>${winner ? `<div class="pick-title-row"><p><b>${esc(winner.label)}</b></p>${pickOddsHTML(options.oddsData, event, winner, options)}</div>${supportHTML(winner, event)}` : `<p class="small">Forma nie wskazuje wyraźnie jednej strony na rynku wyniku.</p>${sourceMarkets.winnerPrices}`}</section><section class="match-market-option"><h4>Suma ${totalName}</h4>${totals ? `<p><b>${total ? esc(total.label) : `Linia ${number(totals.line)} ${unit} — kierunek nierozstrzygnięty`}</b></p>${total ? pickOddsHTML(options.oddsData, event, total, options) : ''}<p class="small">${esc(event.home)}: powyżej ${totals.home.over}/${totals.home.sample}, poniżej ${totals.home.under}/${totals.home.sample}.<br>${esc(event.away)}: powyżej ${totals.away.over}/${totals.away.sample}, poniżej ${totals.away.under}/${totals.away.sample}.</p><p class="small">${totals.uniqueSample} różnych spotkań. Średnia ich sum: ${number(totals.referenceAverage)} ${unit}.</p>${totalPrices}` : '<p class="small">Sumy są dostępne dla NBA i potwierdzonych wyników 90 minut Ekstraklasy i MLS.</p>'}</section></div>${totals ? `<p class="small">${lineExplanation} Zakres: ${scopeExplanation}.</p><form data-match-line><label>Twoja linia sumy ${totalName}<input name="totalLine" type="text" inputmode="decimal" value="${number(totals.line)}" required></label><button type="submit">Porównaj linię</button><p data-match-line-result class="small" role="status"></p></form>` : ''}<details><summary>Jak porównujemy rynki?</summary><p class="small">${esc(data.note)} Wyróżniamy kierunek mający większe poparcie w słabszej z dwóch historii, a przy remisie porównujemy oba bilanse łącznie. To porównanie opisowe, nie porównanie zysku lub kursów.</p></details></section>`;
 }

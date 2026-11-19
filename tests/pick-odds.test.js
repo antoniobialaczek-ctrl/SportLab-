@@ -120,3 +120,11 @@ test('source record metadata does not claim bookmaker freshness and rejects futu
     assert.equal(match(data([{ ...milestone, sourceRecordUpdatedAt: record }]), player).status, 'unavailable');
   }
 });
+
+test('NHL total-goal selections match only the same line and official final-score settlement scope', () => {
+  const fixture = { ...event, sport: 'nhl', route: 'hockey/nhl', id: 'hockey/nhl:401910007' };
+  const pick = { kind: 'total', market: 'total_goals', line: 5.5, direction: 'over', scope: 'including_overtime_shootout' };
+  const value = { ...data([quote('total_goals', { line: 5.5, scope: pick.scope })]), fixtureId: fixture.id, sport: 'nhl', route: fixture.route };
+  assert.equal(match(value, pick, fixture).decimal, 1.91);
+  for (const change of [{ scope: 'including_overtime_excluding_shootout' }, { scope: 'including_overtime' }, { scope: 'regulation_90' }, { line: 6.5 }]) assert.equal(match(value, { ...pick, ...change }, fixture).status, 'unavailable');
+});

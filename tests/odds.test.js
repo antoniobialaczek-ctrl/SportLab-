@@ -155,3 +155,21 @@ test('odds API validates all bindings before source access and handles missing s
   assert.deepEqual(unavailable.body.quotes, []); assert.equal(unavailable.headers['Cache-Control'], 'no-store');
   assert.equal(fetch.mock.callCount(), 1);
 });
+
+test('NHL total-goal prices require an explicit full overtime and shootout scope at the exact line', () => {
+  const nhl = { ...fixture, sport: 'nhl', route: 'hockey/nhl', id: 'hockey/nhl:401910007' };
+  const data = withTotals(), row = data.pickcenter[0]; row.overUnder = 5.5;
+  row.total.displayName = 'Total (including overtime and shootouts)';
+  row.total.over.close.line = 'o5.5'; row.total.under.close.line = 'u5.5';
+  const result = extractOdds(data, nhl, { now }); const total = result.quotes.find(q => q.market === 'total_goals');
+  assert.equal(total.line, 5.5); assert.equal(total.scope, 'including_overtime_shootout');
+  assert.deepEqual(total.outcomes.map(q => q.direction), ['over', 'under']);
+  const html = oddsHTML(result, { ...nhl, date: nhl.startTime, home: 'A', away: 'B', state: 'pre' });
+  assert.match(html, /5,5 gola/); assert.doesNotMatch(html, /5,5 pkt/);
+  for (const label of ['Total', 'Total (including overtime)', 'Total (including overtime excluding shootouts)', 'Total first period (including overtime and shootouts)', 'Team total (including overtime and shootouts)']) {
+    row.total.displayName = label;
+    assert.ok(!extractOdds(data, nhl, { now }).quotes.some(q => q.market === 'total_goals'));
+  }
+  row.total.displayName = 'Total (including overtime and shootouts)'; row.total.under.close.line = 'u6.5';
+  assert.ok(!extractOdds(data, nhl, { now }).quotes.some(q => q.market === 'total_goals'));
+});

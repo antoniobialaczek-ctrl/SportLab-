@@ -23,6 +23,7 @@ function scopeFor(market, sport) {
   const label = clean(market?.displayName) || '';
   if (sport === 'football' && /\b90\s*(?:minutes|minut|min)\b/i.test(label)) return 'regulation_90';
   if (sport === 'nba' && /\b(?:including|incl\.?)\s+overtime\b/i.test(label)) return 'including_overtime';
+  if (sport === 'nhl' && /\b(?:excluding|excl\.?|without)\s+(?:the\s+)?shootouts?\b/i.test(label)) return 'unknown';
   if (sport === 'nhl' && /\b(?:including|incl\.?)\s+overtime\b/i.test(label) && /\bshootouts?\b/i.test(label)) return 'including_overtime_shootout';
   return 'unknown';
 }
@@ -149,21 +150,25 @@ export function extractOdds(data, fixture, { now = Date.now() } = {}) {
     // Full-game NBA totals must have two actual prices at the exact same
     // half-point line. Opening lines and spread prices never fill gaps.
     const total = row?.total;
-    if (fixture.sport !== 'nba' || !total || !/^total(?:\s*\(including overtime\))?$/i.test(clean(total.displayName) || '')
+    const totalLabel = clean(total?.displayName) || '';
+    const allowedTotal = fixture.sport === 'nba' ? /^total(?:\s*\(including overtime\))?$/i.test(totalLabel)
+      : fixture.sport === 'nhl' && /^total\b/i.test(totalLabel) && scopeFor(total, 'nhl') === 'including_overtime_shootout'
+        && !/quarter|half|period|player|team\s+total|\b[1-4](?:st|nd|rd|th)\b/i.test(totalLabel);
+    if (!allowedTotal || !total
       || total.period != null || row.period != null) continue;
     const over = total.over?.close, under = total.under?.close;
     const line = halfPointLine(over?.line, 'over'), underLine = halfPointLine(under?.line, 'under');
-    if (line === null || line !== underLine || (row.overUnder != null && halfPointLine(row.overUnder, 'over') !== line)) continue;
+    if (line === null || line !== underLine || fixture.sport === 'nhl' && line > 25.5 || (row.overUnder != null && halfPointLine(row.overUnder, 'over') !== line)) continue;
     const totalOutcomes = [['over', over, row.overOdds], ['under', under, row.underOdds]].map(([direction, value, legacy]) => {
       if (!selectionMatches(value, sourceId, direction, fixture)) return null;
       const price = americanToDecimal(value?.odds);
       if (!price || (legacy != null && americanToDecimal(legacy)?.american !== price.american)) return null;
       return { side: direction, direction, line, name: direction === 'over' ? 'Powyżej' : 'Poniżej', ...price };
     });
-    if (totalOutcomes.every(Boolean)) addQuote(row, total, provider, 'total_points', totalOutcomes, line);
+    if (totalOutcomes.every(Boolean)) addQuote(row, total, provider, fixture.sport === 'nhl' ? 'total_goals' : 'total_points', totalOutcomes, line);
   }
   base.quotes = quotes.filter(row => !conflicting.has(row.key)).slice(0, 10).map(row => row.quote);
-  for (const market of ['winner', 'total_points']) if (!base.quotes.some(quote => quote.market === market)) base.unavailableMarkets.push({ market, reason: 'Źródło nie dostarcza pełnej, jednoznacznej ceny dla tego rynku.' });
+  for (const market of ['winner', fixture.sport === 'nhl' ? 'total_goals' : 'total_points']) if (!base.quotes.some(quote => quote.market === market)) base.unavailableMarkets.push({ market, reason: 'Źródło nie dostarcza pełnej, jednoznacznej ceny dla tego rynku.' });
   return base.quotes.length ? { ...base, status: 'available', reason: 'Źródło udostępniło odczyt kursów. Sprawdź zakres rynku i czas aktualizacji poniżej.' }
     : unavailable('Źródło nie udostępniło pełnego, jednoznacznego rynku dla tego spotkania. Kurs można wpisać ręcznie w dzienniku.');
 }

@@ -58,8 +58,8 @@ function oddsFor(event) { return fixtureDetails.get(event.id)?.data?.odds || nul
 function marketOptions(event) {
   const oddsData = oddsFor(event);
   if (matchLines.has(event.id)) return { totalLine: matchLines.get(event.id), oddsData };
-  const sourceLine = oddsData?.quotes?.find(quote => quote?.market === 'total_points' && quote.scope === 'including_overtime'
-    && ['over', 'under'].every(direction => matchPickQuote(oddsData, event, { kind: 'total', market: 'total_points', scope: quote.scope, line: quote.line, direction }).status === 'matched'));
+  const sourceLine = oddsData?.quotes?.find(quote => quote?.market === (event.sport === 'nhl' ? 'total_goals' : 'total_points') && quote.scope === (event.sport === 'nhl' ? 'including_overtime_shootout' : 'including_overtime')
+    && ['over', 'under'].every(direction => matchPickQuote(oddsData, event, { kind: 'total', market: quote.market, scope: quote.scope, line: quote.line, direction }).status === 'matched'));
   return { ...(sourceLine ? { totalLine: sourceLine.line, totalLineOrigin: 'source' } : {}), oddsData };
 }
 function updateOddsNodes(event) {
@@ -276,7 +276,7 @@ function renderBetting() {
     const highlighted = rows.filter(row => row.picks.best).sort((a, b) => strength(b) - strength(a));
     const shown = (highlighted.length ? highlighted : rows).slice(0, 4);
     $('betting-summary').innerHTML = !upcoming.length ? '<p class="small">W wybranej dacie nie ma nadchodzących spotkań. Poniżej znajdziesz analizy archiwalne.</p>'
-      : `${shown.length ? `<div class="match-pick-summary-grid">${shown.map(({ event, data, options, picks }) => `<article class="match-signal-card"><div class="match-signal-header"><span class="small">${esc(event.league)} • ${esc(localDate(event.date))}</span><h3>${esc(event.home)} — ${esc(event.away)}</h3></div>${matchPicksHTML(data, event, { ...options, compact: true })}${matchChartsHTML(data, event, { line: picks.totals?.line ?? null, compact: true })}<button data-bet-id="${esc(event.id)}">${['soccer/pol.1', 'soccer/usa.1'].includes(event.route) ? 'Porównaj wynik i gole' : event.sport === 'nba' ? 'Porównaj wynik i punkty' : 'Porównaj wynik meczu'}</button></article>`).join('')}</div>` : '<p class="small">Porównywanie ostatnich wyników i sum punktów…</p>'}
+      : `${shown.length ? `<div class="match-pick-summary-grid">${shown.map(({ event, data, options, picks }) => `<article class="match-signal-card"><div class="match-signal-header"><span class="small">${esc(event.league)} • ${esc(localDate(event.date))}</span><h3>${esc(event.home)} — ${esc(event.away)}</h3></div>${matchPicksHTML(data, event, { ...options, compact: true })}${matchChartsHTML(data, event, { line: picks.totals?.line ?? null, compact: true })}<button data-bet-id="${esc(event.id)}">${event.sport === 'nhl' || ['soccer/pol.1', 'soccer/usa.1'].includes(event.route) ? 'Porównaj wynik i gole' : event.sport === 'nba' ? 'Porównaj wynik i punkty' : 'Porównaj wynik meczu'}</button></article>`).join('')}</div>` : '<p class="small">Porównywanie ostatnich wyników i sum punktów…</p>'}
       <p class="small dashboard-summary-note">${highlighted.length ? `Wyraźniejsze wskazanie z historii: ${highlighted.length} z ${upcoming.length} meczów.` : rows.length ? 'Porównaj pokazane wyniki z własną linią punktową w analizie meczu.' : 'Wczytywanie wcześniejszych spotkań…'}</p>`;
     document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
     return;
@@ -325,7 +325,7 @@ function queuePreviews(selected) {
   void Promise.all([worker(), worker(), worker()]);
 }
 function nav() {
-  document.querySelector('[data-market-view=matches]').textContent = sport === 'football' && ['pol.1', 'usa.1'].includes(league) ? 'Wynik i suma goli' : sport === 'nba' ? 'Wynik i suma punktów' : 'Wynik meczu';
+  document.querySelector('[data-market-view=matches]').textContent = sport === 'nhl' || sport === 'football' && ['pol.1', 'usa.1'].includes(league) ? 'Wynik i suma goli' : sport === 'nba' ? 'Wynik i suma punktów' : 'Wynik meczu';
   $('sports').innerHTML = Object.entries(sports).map(([key, title]) => `<button data-s="${key}" class="${key === sport ? 'active' : ''}" aria-pressed="${key === sport}">${title}</button>`).join('');
   $('leagues').innerHTML = leagues[sport].map(([key, title]) => `<button data-l="${key}" class="${key === league ? 'active' : ''}" aria-pressed="${key === league}">${title}</button>`).join('');
   $('leagues').hidden = leagues[sport].length === 1;
@@ -420,6 +420,7 @@ async function detail(id, button) {
     <details class="panel detail-section"><summary>Kursy i linie ze źródła</summary><div id="source-odds"></div></details>
     <details class="panel detail-section"><summary>Kalkulator kursu i dziennik własnych typów</summary><div id="journal-form"></div></details>
     <details id="game-boxscore" class="panel detail-section" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dodatkowe informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
+  if (event.sport === 'nhl') $('detail').insertBefore($('betting-detail'), $('detail').querySelector('.player-analysis-section'));
   journal.open(event, $('journal-form'));
   void previewRequest(event, previewController?.signal).then(data => {
     if (!controller.signal.aborted) {
@@ -521,7 +522,7 @@ document.addEventListener('click', async click => {
   }
   if (detailEvent?.id !== selected.id) return;
   const line = Number(button.dataset.line);
-  const quote = matchPickQuote(oddsFor(detailEvent), detailEvent, { kind: 'total', market: 'total_points', scope: 'including_overtime', direction: 'over', line });
+  const quote = matchPickQuote(oddsFor(detailEvent), detailEvent, { kind: 'total', market: detailEvent.sport === 'nhl' ? 'total_goals' : 'total_points', scope: detailEvent.sport === 'nhl' ? 'including_overtime_shootout' : 'including_overtime', direction: 'over', line });
   const form = $('betting-detail').querySelector('[data-match-line]');
   if (quote.status !== 'matched' || !form) {
     let message = button.parentElement.querySelector('[data-source-line-status]');
@@ -562,21 +563,20 @@ $('detail').addEventListener('submit', submit => {
     submit.preventDefault();
     const raw = String(matchForm.elements.namedItem('totalLine').value).trim();
     const line = /^\d+(?:[,.]\d+)?$/.test(raw) ? Number(raw.replace(',', '.')) : NaN;
-    const goals = ['soccer/pol.1', 'soccer/usa.1'].includes(detailEvent.route);
+    const goals = detailEvent.sport === 'nhl' || ['soccer/pol.1', 'soccer/usa.1'].includes(detailEvent.route);
+    const maximum = detailEvent.sport === 'nhl' ? 25.5 : goals ? 15.5 : 599.5;
     const output = matchForm.querySelector('[data-match-line-result]');
-    if (!Number.isFinite(line) || line < (goals ? 0.5 : 1.5) || line > (goals ? 15.5 : 599.5) || !Number.isInteger(line * 2) || Number.isInteger(line)) {
-      output.textContent = goals ? 'Wpisz linię połówkową od 0,5 do 15,5 gola.' : 'Wpisz linię połówkową, np. 224,5.'; return;
+    if (!Number.isFinite(line) || line < (goals ? 0.5 : 1.5) || line > maximum || !Number.isInteger(line * 2) || Number.isInteger(line)) {
+      output.textContent = goals ? `Wpisz linię połówkową od 0,5 do ${String(maximum).replace('.', ',')} gola.` : 'Wpisz linię połówkową, np. 224,5.'; return;
     }
     const data = previews.get(previewKey(detailEvent))?.data;
     if (!data) { output.textContent = 'Wczytaj analizę meczu przed porównaniem linii.'; return; }
     const picks = buildMatchPicks(data, detailEvent, { totalLine: line });
     if (!picks.totals) { output.textContent = picks.reason || 'Odśwież analizę przed porównaniem własnej linii.'; return; }
     matchLines.set(detailEvent.id, line);
-    $('betting-detail').innerHTML = matchPicksHTML(data, detailEvent, { totalLine: line, oddsData: oddsFor(detailEvent) }) + matchChartsHTML(data, detailEvent, { line });
-    $('betting-detail').dataset.marketStatus = picks.status;
+    updatePreviewNodes(detailEvent);
     const updated = $('betting-detail').querySelector('[data-match-line-result]');
     if (updated) updated.textContent = picks.totals ? `Porównano Twoją linię ${String(line).replace('.', ',')} z wcześniejszymi sumami ${goals ? 'goli' : 'punktów'}.` : picks.reason;
-    updatePreviewNodes(detailEvent);
     $('betting-detail').querySelector('[name=totalLine]')?.focus({ preventScroll: true });
     return;
   }

@@ -73,3 +73,44 @@ test('source names and invalid reference lines cannot inject SVG or invented num
   assert.ok(!html.includes('probability'));
   assert.deepEqual(totals(html), [210]);
 });
+
+const nhlEvent = { ...event, id: 'hockey/nhl:999999', route: 'hockey/nhl', sport: 'nhl' };
+const nhlRow = (id, date, scoreFor, scoreAgainst, extra = {}) => row(id, date, scoreFor, scoreAgainst, { id: `hockey/nhl:${id}`, route: 'hockey/nhl', ...extra });
+const nhlAnalysis = (home, away = []) => ({ ...analysis(home, away), sport: 'nhl', route: nhlEvent.route, fixtureId: nhlEvent.id });
+
+test('NHL charts show exact final-score goals on a shared goal scale, recent results and team averages', () => {
+  const home = [nhlRow('100002', 2, 4, 3), nhlRow('100001', 1, 0, 2)];
+  const away = [nhlRow('200001', 3, 5, 3)];
+  const html = matchChartsHTML(nhlAnalysis(home, away), nhlEvent, { line: 5.5 });
+  assert.deepEqual(totals(html), [2, 7, 8]);
+  assert.equal((html.match(/>10<\/text>/g) || []).length, 2);
+  assert.equal((html.match(/data-zero-baseline="true"/g) || []).length, 2);
+  assert.match(html, /Sumy goli w ostatnich meczach/);
+  assert.match(html, /4:3; suma 7 goli/);
+  assert.match(html, /Linia porównania: 5,5 gola/);
+  assert.match(html, /Gole zdobyte \/ mecz: <b>2<\/b>/);
+  assert.match(html, /stracone \/ mecz: <b>2,5<\/b>/);
+  assert.match(html, /<td>02\.01<\/td><td>Test Rival<\/td><td>4:3<\/td><td>7<\/td>/);
+  assert.ok(html.indexOf('<td>02.01</td>') < html.indexOf('<td>01.01</td>'));
+  assert.match(html, /data-score-scope="including_overtime_shootout"/);
+  assert.match(html, /Wygrana w serii karnych dodaje jeden gol/);
+  assert.match(html, /Nie są to wyniki po 60 minutach/);
+  assert.ok(!html.includes('punktów'));
+});
+
+test('NHL chart excludes tied, missing, implausible, target and future scores rather than inventing a goal', () => {
+  const rows = [nhlRow('100001', 1, 3, 2), nhlRow('100002', 2, 2, 2), nhlRow('100003', 3, 31, 2),
+    nhlRow('100004', 4, 1, 2), nhlRow('999999', 5, 4, 3), nhlRow('100005', 6, 5, 2, { date: nhlEvent.date })];
+  delete rows[3].scoreFor;
+  assert.deepEqual(totals(matchChartsHTML(nhlAnalysis(rows), nhlEvent)), [5]);
+});
+
+test('NHL compact goal charts keep settlement visible and scale expands for high actual totals', () => {
+  const value = nhlAnalysis([nhlRow('100001', 1, 8, 5)]);
+  const html = matchChartsHTML(value, nhlEvent, { compact: true });
+  assert.deepEqual(totals(html), [13]);
+  assert.match(html, />14<\/text>/);
+  assert.match(html, /Oficjalne wyniki końcowe z dogrywką i karnymi/);
+  assert.ok(!html.includes('<table>'));
+  assert.deepEqual(totals(matchChartsHTML(value, { ...nhlEvent, homeId: '3' })), []);
+});

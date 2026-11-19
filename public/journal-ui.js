@@ -19,6 +19,7 @@ function marketOptions(event) {
     ...(['soccer/pol.1', 'soccer/usa.1'].includes(event.route) ? [{ key: 'total_goals', name: 'Suma goli po 90 minutach', outcomes: [['over', 'Powyżej linii'], ['under', 'Poniżej linii']] }] : []),
   ];
   return [{ key: 'winner', name: event.sport === 'nhl' ? 'Zwycięzca z dogrywką i karnymi' : 'Zwycięzca z dogrywką', outcomes: [['home', event.home], ['away', event.away]] },
+    ...(event.sport === 'nhl' ? [{ key: 'total_goals', name: 'Suma goli — oficjalny wynik z dogrywką i karnymi', outcomes: [['over', 'Powyżej linii'], ['under', 'Poniżej linii']] }] : []),
     ...(event.sport === 'nba' ? [{ key: 'total_points', name: 'Suma punktów z dogrywką', outcomes: [['over', 'Powyżej linii'], ['under', 'Poniżej linii']] }] : [])];
 }
 
@@ -268,7 +269,7 @@ export function createJournalUI({ root, fetchJSON }) {
         if (!(stake >= 0.01 && stake <= 100)) throw new Error('Stawka musi wynosić od 0,01 do 100 jednostek.');
         const market = field('market').value;
         const selection = selected || { market, outcome: field('outcome').value,
-          ...(totalMarket(market) ? { line: inputNumber(field('line').value), scope: market === 'total_goals' ? 'regulation_90' : 'including_overtime' } : {}) };
+          ...(totalMarket(market) ? { line: inputNumber(field('line').value), scope: event.sport === 'nhl' ? 'including_overtime_shootout' : market === 'total_goals' ? 'regulation_90' : 'including_overtime' } : {}) };
         const record = createRecord(event, { ...selection, odds, stake, quotedAt: new Date(now).toISOString(), bookmaker: field('bookmaker').value.trim() }, { now });
         persist(appendRecord(journal, record));
         status.textContent = 'Zapisano Twój wybór w lokalnym dzienniku. Rozliczenie wymaga potwierdzonego wyniku lub dokładnej statystyki zawodnika. Brak danych pozostawia wpis oczekujący.';

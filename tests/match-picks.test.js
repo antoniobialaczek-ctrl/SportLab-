@@ -208,8 +208,8 @@ test('Ekstraklasa manual goal lines are bounded and stale or contradictory obser
   assert.doesNotMatch(detail, /Kurs \d|\d%|punktów|wynik końcowy NBA/);
 });
 
-test('unverified settlement sources in other football and NHL leagues do not acquire goal totals', () => {
-  for (const [sport, alternativeRoute] of [['football', 'soccer/eng.1'], ['nhl', 'hockey/nhl']]) {
+test('other football leagues do not acquire unsupported goal totals', () => {
+  for (const [sport, alternativeRoute] of [['football', 'soccer/eng.1']]) {
     const fixture = { ...event, sport, route: alternativeRoute, id: `${alternativeRoute}:999999` };
     const value = analysis(Array(10).fill(4));
     value.sport = sport; value.route = alternativeRoute; value.fixtureId = fixture.id;
@@ -252,4 +252,24 @@ test('rendering highlights the chosen historical screen, labels analytical lines
   assert.match(detail, /data-match-line/); assert.match(detail, /name="totalLine"/);
   assert.match(detail, /nie jest linią pobraną z oferty/); assert.match(detail, /Wynik czy suma punktów/);
   assert.match(matchPicksHTML(analysis(), { ...event, state: 'post' }, { now }), /betting-closed/);
+});
+
+test('NHL compares winner and official final-score goal totals at a fixed 5.5 line', () => {
+  const fixture = { ...event, sport: 'nhl', route: 'hockey/nhl', id: 'hockey/nhl:999999' };
+  const value = analysis(Array(10).fill(6), Array(10).fill(6), 10, 0);
+  value.sport = 'nhl'; value.route = fixture.route; value.fixtureId = fixture.id;
+  for (const side of ['home', 'away']) for (const row of value[side].recent) { row.id = row.id.replace(route, fixture.route); row.route = fixture.route; }
+  const result = build(value, {}, fixture);
+  assert.equal(result.totals.line, 5.5); assert.equal(result.totals.market, 'total_goals');
+  assert.equal(result.totals.scope, 'including_overtime_shootout');
+  assert.equal(result.totals.home.over, 10); assert.equal(result.totals.uniqueSample, 20);
+  assert.equal(result.candidates[0].kind, 'result'); assert.equal(result.candidates[1].kind, 'total');
+  const manual = build(value, { totalLine: 6.5 }, fixture);
+  assert.equal(manual.totals.home.under, 10); assert.equal(manual.totals.lineOrigin, 'manual');
+  const html = matchPicksHTML(value, fixture, { now });
+  assert.match(html, /Wynik czy suma goli/); assert.match(html, /Stała linia analityczna 5,5/);
+  assert.match(html, /jeden gol przypisany zwycięzcy/); assert.doesNotMatch(html, /wynik końcowy NBA/);
+  for (const totalLine of [6, 26.5, 0, NaN]) assert.equal(build(value, { totalLine }, fixture).status, 'unavailable');
+  value.home.recent[0].scoreFor = 3; value.home.recent[0].scoreAgainst = 3;
+  assert.equal(build(value, {}, fixture).status, 'unavailable');
 });

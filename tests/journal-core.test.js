@@ -230,3 +230,15 @@ test('new market imports reject contradictory grades, earlier source evidence an
     verification: { pointInTimeVerified: true, publicationEligible: true, modelVersion: 'v1' } };
   assert.equal(evaluatePrice(2, forgedForecast, { event, market: 'total_points', outcome: 'over', now: recordedAt }).modelProbability, null);
 });
+
+test('NHL goal totals settle the official final score and require matching overtime/shootout scope', () => {
+  const fixture = { ...event, sport: 'nhl', route: 'hockey/nhl', id: 'hockey/nhl:12345' };
+  const input = { market: 'total_goals', outcome: 'over', line: 4.5, scope: 'including_overtime_shootout' };
+  const record = make('record-nhlgoals', input, fixture);
+  const result = row({ id: fixture.id, sport: fixture.sport, route: fixture.route, homeScore: 3, awayScore: 2, scope: input.scope,
+    source: { provider: 'ESPN', url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261119', fetchedAt: '2026-11-20T00:30:00.000Z' } });
+  const settled = settleJournal(journal(record), [result], { now: settledAt });
+  assert.equal(settled.records[0].status, 'won'); assert.equal(settled.records[0].settlement.value, 5);
+  assert.equal(settleJournal(journal(record), [{ ...result, scope: 'including_overtime_excluding_shootout' }], { now: settledAt }).records[0].status, 'pending');
+  for (const change of [{ scope: 'regulation_90' }, { scope: 'including_overtime_excluding_shootout' }, { line: 5 }, { line: 26.5 }]) assert.throws(() => make('record-nhlgoals-bad', { ...input, ...change }, fixture));
+});
