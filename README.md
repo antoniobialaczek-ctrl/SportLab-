@@ -61,7 +61,7 @@ Więcej: [architektura](docs/architecture.md), [kontrakt danych](docs/data-contr
 
 ## Stan przygotowanej wersji
 
-Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 196 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
+Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 209 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
 
 Bieżące prawdopodobieństwa nadal są wstrzymane. Ani rozpoczęcie zbierania migawek, ani dodatni wynik badawczego testu retrospektywnego nie zastępują niezależnej walidacji przedmeczowej. CS2 pozostaje wyłączone z powodów opisanych w [audycie źródeł](docs/cs2-sources.md).
 
@@ -95,7 +95,9 @@ Pierwsze dwa nadchodzące mecze wczytują formę zawodników automatycznie; przy
 
 Dziennik działa lokalnie w tej przeglądarce, z importem i eksportem JSON. Nie ma wpłat ani wysyłania typów do bukmachera. Własne zapisy nie są niezależnie potwierdzonym rejestrem modeli. Automatyczne sprawdzenie przy wejściu i co pięć minut oraz przycisk „Sprawdź wyniki” korzystają z `/api/journal-results` i istniejącej historii. Czekają na potwierdzony wynik; brak danych nie oznacza przegranej. Korekta źródła oznacza konflikt i wyłączenie wpisu ze statystyk. Zysk, ROI i trafność odnoszą się wyłącznie do rozliczonych własnych typów, bez podatków i opłat. Anulowania i zmiany terminu wymagają dodatkowego dowodu — przy jego braku wpis pozostaje oczekujący.
 
-`/api/odds` odczytuje bezpłatne dane istniejącego ESPN API po otwarciu meczu. Dokładnie wiąże kurs z uczestnikami i terminem. Brak czasu aktualizacji lub zasad rozliczenia jest jawny; takich odczytów nie traktujemy jako aktualnej oferty i nie podstawiamy do EV ani dziennika. Nie dodano płatnej usługi ani klucza. CS2 i Ekstraklasa pozostają poza zakresem tej rozbudowy.
+Kurs jest widoczny przy konkretnym typie, jeżeli odczyt ESPN odpowiada dokładnie temu samemu meczowi, rynkowi, kierunkowi, zasadom rozliczenia i linii. `/api/details` współdzieli odczyt z analizą meczu; dotychczasowy `/api/odds` pozostaje obsługiwany. Dane nadchodzących spotkań są pobierane automatycznie z ograniczoną równoległością. Oferta źródła może być pokazana osobno także bez zgodnego sygnału w historii. Przycisk „Porównaj typ dla tej linii” przenosi odczytaną linię NBA do istniejącego porównania i wykresu. Cena z innej linii, rynku lub zawodnika nie jest podstawiana.
+
+Przy cenie widnieje dostawca i oznaczenie „odczyt”; szczegóły wyjaśniają brak potwierdzonego czasu aktualizacji źródła. Odczyt wygasa po pięciu minutach lub przy rozpoczęciu meczu. Nie oznacza potwierdzonej aktualnej oferty i nie trafia automatycznie do EV ani dziennika. Brak dopasowania jest pokazany jako „Kurs niedostępny”. Obecne darmowe źródło nie udostępnia kompletnych kursów na statystyki konkretnych zawodników; ich analizy pozostają dostępne bez wymyślonych cen. Nie dodano płatnej usługi ani klucza. CS2 i Ekstraklasa pozostają poza zakresem tej rozbudowy.
 
 Kontekst spotkania obejmuje znane obciążenie terminarza, czas od ostatniego meczu oraz wcześniejsze bilanse przeciwników mierzone przed każdym wcześniejszym spotkaniem. Kontuzje i zgłoszeni starterzy są powiązani z danym meczem; brak raportu nie oznacza zdrowego składu. Bieżące raporty są ukryte w analizach archiwalnych. Historia nie zawiera zweryfikowanych nawierzchni tenisa — nie tworzymy zastępczych oznaczeń.
 

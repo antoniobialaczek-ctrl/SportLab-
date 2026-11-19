@@ -36,12 +36,68 @@ test('real ESPN-shaped moneyline remains read-only when freshness and overtime r
   assert.ok(!JSON.stringify(result).includes('probability'));
 });
 
+function withTotals() {
+  const data = source(), row = data.pickcenter[0];
+  row.header = { text: 'Game Odds' }; row.provider = { id: '100', name: 'DraftKings' };
+  row.overUnder = 238.5; row.overOdds = -110; row.underOdds = -110;
+  row.total = { displayName: 'Total', over: { close: { line: 'o238.5', odds: '-110' }, open: { line: 'o236.5', odds: '-105' } }, under: { close: { line: 'u238.5', odds: '-110' } } };
+  return data;
+}
+
+test('NBA full-game source totals retain exact lines and both actual prices, independently of winner prices', () => {
+  const result = extract(withTotals()), total = result.quotes.find(row => row.market === 'total_points');
+  assert.equal(result.quotes.find(row => row.market === 'winner').line, null);
+  assert.equal(total.line, 238.5); assert.equal(total.scope, 'including_overtime');
+  assert.deepEqual(total.outcomes.map(row => [row.direction, row.line, row.american, row.decimal]), [['over', 238.5, -110, 1.909091], ['under', 238.5, -110, 1.909091]]);
+  assert.equal(total.scopeBasis.kind, 'provider-rules');
+  assert.equal(total.scopeBasis.provider, 'DraftKings');
+  assert.ok(total.scopeBasis.url.startsWith('https://boothillcasino.com/'));
+  assert.equal(total.usableForComparison, false);
+  assert.equal(total.freshness, 'unverified'); assert.equal(total.quotedAt, null);
+  assert.equal(total.maxObservationAgeMs, 300000);
+  assert.equal(Date.parse(total.observationValidUntil) - now, 300000);
+  assert.equal(result.unavailableMarkets.find(row => row.market === 'player_prop').market, 'player_prop');
+});
+
+test('totals never use a different line, opening price, spread or default price to fill missing data', () => {
+  for (const mutate of [row => row.total.under.close.line = 'u237.5', row => row.total.over.close.line = 'u238.5',
+    row => row.total.over.close.line = 'o238', row => row.overUnder = 236.5,
+    row => delete row.total.under.close.odds, row => row.total.over.close.odds = '1.91',
+    row => row.overOdds = -115, row => row.total.displayName = '1st Half Total',
+    row => row.total.period = 1]) {
+    const data = withTotals(); mutate(data.pickcenter[0]);
+    assert.equal(extract(data).quotes.some(row => row.market === 'total_points'), false);
+    assert.equal(extract(data).quotes.some(row => row.market === 'winner'), true);
+  }
+  const noWinner = withTotals(); delete noWinner.pickcenter[0].moneyline;
+  assert.equal(extract(noWinner).quotes[0].market, 'total_points');
+  const wrongFixture = withTotals(); wrongFixture.pickcenter[0].total.over.close.link = { tracking: { tags: { gameId: '99999', betSide: 'over', league: 'nba' } } };
+  assert.equal(extract(wrongFixture).quotes.some(row => row.market === 'total_points'), false);
+  const wrongDirection = withTotals(); wrongDirection.pickcenter[0].total.over.close.link = { tracking: { tags: { gameId: '401910007', betSide: 'under', league: 'nba' } } };
+  assert.equal(extract(wrongDirection).quotes.some(row => row.market === 'total_points'), false);
+});
+
+test('provider overtime rule is limited to documented provider identity and full-game markets, with expiring evidence', () => {
+  const valid = extract(withTotals());
+  assert.ok(valid.quotes.every(row => row.scope === 'including_overtime'));
+  for (const mutate of [row => row.provider.id = '101', row => row.provider.name = 'Other provider', row => row.header.text = 'First Half Odds', row => delete row.header]) {
+    const data = withTotals(); mutate(data.pickcenter[0]);
+    assert.ok(extract(data).quotes.every(row => row.scope === 'unknown'));
+  }
+  const laterSource = withTotals(); laterSource.header.competitions[0].date = '2027-01-01T00:00:00Z';
+  const expired = extractOdds(laterSource, { ...fixture, startTime: '2027-01-01T00:00:00Z' }, { now: Date.parse('2026-12-20T00:00:00Z') });
+  assert.ok(expired.quotes.every(row => row.scope === 'unknown'));
+  const quarter = withTotals(); quarter.pickcenter[0].moneyline.displayName = '1st Quarter Moneyline including overtime';
+  assert.equal(extract(quarter).quotes.some(row => row.market === 'winner'), false);
+});
+
 test('wrong identity, ambiguous header, team-bound prices and conflicting prices cannot expose a quote', () => {
   for (const mutate of [data => data.header.id = '99999', data => data.header.competitions.push(structuredClone(data.header.competitions[0])),
     data => data.header.competitions[0].date = '2026-11-19T01:00:00Z', data => data.header.competitions[0].competitors[0].id = '29',
     data => data.header.competitions[0].competitors[0].team.id = '99', data => data.pickcenter[0].homeTeamOdds.teamId = '29',
     data => data.pickcenter[0].homeTeamOdds.moneyLine = -250, data => delete data.pickcenter[0].provider.name,
-    data => delete data.pickcenter[0].moneyline.away.close, data => data.pickcenter[0].moneyline.home.close.odds = '1.5']) {
+    data => delete data.pickcenter[0].moneyline.away.close, data => data.pickcenter[0].moneyline.home.close.odds = '1.5',
+    data => data.pickcenter[0].moneyline.home.close.link = { tracking: { tags: { gameId: '99999' } } }]) {
     const data = source(); mutate(data); assert.equal(extract(data).quotes.length, 0);
   }
   const conflict = source(); conflict.pickcenter.push(structuredClone(conflict.pickcenter[0]));

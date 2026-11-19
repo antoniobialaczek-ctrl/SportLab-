@@ -3,6 +3,7 @@ import { ROUTES, isAllowedRoute } from '../src/data/catalog.js';
 import { fetchJSON } from '../src/data/fetch.js';
 import { failure, getOnly, scalar } from '../src/server/http.js';
 import { extractAvailability } from '../src/server/match-context.js';
+import { extractOdds } from '../src/server/odds.js';
 
 export default async function handler(req, res) {
   if (!getOnly(req, res)) return;
@@ -25,7 +26,13 @@ export default async function handler(req, res) {
     const injuries = (data.injuries || []).flatMap(t => (t.injuries || []).map(i => ({ team: t.team?.displayName || '', name: i.athlete?.displayName || '', status: i.status || '' })));
     const fetchedAt = new Date().toISOString();
     const availability = extractAvailability(data, { id, sport, fetchedAt });
-    res.setHeader('Cache-Control', 'public, s-maxage=300');
-    res.json({ players, teamStats, injuries, availability, playerAnalysis: analyzePlayers(players, sport), source: 'ESPN', fetchedAt, note: 'Statystyki opisowe. Lista kontuzji odzwierciedla stan źródła w chwili pobrania, nie historyczny stan przed meczem.' });
+    const competition = Array.isArray(data.header?.competitions) ? data.header.competitions.find(row => String(row?.id) === id) : null;
+    const home = competition?.competitors?.find?.(row => row.homeAway === 'home');
+    const away = competition?.competitors?.find?.(row => row.homeAway === 'away');
+    const odds = competition && home && away ? extractOdds(data, {
+      sport, route, id: `${route}:${id}`, homeId: String(home.id), awayId: String(away.id), startTime: competition.date,
+    }, { now: Date.parse(fetchedAt) }) : null;
+    res.setHeader('Cache-Control', odds?.status === 'available' ? 'public, s-maxage=60' : 'public, s-maxage=300');
+    res.json({ players, teamStats, injuries, availability, odds, playerAnalysis: analyzePlayers(players, sport), source: 'ESPN', fetchedAt, note: 'Statystyki opisowe. Lista kontuzji odzwierciedla stan źródła w chwili pobrania, nie historyczny stan przed meczem.' });
   } catch { return failure(res, 502, 'Nie udało się pobrać szczegółów z ESPN'); }
 }

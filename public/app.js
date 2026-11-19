@@ -7,6 +7,7 @@ import { oddsHTML } from '/odds-view.js';
 import { buildPlayerPicks, playerPicksHTML, evaluatePlayerLine } from '/player-picks.js';
 import { buildMatchPicks, matchPicksHTML } from '/match-picks.js';
 import { matchChartsHTML } from '/match-charts.js';
+import { matchPickQuote, pickOddsHTML, pickOddsContentHTML } from '/pick-odds.js';
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
 const leagues = {
   football: [['all', 'Wszystkie ligi'], ['eng.1', 'Premier League'], ['esp.1', 'La Liga'], ['ger.1', 'Bundesliga'], ['ita.1', 'Serie A'], ['fra.1', 'Ligue 1'], ['pol.1', 'Ekstraklasa'], ['uefa.champions', 'Liga Mistrzów'], ['uefa.europa', 'Liga Europy'], ['eng.2', 'Championship'], ['ned.1', 'Eredivisie'], ['por.1', 'Portugalia']],
@@ -25,6 +26,8 @@ const previews = new Map();
 const matchLines = new Map();
 const playerForms = new Map(), fixtureDetails = new Map();
 let playerQueue = [], playerWorkers = 0;
+let detailRequests = 0;
+const detailWaiters = [];
 const today = new Date();
 $('date').value = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'), String(today.getDate()).padStart(2, '0')].join('-');
 
@@ -33,6 +36,32 @@ async function json(url, signal) {
   const data = await response.json();
   if (!response.ok) throw Error(data.error || `HTTP ${response.status}`);
   return data;
+}
+async function boundedDetails(url, signal) {
+  if (detailRequests >= 2) await new Promise(resolve => detailWaiters.push(resolve)); else detailRequests++;
+  try {
+    if (signal?.aborted) throw new DOMException('Przerwano pobieranie', 'AbortError');
+    return await json(url, signal);
+  } finally {
+    const next = detailWaiters.shift();
+    if (next) next(); else detailRequests--;
+  }
+}
+function oddsFor(event) { return fixtureDetails.get(event.id)?.data?.odds || null; }
+function marketOptions(event) {
+  return { ...(matchLines.has(event.id) ? { totalLine: matchLines.get(event.id) } : {}), oddsData: oddsFor(event) };
+}
+function updateOddsNodes(event) {
+  document.querySelectorAll('[data-pick-odds]').forEach(node => {
+    if (node.dataset.oddsEvent !== event.id) return;
+    try {
+      const pick = JSON.parse(node.dataset.oddsPick);
+      const result = matchPickQuote(oddsFor(event), event, pick);
+      node.innerHTML = pickOddsContentHTML(oddsFor(event), event, pick);
+      node.classList.remove('pick-odds-matched', 'pick-odds-unavailable', 'pick-odds-closed');
+      node.classList.add(`pick-odds-${result.status}`); node.dataset.oddsStatus = result.status;
+    } catch { node.textContent = 'Kurs niedostępny'; }
+  });
 }
 function cutoffFor(event) {
   const time = new Date(Math.min(viewAsOf, Date.parse(event.date)));
@@ -55,7 +84,10 @@ function eventPlayerPicks(event) {
   const options = { excludedPlayerIds: excludedPlayers(event) };
   const home = playerForms.get(playerKey(event, event.homeId))?.data;
   const away = playerForms.get(playerKey(event, event.awayId))?.data;
-  const lists = [home, away].map(data => data ? buildPlayerPicks(data, event, options).picks : []);
+  const lists = [home, away].map(data => data ? buildPlayerPicks(data, event, options).picks.map(pick => ({
+    ...pick, kind: 'player', market: 'player_prop', teamId: data.teamId,
+    scope: event.sport === 'nba' ? 'including_overtime' : event.sport === 'football' ? 'regulation_90' : 'including_overtime_excluding_shootout',
+  })) : []);
   const all = lists[0].flatMap((pick, index) => [pick, lists[1][index]].filter(Boolean)).concat(lists[1].slice(lists[0].length));
   const first = [], metrics = new Set();
   for (const pick of all) if (!metrics.has(pick.metric)) { metrics.add(pick.metric); first.push(pick); }
@@ -66,7 +98,7 @@ function playerPreviewContent(event) {
   const picks = eventPlayerPicks(event).slice(0, 3);
   const entries = [event.homeId, event.awayId].map(id => playerForms.get(playerKey(event, id)));
   return `<div class="preview-heading">Typy na zawodników</div>${picks.length
-    ? picks.map(pick => `<p class="player-preview-pick"><b>${esc(pick.statement)}</b><span class="small">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej linii</span></p>`).join('')
+    ? picks.map(pick => `<p class="player-preview-pick"><b>${esc(pick.statement)}</b>${pickOddsHTML(oddsFor(event), event, pick)}<span class="small">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej linii</span></p>`).join('')
     : `<p class="small">${entries.some(entry => entry?.status === 'loading') ? 'Analizowanie do 10 wcześniejszych meczów…' : entries.every(entry => entry?.data) ? 'Dostępne wyniki nie spełniają kryteriów typu zawodnika. Pełna forma w analizie.' : 'Punkty, asysty, zbiórki i strzały — otwórz typy zawodników.'}</p>`}`;
 }
 function updatePlayerViews(event) {
@@ -77,7 +109,7 @@ function updatePlayerViews(event) {
       if (entry?.data) {
         const key = `${entry.data.fetchedAt}:${excludedPlayers(event).join(',')}:${event.state}:${Date.parse(event.date) <= Date.now()}`;
         const pickNode = $(`player-picks-${side}`), formNode = $(`players-${side}`);
-        if (pickNode && pickNode.dataset.renderKey !== key) { pickNode.innerHTML = playerPicksHTML(entry.data, event, { excludedPlayerIds: excludedPlayers(event), showNote: false }); pickNode.dataset.renderKey = key; }
+        if (pickNode && pickNode.dataset.renderKey !== key) { pickNode.innerHTML = playerPicksHTML(entry.data, event, { excludedPlayerIds: excludedPlayers(event), showNote: false, oddsData: oddsFor(event) }); pickNode.dataset.renderKey = key; }
         if (formNode && formNode.dataset.renderKey !== entry.data.fetchedAt) { formNode.innerHTML = playerFormHTML(entry.data, name); formNode.dataset.renderKey = entry.data.fetchedAt; }
       } else if (entry?.status === 'error') {
         if ($(`player-picks-${side}`)) $(`player-picks-${side}`).innerHTML = `<p class="small">Statystyki ${esc(name)} są chwilowo niedostępne. Otwórz analizę ponownie, aby powtórzyć pobranie.</p>`;
@@ -102,10 +134,14 @@ function requestPlayerForm(event, teamId, signal) {
 function requestFixtureDetails(event, signal) {
   const cached = fixtureDetails.get(event.id);
   if (cached?.promise) return cached.promise;
-  if (cached?.data && Date.now() - Date.parse(cached.data.fetchedAt) < 5 * 60000) return Promise.resolve(cached.data);
+  if (cached?.data && Date.now() - Date.parse(cached.data.fetchedAt) < (cached.data.odds?.status === 'available' ? 60000 : 5 * 60000)) return Promise.resolve(cached.data);
   const params = new URLSearchParams({ sport: event.sport, route: event.route, id: event.sourceEventId });
   const entry = {};
-  entry.promise = json(`/api/details?${params}`, signal).then(data => { entry.data = data; delete entry.promise; updatePlayerViews(event); return data; })
+  entry.promise = boundedDetails(`/api/details?${params}`, signal).then(data => {
+    entry.data = data; delete entry.promise; updateOddsNodes(event); updatePreviewNodes(event); updatePlayerViews(event);
+    if (detailEvent?.id === event.id && $('source-odds')) $('source-odds').innerHTML = oddsHTML(data.odds, event);
+    return data;
+  })
     .catch(error => { delete entry.promise; throw error; });
   fixtureDetails.set(event.id, entry);
   return entry.promise;
@@ -150,7 +186,7 @@ function previewRequest(event, signal) {
 function previewContent(event) {
   const entry = previews.get(previewKey(event));
   if (entry?.data) {
-    const options = matchLines.has(event.id) ? { totalLine: matchLines.get(event.id) } : {};
+    const options = marketOptions(event);
     const picks = buildMatchPicks(entry.data, event, options);
     return matchPicksHTML(entry.data, event, { ...options, compact: true })
       + matchChartsHTML(entry.data, event, { line: picks.totals?.line ?? null, compact: true })
@@ -176,7 +212,7 @@ function renderBetting() {
   if (marketView === 'matches') {
     const rows = upcoming.flatMap(event => {
       const data = previews.get(previewKey(event))?.data;
-      const options = matchLines.has(event.id) ? { totalLine: matchLines.get(event.id) } : {};
+      const options = marketOptions(event);
       return data ? [{ event, data, options, picks: buildMatchPicks(data, event, options) }] : [];
     });
     const strength = row => row.picks.best ? Math.min(row.picks.best.support.home.hits / row.picks.best.support.home.sample, row.picks.best.support.away.hits / row.picks.best.support.away.sample) : -1;
@@ -197,7 +233,7 @@ function renderBetting() {
   const watch = upcoming.flatMap(event => { const data = previews.get(previewKey(event))?.data; const assessment = data && assessBetting(data, event); return assessment?.candidate ? [{ event, assessment }] : []; });
   $('betting-summary').innerHTML = !upcoming.length
     ? '<p class="small">W wybranym zestawie nie ma nadchodzących spotkań. Analizy rozegranych meczów znajdziesz poniżej.</p>'
-    : `${selected.length ? `<div class="player-picks-grid picks-summary-grid">${selected.map(({ event, pick }) => `<article class="player-pick" data-pick-metric="${esc(pick.metric)}"><span class="small">${esc(event.home)} — ${esc(event.away)}</span><h3>${esc(pick.statement)}</h3><p class="player-pick-market">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej tej linii</p><p class="small">Średnia: ${Number(pick.average).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} • mediana: ${Number(pick.median).toLocaleString('pl-PL', { maximumFractionDigits: 1 })}</p><button data-bet-id="${esc(event.id)}">Zobacz formę i pozostałe typy</button></article>`).join('')}</div>`
+    : `${selected.length ? `<div class="player-picks-grid picks-summary-grid">${selected.map(({ event, pick }) => `<article class="player-pick" data-pick-metric="${esc(pick.metric)}"><span class="small">${esc(event.home)} — ${esc(event.away)}</span><div class="pick-title-row"><h3>${esc(pick.statement)}</h3>${pickOddsHTML(oddsFor(event), event, pick)}</div><p class="player-pick-market">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej tej linii</p><p class="small">Średnia: ${Number(pick.average).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} • mediana: ${Number(pick.median).toLocaleString('pl-PL', { maximumFractionDigits: 1 })}</p><button data-bet-id="${esc(event.id)}">Zobacz formę i pozostałe typy</button></article>`).join('')}</div>`
       : `<p class="small">${loading ? 'Analizowanie ostatnich 10 meczów zawodników…' : ready.length ? 'Dla wybranego rynku nie ma wskazania spełniającego kryteria. Możesz sprawdzić własną linię w analizie zawodnika.' : 'Typy zawodników pojawią się po wczytaniu dłuższej formy.'}</p>`}
       <div class="picks-load"><span class="small">Forma zawodników wczytana dla ${ready.length} z ${upcoming.length} meczów.</span>${remaining.length ? `<button data-more-player-picks ${loading ? 'disabled' : ''}>${loading ? 'Wczytywanie…' : 'Wczytaj typy kolejnych meczów'}</button>` : ''}</div>
       ${watch.length ? `<details class="team-picks-list"><summary>Typy z formy drużyn (${watch.length})</summary><ul class="betting-watchlist">${watch.map(({ event, assessment }) => `<li><div><b>${esc(assessment.candidate.label)}</b><span class="small">${esc(event.home)} — ${esc(event.away)}</span></div><button data-bet-id="${esc(event.id)}">Uzasadnienie</button></li>`).join('')}</ul></details>` : ''}`;
@@ -210,6 +246,11 @@ function queuePreviews(selected) {
   const controller = previewController;
   if (!controller || controller.signal.aborted) return;
   const version = ++renderVersion, pending = selected.slice(0, 24);
+  for (const event of selected.slice(0, 12)) {
+    if (['nba', 'nhl', 'football'].includes(event.sport) && event.state === 'pre' && Date.parse(event.date) > Date.now()) {
+      void requestFixtureDetails(event, loadController?.signal).catch(() => {});
+    }
+  }
   let next = 0;
   async function worker() {
     while (next < pending.length && !controller.signal.aborted && version === renderVersion) {
@@ -305,19 +346,13 @@ async function detail(id, button) {
     <div id="availability"><p class="small">Sprawdzanie dostępności zawodników…</p></div>
     <details class="panel detail-section"><summary>Pełna forma drużyn i bezpośrednie spotkania</summary><div id="match-detail"><p>Wczytywanie porównania…</p></div></details>
     ${event.sport !== 'tennis' ? `<details class="panel detail-section"><summary>Pełna forma zawodników — do 10 meczów</summary><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div></details>` : ''}
-    <details class="panel detail-section"><summary>Kursy na wynik meczu ze źródła</summary><div id="source-odds"></div></details>
+    <details class="panel detail-section"><summary>Kursy i linie ze źródła</summary><div id="source-odds"></div></details>
     <details class="panel detail-section"><summary>Kalkulator kursu i dziennik własnych typów na wynik</summary><div id="journal-form"></div></details>
     <details id="game-boxscore" class="panel detail-section" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dodatkowe informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
   journal.open(event, $('journal-form'));
-  if (['nba', 'nhl', 'football'].includes(event.sport) && event.state === 'pre' && Date.parse(event.date) > Date.now()) {
-    const params = new URLSearchParams({ sport: event.sport, route: event.route, id: event.id, homeId: event.homeId, awayId: event.awayId, startTime: new Date(event.date).toISOString() });
-    void json(`/api/odds?${params}`, controller.signal).then(data => {
-      if (!controller.signal.aborted) $('source-odds').innerHTML = oddsHTML(data, event);
-    }).catch(() => { if (!controller.signal.aborted) $('source-odds').innerHTML = '<p class="small">Kursy źródłowe są chwilowo niedostępne. Możesz ręcznie wpisać kurs w kalkulatorze.</p>'; });
-  }
   void previewRequest(event, previewController?.signal).then(data => {
     if (!controller.signal.aborted) {
-      const options = matchLines.has(event.id) ? { totalLine: matchLines.get(event.id) } : {};
+      const options = marketOptions(event);
       const marketPicks = buildMatchPicks(data, event, options);
       $('betting-detail').innerHTML = matchPicksHTML(data, event, options) + matchChartsHTML(data, event, { line: marketPicks.totals?.line ?? null });
       $('betting-detail').dataset.marketStatus = marketPicks.status;
@@ -329,6 +364,7 @@ async function detail(id, button) {
     queuePlayerForms([event], 1, true, true);
   }
   void requestFixtureDetails(event, loadController?.signal).then(data => { if (!controller.signal.aborted) {
+    $('source-odds').innerHTML = oddsHTML(data.odds, event);
     $('availability').innerHTML = availabilityHTML(data, event);
     $('match-boxscore').innerHTML = existingStatsHTML(data, event);
   } }).catch(() => { if (!controller.signal.aborted) {
@@ -397,6 +433,29 @@ $('refresh').onclick = () => { closeDetail(); load(); loadModel(); loadReadiness
 $('show-archive').onclick = () => loadArchive(loadController?.signal, true);
 $('close').onclick = closeDetail;
 $('modal').onclick = event => { if (event.target === $('modal')) closeDetail(); };
+document.addEventListener('click', async click => {
+  const button = click.target.closest('[data-use-source-line]');
+  if (!button) return;
+  const selected = button.dataset.oddsEvent ? [...events, ...archiveEvents].find(event => event.id === button.dataset.oddsEvent) : detailEvent;
+  if (!selected) return;
+  if (!$('modal').classList.contains('on') || detailEvent?.id !== selected.id) {
+    try { await detail(selected.id, button); await previewRequest(selected, previewController?.signal); }
+    catch { return; }
+  }
+  if (detailEvent?.id !== selected.id) return;
+  const line = Number(button.dataset.line);
+  const quote = matchPickQuote(oddsFor(detailEvent), detailEvent, { kind: 'total', market: 'total_points', scope: 'including_overtime', direction: 'over', line });
+  const form = $('betting-detail').querySelector('[data-match-line]');
+  if (quote.status !== 'matched' || !form) {
+    let message = button.parentElement.querySelector('[data-source-line-status]');
+    if (!message) { message = document.createElement('p'); message.className = 'small'; message.dataset.sourceLineStatus = ''; message.setAttribute('role', 'status'); button.after(message); }
+    message.textContent = quote.status !== 'matched' ? 'Odczyt kursu wygasł lub nie potwierdza tej linii. Odśwież analizę.' : 'Do porównania potrzebna jest pełniejsza historia obu drużyn.';
+    return;
+  }
+  form.elements.namedItem('totalLine').value = String(line).replace('.', ',');
+  form.requestSubmit();
+  $('betting-detail').scrollIntoView({ block: 'start' });
+});
 document.addEventListener('keydown', event => {
   if (!$('modal').classList.contains('on')) return;
   if (event.key === 'Escape') closeDetail();
@@ -422,7 +481,7 @@ $('detail').addEventListener('submit', submit => {
     const picks = buildMatchPicks(data, detailEvent, { totalLine: line });
     if (!picks.totals) { output.textContent = picks.reason || 'Odśwież analizę przed porównaniem własnej linii.'; return; }
     matchLines.set(detailEvent.id, line);
-    $('betting-detail').innerHTML = matchPicksHTML(data, detailEvent, { totalLine: line }) + matchChartsHTML(data, detailEvent, { line });
+    $('betting-detail').innerHTML = matchPicksHTML(data, detailEvent, { totalLine: line, oddsData: oddsFor(detailEvent) }) + matchChartsHTML(data, detailEvent, { line });
     $('betting-detail').dataset.marketStatus = picks.status;
     const updated = $('betting-detail').querySelector('[data-match-line-result]');
     if (updated) updated.textContent = picks.totals ? `Porównano Twoją linię ${String(line).replace('.', ',')} z wcześniejszymi sumami punktów.` : picks.reason;
@@ -453,10 +512,11 @@ setInterval(() => {
   document.querySelectorAll('[data-preview]').forEach(node => {
     const event = [...events, ...archiveEvents].find(item => item.id === node.dataset.preview);
     if (event && previews.get(previewKey(event))?.data) node.innerHTML = previewContent(event);
+    if (event) updateOddsNodes(event);
   });
   const data = detailEvent && previews.get(previewKey(detailEvent))?.data;
   if (data && $('betting-detail')) {
-    const options = matchLines.has(detailEvent.id) ? { totalLine: matchLines.get(detailEvent.id) } : {};
+    const options = marketOptions(detailEvent);
     const current = buildMatchPicks(data, detailEvent, options);
     if (['unavailable', 'closed'].includes(current.status) && $('betting-detail').dataset.marketStatus !== current.status) {
       $('betting-detail').innerHTML = matchPicksHTML(data, detailEvent, options) + matchChartsHTML(data, detailEvent, { line: current.totals?.line ?? null });
