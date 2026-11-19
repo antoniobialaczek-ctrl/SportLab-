@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-19T09:13:06.874Z",
+  "updatedAt": "2026-11-19T17:14:19.633Z",
   "events": [
     {
       "id": "hockey/nhl:401688201",
@@ -65134,7 +65134,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65159,7 +65159,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65184,7 +65184,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65209,7 +65209,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65234,7 +65234,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65259,7 +65259,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65284,7 +65284,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65309,7 +65309,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65334,7 +65334,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65359,7 +65359,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65384,7 +65384,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65409,7 +65409,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65434,7 +65434,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65459,7 +65459,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65484,7 +65484,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65509,7 +65509,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65534,7 +65534,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65559,7 +65559,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65584,7 +65584,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65609,7 +65609,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65634,7 +65634,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65659,7 +65659,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65684,7 +65684,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65709,7 +65709,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65734,7 +65734,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65759,7 +65759,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65784,7 +65784,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65809,7 +65809,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65834,7 +65834,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65859,7 +65859,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65884,7 +65884,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65909,7 +65909,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65934,7 +65934,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65959,7 +65959,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -65984,7 +65984,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66009,7 +66009,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66034,7 +66034,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66059,7 +66059,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66084,7 +66084,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66109,7 +66109,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66134,7 +66134,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66159,7 +66159,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66184,7 +66184,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66209,7 +66209,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66234,7 +66234,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66259,7 +66259,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261118&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66284,7 +66284,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261118&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     },
     {
@@ -66309,7 +66309,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261118&limit=1000",
-        "fetchedAt": "2026-11-19T09:13:06.874Z"
+        "fetchedAt": "2026-11-19T17:14:19.633Z"
       }
     }
   ],
