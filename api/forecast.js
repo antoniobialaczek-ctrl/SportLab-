@@ -1,4 +1,4 @@
-import { isAllowedRoute } from '../src/data/catalog.js';
+import { isAllowedRoute } from '../src/server/catalog.js';
 import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js';
 import { readForwardReport, readReports } from '../src/server/storage.js';
 import { forecastReadiness } from '../src/server/forecast.js';

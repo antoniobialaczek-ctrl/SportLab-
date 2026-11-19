@@ -1,7 +1,7 @@
 export const JOURNAL_VERSION = 2;
 export const MAX_RECORDS = 500;
 const MINUTE = 60000;
-const SPORTS = { nba: ['basketball/nba'], nhl: ['hockey/nhl'], football: ['soccer/eng.1', 'soccer/esp.1', 'soccer/ger.1', 'soccer/ita.1', 'soccer/fra.1', 'soccer/uefa.champions', 'soccer/uefa.europa', 'soccer/eng.2', 'soccer/ned.1', 'soccer/por.1', 'soccer/pol.1'] };
+const SPORTS = { nba: ['basketball/nba'], nhl: ['hockey/nhl'], football: ['soccer/eng.1', 'soccer/esp.1', 'soccer/ger.1', 'soccer/ita.1', 'soccer/fra.1', 'soccer/uefa.champions', 'soccer/uefa.europa', 'soccer/eng.2', 'soccer/ned.1', 'soccer/por.1', 'soccer/pol.1', 'soccer/usa.1'] };
 const MARKETS = { winner: ['home', 'away'], result_90: ['home', 'draw', 'away'], double_chance_90: ['home_draw', 'draw_away'] };
 const RECORD_KEYS = ['id', 'personal', 'fixtureId', 'sport', 'route', 'homeId', 'awayId', 'home', 'away', 'startTime', 'createdAt', 'quotedAt', 'bookmaker', 'market', 'outcome', 'odds', 'stake', 'status', 'settlement', 'conflict', 'scope', 'line', 'playerId', 'teamId', 'metric', 'playerName'];
 const fail = message => { throw new Error(message); };
@@ -54,6 +54,7 @@ function sourceValid(source, record, now) {
     if (url.pathname === prefix + 'summary') return url.searchParams.get('event') === sourceId;
     if (url.pathname !== prefix + 'scoreboard') return false;
     const day = url.searchParams.get('dates');
+    if (record.route === 'soccer/usa.1' && /^\d{4}$/.test(day || '')) return day === record.startTime.slice(0, 4);
     if (!/^\d{8}$/.test(day || '')) return false;
     const parsed = Date.parse(`${day.slice(0, 4)}-${day.slice(4, 6)}-${day.slice(6)}T00:00:00.000Z`);
     return Number.isFinite(parsed) && iso(parsed).slice(0, 10).replaceAll('-', '') === day
@@ -66,7 +67,7 @@ function marketValid(record) {
   if (!['over', 'under'].includes(record.outcome)) return false;
   if (record.market === 'total_points') return record.sport === 'nba' && record.scope === 'including_overtime'
     && halfLine(record.line, 599.5) && playerFields.every(key => record[key] === undefined);
-  if (record.market === 'total_goals') return record.sport === 'football' && record.route === 'soccer/pol.1' && record.scope === 'regulation_90'
+  if (record.market === 'total_goals') return record.sport === 'football' && ['soccer/pol.1', 'soccer/usa.1'].includes(record.route) && record.scope === 'regulation_90'
     && halfLine(record.line, 15.5) && playerFields.every(key => record[key] === undefined);
   return record.market === 'player_prop' && record.route !== 'soccer/pol.1' && halfLine(record.line)
     && numericId(record.playerId) && numericId(record.teamId) && [record.homeId, record.awayId].includes(record.teamId)

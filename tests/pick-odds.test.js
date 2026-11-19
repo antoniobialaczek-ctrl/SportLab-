@@ -65,6 +65,21 @@ test('a three-way result quote never becomes a double-chance price', () => {
   assert.equal(match(value, { kind: 'result', market: '1X', side: 'home', scope: 'regulation_90' }, football).status, 'unavailable');
 });
 
+test('MLS quotes bind the exact ESPN fixture and player without deriving double chance from result prices', () => {
+  const fixture = { ...event, id: 'soccer/usa.1:1234567', sport: 'football', route: 'soccer/usa.1' };
+  const pick = { ...player, metric: 'SH', line: 1.5, scope: 'regulation_90' };
+  const value = { ...data([
+    quote('winner', { scope: 'regulation_90', outcomes: [{ side: 'home', decimal: 1.8 }, { side: 'draw', decimal: 3.2 }, { side: 'away', decimal: 3.9 }] }),
+    quote('player_prop', { scope: pick.scope, line: pick.line, playerId: pick.playerId, teamId: pick.teamId, metric: pick.metric }),
+  ]), fixtureId: fixture.id, sport: fixture.sport, route: fixture.route };
+  assert.equal(match(value, { kind: 'result', market: 'winner', side: 'draw', scope: 'regulation_90' }, fixture).decimal, 3.2);
+  assert.equal(match(value, { kind: 'result', market: '1X', side: 'home', scope: 'regulation_90' }, fixture).status, 'unavailable');
+  assert.equal(match(value, pick, fixture).decimal, 1.91);
+  for (const changed of [{ ...pick, playerId: '10' }, { ...pick, teamId: '29' }, { ...pick, metric: 'G' }]) assert.equal(match(value, changed, fixture).status, 'unavailable');
+  assert.equal(match({ ...value, route: 'soccer/eng.1' }, pick, fixture).status, 'unavailable');
+  assert.equal(match(value, pick, { ...fixture, id: 'soccer/usa.1:tsdb-1234567' }).status, 'unavailable');
+});
+
 test('duplicate source conflicts and invalid prices do not silently select a convenient quote', () => {
   const changed = quote('winner', { outcomes: [{ side: 'home', decimal: 1.9 }, { side: 'away', decimal: 2.1 }] });
   assert.equal(match(data([quote(), changed])).status, 'unavailable');

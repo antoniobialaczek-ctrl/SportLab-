@@ -3,7 +3,7 @@ import { escapeHTML as esc } from './analysis-view.js';
 const MINUTE = 60000;
 const MAX_OBSERVATION_AGE = 5 * MINUTE;
 const SCOPES = new Set(['including_overtime', 'including_overtime_shootout', 'including_overtime_excluding_shootout', 'regulation_90']);
-const ROUTES = { nba: ['basketball/nba'], nhl: ['hockey/nhl'], football: ['soccer/eng.1', 'soccer/esp.1', 'soccer/ger.1', 'soccer/ita.1', 'soccer/fra.1', 'soccer/uefa.champions', 'soccer/uefa.europa', 'soccer/eng.2', 'soccer/ned.1', 'soccer/por.1'] };
+const ROUTES = { nba: ['basketball/nba'], nhl: ['hockey/nhl'], football: ['soccer/eng.1', 'soccer/esp.1', 'soccer/ger.1', 'soccer/ita.1', 'soccer/fra.1', 'soccer/uefa.champions', 'soccer/uefa.europa', 'soccer/eng.2', 'soccer/ned.1', 'soccer/por.1', 'soccer/usa.1'] };
 const METRICS = { nba: new Set(['PTS', 'AST', 'REB']), nhl: new Set(['S', 'G', 'A']), football: new Set(['SH', 'G', 'A']) };
 const text = (value, maximum = 120) => typeof value === 'string' && value.trim() && value.length <= maximum ? value.trim() : null;
 const numericId = value => typeof value === 'string' && /^\d{1,14}$/.test(value);
@@ -31,6 +31,10 @@ function selectionFor(pick, event, options) {
   }
   if (kind === 'total' && pick.market === 'total_points' && event.sport === 'nba' && ['over', 'under'].includes(pick.direction) && line(pick.line)) {
     return { market: 'total_points', selection: pick.direction, scope: pick.scope, line: pick.line };
+  }
+  if (kind === 'total' && pick.market === 'total_goals' && event.sport === 'football' && event.route === 'soccer/usa.1'
+    && pick.scope === 'regulation_90' && ['over', 'under'].includes(pick.direction) && line(pick.line)) {
+    return { market: 'total_goals', selection: pick.direction, scope: pick.scope, line: pick.line };
   }
   if (kind === 'player' && (pick.market == null || pick.market === 'player_prop') && METRICS[event.sport]?.has(pick.metric)
     && numericId(pick.playerId) && ['over', 'under'].includes(pick.direction) && line(pick.line)) {

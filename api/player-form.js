@@ -1,6 +1,6 @@
-import { isAllowedRoute } from '../src/data/catalog.js';
+import { isAllowedRoute } from '../src/server/catalog.js';
 import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js';
-import { readHistory } from '../src/server/storage.js';
+import { readSiteHistory } from '../src/server/site-history.js';
 import { buildPlayerForm } from '../src/server/player-form.js';
 import { isEkstraklasaId } from '../src/server/ekstraklasa-source.js';
 
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   try {
     if (route === 'soccer/pol.1') return res.json({ status: 'unavailable', sport, route, teamId, cutoff, players: [], sampledMatches: [], attemptedMatches: [], errors: [],
       fetchedAt: new Date().toISOString(), source: 'TheSportsDB', reason: 'Darmowe źródło Ekstraklasy nie udostępnia statystyk zawodników. Dostępna jest forma drużyn i porównanie wcześniejszych wyników.' });
-    const history = sport === 'tennis' ? { events: [], updatedAt: null, runtimeData: { origin: 'local', fallback: false } } : await readHistory(sport);
+    const history = sport === 'tennis' ? { events: [], updatedAt: null, runtimeData: { origin: 'local', fallback: false } } : await readSiteHistory(sport, { route });
     const result = await buildPlayerForm(history.events, { sport, route, teamId, cutoff, count });
     res.setHeader('Cache-Control', result.errors.length || result.status !== 'available' ? 'no-store' : 'public, s-maxage=900');
     res.json({ ...result, historyUpdatedAt: history.updatedAt, updateSource: history.runtimeData });

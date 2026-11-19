@@ -1,5 +1,5 @@
 import { SPORTS, failure, getOnly, scalar } from '../src/server/http.js';
-import { ROUTES } from '../src/data/catalog.js';
+import { ROUTES } from '../src/server/catalog.js';
 import { readForwardReport, readReports } from '../src/server/storage.js';
 import { buildReadiness } from '../src/server/readiness.js';
 

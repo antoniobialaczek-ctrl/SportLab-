@@ -1,4 +1,4 @@
-import { ROUTES, leagueLabel } from '../data/catalog.js';
+import { ROUTES, leagueLabel } from './catalog.js';
 
 const STAGES = ['calibration', 'selection', 'test'];
 const TARGETS = { calibration: 60, selection: 45, test: 150 };

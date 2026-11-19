@@ -68,6 +68,26 @@ test('football double chance counts a regulation draw and normal result market d
   assert.equal(settleJournal(journal(draw), [result], { now: settledAt }).records[0].status, 'won');
 });
 
+test('MLS journal records retain numeric ESPN identity and require the same league source for settlement', () => {
+  const fixture = { ...event, id: 'soccer/usa.1:12345', sport: 'football', route: 'soccer/usa.1' };
+  const record = make('record-mls001', { market: 'double_chance_90', outcome: 'home_draw' }, fixture);
+  const result = row({ id: fixture.id, sport: fixture.sport, route: fixture.route, scope: 'regulation_90', homeScore: 1, awayScore: 1,
+    source: { provider: 'ESPN', url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/summary?event=12345', fetchedAt: '2026-11-20T00:30:00.000Z' } });
+  assert.equal(record.scope, 'regulation_90');
+  assert.equal(settleJournal(journal(record), [result], { now: settledAt }).records[0].status, 'won');
+  const seasonSource = { ...result.source, url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard?dates=2026&limit=1000' };
+  assert.equal(settleJournal(journal(record), [{ ...result, source: seasonSource }], { now: settledAt }).records[0].status, 'won');
+  assert.equal(settleJournal(journal(record), [{ ...result, source: { ...seasonSource, url: seasonSource.url.replace('2026', '2025') } }], { now: settledAt }).records[0].status, 'pending');
+  const wrongLeague = { ...result, source: { ...result.source, url: result.source.url.replace('usa.1', 'eng.1') } };
+  assert.equal(settleJournal(journal(record), [wrongLeague], { now: settledAt }).records[0].status, 'pending');
+  assert.equal(settleJournal(journal(), [row({ source: { ...seasonSource, url: seasonSource.url.replace('soccer/usa.1', 'basketball/nba') } })], { now: settledAt }).records[0].status, 'pending');
+  for (const changed of [{ ...fixture, id: 'soccer/usa.1:tsdb-12345' }, { ...fixture, homeId: 'tsdb-1' }, { ...fixture, route: 'soccer/eng.1' }]) assert.throws(() => make('record-mls-bad', { market: 'result_90' }, changed));
+  const goals = make('record-mlsgoal', { market: 'total_goals', outcome: 'over', line: 2.5, scope: 'regulation_90' }, fixture);
+  assert.equal(settleJournal(journal(goals), [result], { now: settledAt }).records[0].status, 'lost');
+  assert.equal(settleJournal(journal(goals), [{ ...result, scope: 'including_overtime' }], { now: settledAt }).records[0].status, 'pending');
+  assert.throws(() => make('record-mlsgoal-bad', { market: 'total_goals', outcome: 'over', line: 2, scope: 'regulation_90' }, fixture));
+});
+
 test('profit and ROI use only settled personal unit stakes and never research model accuracy', () => {
   const a = make('record-0001'), b = make('record-0002', { outcome: 'away', odds: 2, stake: 1 });
   let entries = appendRecord(journal(a), b); entries = appendRecord(entries, make('record-0003', { stake: 10 }));

@@ -1,6 +1,6 @@
-import { ESPN_UNAVAILABLE_HISTORY_ROUTES, isAllowedRoute } from '../src/data/catalog.js';
+import { ESPN_UNAVAILABLE_HISTORY_ROUTES, isAllowedRoute } from '../src/server/catalog.js';
 import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js';
-import { readHistory } from '../src/server/storage.js';
+import { readSiteHistory } from '../src/server/site-history.js';
 import { buildMatchAnalysis } from '../src/server/match-analysis.js';
 import { isEkstraklasaId } from '../src/server/ekstraklasa-source.js';
 import { loadEkstraklasaHistory } from '../src/server/ekstraklasa-history.js';
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         historyUpdatedAt: history.fetchedAt, coverage: history.coverage, source: 'TheSportsDB', runtimeData: history.runtimeData,
         modelExperimentEligible: false });
     }
-    const history = await readHistory(query.sport);
+    const history = await readSiteHistory(query.sport, { route: query.route });
     const analysis = buildMatchAnalysis(history.events, query);
     const unavailable = ESPN_UNAVAILABLE_HISTORY_ROUTES[query.route];
     if (unavailable && analysis.status === 'unavailable') analysis.notes.unshift(unavailable.reason);

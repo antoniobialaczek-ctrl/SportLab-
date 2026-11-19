@@ -1,4 +1,4 @@
-import { leagueLabel } from '../data/catalog.js';
+import { leagueLabel } from './catalog.js';
 
 const record = competitor => competitor.records?.find(r => r.type === 'total')?.summary || null;
 const name = competitor => competitor.team?.displayName || competitor.athlete?.displayName || competitor.roster?.displayName;

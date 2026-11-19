@@ -1,6 +1,6 @@
-import { isAllowedRoute } from '../src/data/catalog.js';
+import { isAllowedRoute } from '../src/server/catalog.js';
 import { failure, getOnly, scalar } from '../src/server/http.js';
-import { readHistory } from '../src/server/storage.js';
+import { readSiteHistory } from '../src/server/site-history.js';
 import { isEkstraklasaId } from '../src/server/ekstraklasa-source.js';
 import { loadEkstraklasaHistory } from '../src/server/ekstraklasa-history.js';
 import { fetchJournalResult, journalScoreScope } from '../src/server/journal-result-source.js';
@@ -28,7 +28,7 @@ export function selectJournalResults(history, ids, { now = Date.now() } = {}) {
 async function requestedHistory(sport, ids) {
   const needsEkstraklasa = ids.some(id => id.startsWith('soccer/pol.1:'));
   const needsESPN = ids.some(id => !id.startsWith('soccer/pol.1:'));
-  const [original, extra] = await Promise.all([needsESPN ? readHistory(sport) : null, needsEkstraklasa ? loadEkstraklasaHistory() : null]);
+  const [original, extra] = await Promise.all([needsESPN ? readSiteHistory(sport, { routes: [...new Set(ids.filter(id => !id.startsWith('soccer/pol.1:')).map(id => id.slice(0, id.lastIndexOf(':'))))] }) : null, needsEkstraklasa ? loadEkstraklasaHistory() : null]);
   if (!extra) return original;
   return { events: [...(original?.events || []), ...extra.events], available: Boolean(original?.available || extra.events.length),
     updatedAt: [original?.updatedAt, extra.fetchedAt].filter(Boolean).sort().at(-1) || null,

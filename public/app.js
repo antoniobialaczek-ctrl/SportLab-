@@ -16,7 +16,7 @@ const availabilityMemory = createAvailabilityMemory();
 installPlayerPhotoFallback(document);
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
 const leagues = {
-  football: [['all', 'Wszystkie ligi'], ['eng.1', 'Premier League'], ['esp.1', 'La Liga'], ['ger.1', 'Bundesliga'], ['ita.1', 'Serie A'], ['fra.1', 'Ligue 1'], ['pol.1', 'Ekstraklasa'], ['uefa.champions', 'Liga Mistrzów'], ['uefa.europa', 'Liga Europy'], ['eng.2', 'Championship'], ['ned.1', 'Eredivisie'], ['por.1', 'Portugalia']],
+  football: [['all', 'Wszystkie ligi'], ['eng.1', 'Premier League'], ['esp.1', 'La Liga'], ['ger.1', 'Bundesliga'], ['ita.1', 'Serie A'], ['fra.1', 'Ligue 1'], ['pol.1', 'Ekstraklasa'], ['usa.1', 'MLS'], ['uefa.champions', 'Liga Mistrzów'], ['uefa.europa', 'Liga Europy'], ['eng.2', 'Championship'], ['ned.1', 'Eredivisie'], ['por.1', 'Portugalia']],
   nba: [['all', 'NBA']], nhl: [['all', 'NHL']], tennis: [['all', 'ATP i WTA'], ['atp', 'ATP'], ['wta', 'WTA']], cs2: [['all', 'CS2']],
 };
 const $ = id => document.getElementById(id);
@@ -79,7 +79,7 @@ function cutoffFor(event) {
   return time.toISOString();
 }
 function previewKey(event) { return `${event.id}:${cutoffFor(event)}`; }
-function playerCutoffFor(event) { return new Date(Math.floor(Date.parse(cutoffFor(event)) / 900000) * 900000).toISOString(); }
+function playerCutoffFor(event) { if (event.route === 'soccer/usa.1') return cutoffFor(event); return new Date(Math.floor(Date.parse(cutoffFor(event)) / 900000) * 900000).toISOString(); }
 function playerKey(event, teamId) { return `${event.route}:${teamId}:${playerCutoffFor(event)}`; }
 function playerEntryFresh(entry) {
   return entry?.data && Number.isFinite(Date.parse(entry.data.fetchedAt)) && Date.now() - Date.parse(entry.data.fetchedAt) < 15 * 60000;
@@ -268,7 +268,7 @@ function renderBetting() {
     const highlighted = rows.filter(row => row.picks.best).sort((a, b) => strength(b) - strength(a));
     const shown = (highlighted.length ? highlighted : rows).slice(0, 4);
     $('betting-summary').innerHTML = !upcoming.length ? '<p class="small">W wybranej dacie nie ma nadchodzących spotkań. Poniżej znajdziesz analizy archiwalne.</p>'
-      : `${shown.length ? `<div class="match-pick-summary-grid">${shown.map(({ event, data, options, picks }) => `<article class="match-signal-card"><div class="match-signal-header"><span class="small">${esc(event.league)} • ${esc(localDate(event.date))}</span><h3>${esc(event.home)} — ${esc(event.away)}</h3></div>${matchPicksHTML(data, event, { ...options, compact: true })}${matchChartsHTML(data, event, { line: picks.totals?.line ?? null, compact: true })}<button data-bet-id="${esc(event.id)}">${event.route === 'soccer/pol.1' ? 'Porównaj wynik i gole' : event.sport === 'nba' ? 'Porównaj wynik i punkty' : 'Porównaj wynik meczu'}</button></article>`).join('')}</div>` : '<p class="small">Porównywanie ostatnich wyników i sum punktów…</p>'}
+      : `${shown.length ? `<div class="match-pick-summary-grid">${shown.map(({ event, data, options, picks }) => `<article class="match-signal-card"><div class="match-signal-header"><span class="small">${esc(event.league)} • ${esc(localDate(event.date))}</span><h3>${esc(event.home)} — ${esc(event.away)}</h3></div>${matchPicksHTML(data, event, { ...options, compact: true })}${matchChartsHTML(data, event, { line: picks.totals?.line ?? null, compact: true })}<button data-bet-id="${esc(event.id)}">${['soccer/pol.1', 'soccer/usa.1'].includes(event.route) ? 'Porównaj wynik i gole' : event.sport === 'nba' ? 'Porównaj wynik i punkty' : 'Porównaj wynik meczu'}</button></article>`).join('')}</div>` : '<p class="small">Porównywanie ostatnich wyników i sum punktów…</p>'}
       <p class="small dashboard-summary-note">${highlighted.length ? `Wyraźniejsze wskazanie z historii: ${highlighted.length} z ${upcoming.length} meczów.` : rows.length ? 'Porównaj pokazane wyniki z własną linią punktową w analizie meczu.' : 'Wczytywanie wcześniejszych spotkań…'}</p>`;
     document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
     return;
@@ -315,7 +315,7 @@ function queuePreviews(selected) {
   void Promise.all([worker(), worker(), worker()]);
 }
 function nav() {
-  document.querySelector('[data-market-view=matches]').textContent = sport === 'football' && league === 'pol.1' ? 'Wynik i suma goli' : sport === 'nba' ? 'Wynik i suma punktów' : 'Wynik meczu';
+  document.querySelector('[data-market-view=matches]').textContent = sport === 'football' && ['pol.1', 'usa.1'].includes(league) ? 'Wynik i suma goli' : sport === 'nba' ? 'Wynik i suma punktów' : 'Wynik meczu';
   $('sports').innerHTML = Object.entries(sports).map(([key, title]) => `<button data-s="${key}" class="${key === sport ? 'active' : ''}" aria-pressed="${key === sport}">${title}</button>`).join('');
   $('leagues').innerHTML = leagues[sport].map(([key, title]) => `<button data-l="${key}" class="${key === league ? 'active' : ''}" aria-pressed="${key === league}">${title}</button>`).join('');
   $('leagues').hidden = leagues[sport].length === 1;
@@ -539,7 +539,7 @@ $('detail').addEventListener('submit', submit => {
     submit.preventDefault();
     const raw = String(matchForm.elements.namedItem('totalLine').value).trim();
     const line = /^\d+(?:[,.]\d+)?$/.test(raw) ? Number(raw.replace(',', '.')) : NaN;
-    const goals = detailEvent.route === 'soccer/pol.1';
+    const goals = ['soccer/pol.1', 'soccer/usa.1'].includes(detailEvent.route);
     const output = matchForm.querySelector('[data-match-line-result]');
     if (!Number.isFinite(line) || line < (goals ? 0.5 : 1.5) || line > (goals ? 15.5 : 599.5) || !Number.isInteger(line * 2) || Number.isInteger(line)) {
       output.textContent = goals ? 'Wpisz linię połówkową od 0,5 do 15,5 gola.' : 'Wpisz linię połówkową, np. 224,5.'; return;

@@ -1,6 +1,6 @@
-import { ROUTES } from '../src/data/catalog.js';
+import { ROUTES } from '../src/server/catalog.js';
 import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js';
-import { readHistory } from '../src/server/storage.js';
+import { readSiteHistory } from '../src/server/site-history.js';
 import { buildAnalysisCatalog } from '../src/server/analysis-catalog.js';
 import { loadEkstraklasaHistory } from '../src/server/ekstraklasa-history.js';
 
@@ -23,10 +23,10 @@ export default async function handler(req, res) {
   try {
     let history;
     if (routes.includes('soccer/pol.1')) {
-      const [extra, original] = await Promise.all([loadEkstraklasaHistory(), routes.some(route => route !== 'soccer/pol.1') ? readHistory(sport) : Promise.resolve(null)]);
+      const [extra, original] = await Promise.all([loadEkstraklasaHistory(), routes.some(route => route !== 'soccer/pol.1') ? readSiteHistory(sport, { routes: routes.filter(route => route !== 'soccer/pol.1') }) : Promise.resolve(null)]);
       history = { events: [...(original?.events || []), ...extra.events], updatedAt: [original?.updatedAt, extra.fetchedAt].filter(Boolean).sort().at(-1),
         runtimeData: { sources: [original?.runtimeData, extra.runtimeData].filter(Boolean), fallback: Boolean(original?.runtimeData?.fallback || extra.runtimeData.fallback) } };
-    } else history = await readHistory(sport);
+    } else history = await readSiteHistory(sport, { routes: routes.filter(route => route !== 'soccer/pol.1') });
     const events = buildAnalysisCatalog(history.events, { sport, routes, cutoff, limit });
     res.setHeader('Cache-Control', 'public, s-maxage=300');
     res.json({ events, status: events.length ? 'available' : 'unavailable', cutoff, historyUpdatedAt: history.updatedAt, runtimeData: history.runtimeData,

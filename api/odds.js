@@ -1,4 +1,4 @@
-import { ESPN_UNAVAILABLE_HISTORY_ROUTES, isAllowedRoute } from '../src/data/catalog.js';
+import { ESPN_UNAVAILABLE_HISTORY_ROUTES, isAllowedRoute } from '../src/server/catalog.js';
 import { fetchJSON } from '../src/data/fetch.js';
 import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js';
 import { extractOdds } from '../src/server/odds.js';

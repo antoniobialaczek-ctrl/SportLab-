@@ -1,4 +1,4 @@
-import { leagueLabel } from '../data/catalog.js';
+import { leagueLabel } from './catalog.js';
 
 export function buildAnalysisCatalog(events, { sport, routes, cutoff, limit = 12 }) {
   const before = Date.parse(cutoff);

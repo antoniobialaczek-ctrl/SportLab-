@@ -10,7 +10,7 @@ const TYPES = {
   nhl: new Map([['231', { name: 'Shots on Goal Milestones', metric: 'S' }]]),
   football: new Map([['266', { name: 'Shots Milestones', metric: 'SH' }]]),
 };
-const FOOTBALL_ROUTES = new Set(['soccer/eng.1', 'soccer/esp.1', 'soccer/ger.1', 'soccer/ita.1', 'soccer/fra.1', 'soccer/uefa.champions', 'soccer/uefa.europa', 'soccer/eng.2', 'soccer/ned.1', 'soccer/por.1']);
+const FOOTBALL_ROUTES = new Set(['soccer/usa.1', 'soccer/eng.1', 'soccer/esp.1', 'soccer/ger.1', 'soccer/ita.1', 'soccer/fra.1', 'soccer/uefa.champions', 'soccer/uefa.europa', 'soccer/eng.2', 'soccer/ned.1', 'soccer/por.1']);
 const MAX_QUOTES = 500;
 const RULES = Object.freeze({
   kind: 'provider-rules', provider: 'DraftKings', jurisdiction: 'Kansas, US',

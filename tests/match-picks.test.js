@@ -221,6 +221,26 @@ test('unverified settlement sources in other football and NHL leagues do not acq
   }
 });
 
+test('MLS uses the existing football form criteria and numeric ESPN identity for both double chances', () => {
+  const mlsRoute = 'soccer/usa.1';
+  const fixture = { ...event, sport: 'football', route: mlsRoute, id: `${mlsRoute}:999999` };
+  for (const [homeWins, awayWins, market] of [[9, 0, '1X'], [0, 9, 'X2']]) {
+    const value = analysis(Array(10).fill(4), undefined, homeWins, awayWins);
+    Object.assign(value, { sport: 'football', route: mlsRoute, fixtureId: fixture.id });
+    for (const side of ['home', 'away']) for (const row of value[side].recent) {
+      row.id = `${mlsRoute}:${row.id.slice(route.length + 1)}`; row.route = mlsRoute;
+    }
+    const result = build(value, { totalLine: 2.5 }, fixture);
+    assert.equal(result.status, 'available'); assert.equal(result.candidates.find(p => p.kind === 'result').market, market);
+    assert.equal(result.best.scope, 'regulation_90'); assert.equal(result.totals.market, 'total_goals');
+    assert.equal(result.totals.line, 2.5); assert.equal(result.totals.scope, 'regulation_90');
+    assert.equal(result.probability, undefined); assert.equal(result.expectedValue, undefined);
+    assert.equal(build(value, {}, { ...fixture, id: `${mlsRoute}:tsdb-999999` }).status, 'unavailable');
+    const wrongLeague = structuredClone(value); wrongLeague.home.recent[0].route = 'soccer/eng.1';
+    assert.equal(build(wrongLeague, {}, fixture).status, 'unavailable');
+  }
+});
+
 test('rendering highlights the chosen historical screen, labels analytical lines and escapes names', () => {
   const fixture = { ...event, home: '<img src=x onerror=alert(1)>' };
   const detail = matchPicksHTML(analysis(), fixture, { now });

@@ -1,4 +1,4 @@
-import { leagueLabel } from '../data/catalog.js';
+import { leagueLabel } from './catalog.js';
 import { summarizeParticipant } from './analysis.js';
 import { buildMatchContext } from './match-context.js';
 

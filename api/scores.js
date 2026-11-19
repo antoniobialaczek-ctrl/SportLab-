@@ -1,4 +1,4 @@
-import { ESPN_UNAVAILABLE_HISTORY_ROUTES, ROUTES } from '../src/data/catalog.js';
+import { ESPN_UNAVAILABLE_HISTORY_ROUTES, ROUTES } from '../src/server/catalog.js';
 import { fetchJSON } from '../src/data/fetch.js';
 import { failure, getOnly, parseDate, scalar } from '../src/server/http.js';
 import { liveEvents } from '../src/server/scores.js';

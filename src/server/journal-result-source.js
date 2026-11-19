@@ -1,4 +1,4 @@
-import { isAllowedRoute } from '../data/catalog.js';
+import { isAllowedRoute } from './catalog.js';
 import { fetchJSON } from '../data/fetch.js';
 import { aggregatePlayerForm } from './player-form.js';
 

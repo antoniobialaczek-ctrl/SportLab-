@@ -1,4 +1,4 @@
-import { isAllowedRoute } from '../data/catalog.js';
+import { isAllowedRoute } from './catalog.js';
 import { predictFixture } from '../models/index.js';
 
 const DAY = 86400000;
