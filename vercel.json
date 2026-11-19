@@ -5,7 +5,7 @@
   "outputDirectory": "dist",
   "functions": {
     "api/*.js": {
-      "includeFiles": "{data/history/*.json,data/reports/*.json,src/**}",
+      "includeFiles": "{data/history/*.json,data/reports/*.json,data/supplemental/ekstraklasa.json,src/**}",
       "maxDuration": 30
     }
   },

@@ -79,7 +79,7 @@ test('conflicting duplicate statistics are excluded instead of silently selectin
 });
 
 test('each sport uses its own recognized metric definitions without inferring goals from saves', () => {
-  const records = [record('100007', summary([group('1', [category([athlete('10', 'Player A', ['2', '1', '4'])], ['G', 'A', 'SOG'])])]))];
+  const records = [record('100007', summary([group('1', [category([athlete('10', 'Player A', ['2', '1', '4'])], ['G', 'A', 'S'])])]))];
   const nhl = aggregatePlayerForm(records, { ...query, sport: 'nhl' });
   assert.equal(nhl.primaryMetric, 'G');
   assert.equal(nhl.players[0].metrics.S.average, 4);
@@ -88,6 +88,28 @@ test('each sport uses its own recognized metric definitions without inferring go
   assert.equal(football.players[0].metrics.SH.average, 3);
   const goalkeepers = aggregatePlayerForm([record('100008', summary([group('1', [category([athlete('10', 'Keeper', ['3', '4'])], ['GA', 'SV'])])]))], { ...query, sport: 'nhl' });
   assert.equal(goalkeepers.players.length, 0);
+});
+
+test('NHL shots use semantic source keys and never mistake shootout goals for a second shot count', () => {
+  const skaters = { keys: ['goals', 'assists', 'shotsTotal', 'shootoutGoals', 'shotsMissed'],
+    labels: ['G', 'A', 'S', 'SOG', 'SM'], athletes: [athlete('10', 'Skater', ['2', '1', '4', '0', '1'])] };
+  const parse = categories => aggregatePlayerForm([record('100007', summary([group('1', categories)]))], { ...query, sport: 'nhl' });
+  const result = parse([skaters]);
+  assert.equal(result.conflicts, 0);
+  assert.equal(result.players[0].metrics.S.average, 4);
+  assert.equal(result.players[0].metrics.S.sample, 1);
+  assert.equal(result.players[0].metrics.G.average, 2);
+  const second = structuredClone(skaters); second.athletes[0].stats[2] = '5';
+  const conflicting = parse([skaters, second]);
+  assert.equal(conflicting.conflicts, 1);
+  assert.equal(conflicting.players[0].metrics.S, undefined);
+  assert.equal(conflicting.players[0].metrics.G.average, 2);
+  for (const change of [{ keys: ['goals', 'assists', 'shootoutGoals'] }, {}, { keys: ['goals'] }]) {
+    const ambiguous = { labels: ['G', 'A', 'SOG'], athletes: [athlete('10', 'Skater', ['2', '1', '4'])], ...change };
+    assert.equal(parse([ambiguous]).players[0].metrics.S, undefined);
+  }
+  const explicit = { keys: ['goals', 'assists', 'shotsOnGoal'], labels: ['G', 'A', 'SOG'], athletes: [athlete('10', 'Skater', ['2', '1', '4'])] };
+  assert.equal(parse([explicit]).players[0].metrics.S.average, 4);
 });
 
 test('up to ten observed leaders are returned and names break score ties deterministically', () => {

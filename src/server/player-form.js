@@ -1,4 +1,5 @@
 import { fetchJSON } from '../data/fetch.js';
+import { verifiedPlayerPhoto } from './player-photo.js';
 
 const DEFINITIONS = {
   nba: { primary: 'PTS', metrics: [
@@ -9,7 +10,7 @@ const DEFINITIONS = {
   nhl: { primary: 'G', metrics: [
     { key: 'G', label: 'Gole', aliases: ['G', 'GOALS'] },
     { key: 'A', label: 'Asysty', aliases: ['A', 'ASSISTS'] },
-    { key: 'S', label: 'Strzały na bramkę', aliases: ['S', 'SOG', 'SHOTS'] },
+    { key: 'S', label: 'Strzały na bramkę', aliases: ['S', 'SHOTS'] },
   ] },
   football: { primary: 'G', metrics: [
     { key: 'G', label: 'Gole', aliases: ['G', 'GOALS'] },
@@ -21,6 +22,19 @@ const DEFINITIONS = {
 const numeric = value => (typeof value === 'number' || typeof value === 'string')
   && /^\d+(?:\.\d+)?$/.test(String(value)) && Number.isFinite(Number(value))
   ? Number(value) : null;
+
+function nhlShotColumn(category, labels, index) {
+  // ESPN uses SOG for shootoutGoals, alongside S for shotsTotal. The
+  // semantic key distinguishes shots on goal from shootout goals; those
+  // values must never be merged or reported as conflicting shot counts.
+  if (Object.hasOwn(category, 'keys')) {
+    return Array.isArray(category.keys) && category.keys.length === labels.length
+      && ['shotsTotal', 'shotsOnGoal'].includes(category.keys[index]);
+  }
+  // Legacy label-only payloads can establish S/SHOTS, but SOG alone is
+  // ambiguous in this provider and cannot establish a shot observation.
+  return ['S', 'SHOTS'].includes(labels[index]);
+}
 
 function parseMinutes(value) {
   if (typeof value === 'string' && /^\d{1,3}:[0-5]\d$/.test(value)) {
@@ -136,8 +150,9 @@ export function aggregatePlayerForm(records, { sport, teamId, limit = 10 }) {
           if (athlete.athlete?.team?.id != null && String(athlete.athlete.team.id) !== teamId) continue;
           if (athlete.didNotPlay) { deniedPlayers.add(id); continue; }
           if (!Array.isArray(athlete.stats) || typeof name !== 'string' || !name.trim()) continue;
-          if (!perGame.has(id)) perGame.set(id, { id, name, team: group.team?.displayName || (match.homeId === teamId ? match.home : match.away), values: new Map(), rejected: new Set(), minutes: null, minutesRejected: false, zeroMinutes: false });
+          if (!perGame.has(id)) perGame.set(id, { id, name, headshot: null, team: group.team?.displayName || (match.homeId === teamId ? match.home : match.away), values: new Map(), rejected: new Set(), minutes: null, minutesRejected: false, zeroMinutes: false });
           const player = perGame.get(id);
+          player.headshot ||= verifiedPlayerPhoto(athlete.athlete?.headshot, id, sport);
           const minuteIndex = labels.findIndex(label => ['MIN', 'MINUTES', 'TOI'].includes(label));
           if (minuteIndex >= 0) {
             const minutes = parseMinutes(athlete.stats[minuteIndex]);
@@ -150,7 +165,8 @@ export function aggregatePlayerForm(records, { sport, teamId, limit = 10 }) {
           for (const metric of definition.metrics) {
             if (player.rejected.has(metric.key)) continue;
             const values = labels.flatMap((label, index) => {
-              const value = metric.aliases.includes(label) ? numeric(athlete.stats[index]) : null;
+              const recognized = sport === 'nhl' && metric.key === 'S' ? nhlShotColumn(category, labels, index) : metric.aliases.includes(label);
+              const value = recognized ? numeric(athlete.stats[index]) : null;
               return value !== null && Number.isInteger(value) ? [value] : [];
             });
             if (!values.length) continue;
@@ -167,8 +183,9 @@ export function aggregatePlayerForm(records, { sport, teamId, limit = 10 }) {
     const available = [...perGame.values()].filter(player => player.values.size > 0 && !player.zeroMinutes && !deniedPlayers.has(player.id));
     if (available.length) sampledMatches.push({ id: match.id, date: match.startTime, url, playerCount: available.length });
     for (const player of available) {
-      if (!totals.has(player.id)) totals.set(player.id, { id: player.id, name: player.name, team: player.team, games: 0, observations: new Map(), minutes: [] });
+      if (!totals.has(player.id)) totals.set(player.id, { id: player.id, name: player.name, team: player.team, headshot: null, photoDate: null, games: 0, observations: new Map(), minutes: [] });
       const total = totals.get(player.id); total.games++;
+      if (player.headshot && (!total.photoDate || match.startTime > total.photoDate)) { total.headshot = player.headshot; total.photoDate = match.startTime; }
       for (const [key, value] of player.values) {
         const previous = total.observations.get(key) || [];
         previous.push({ matchId: match.id, date: match.startTime, value });
@@ -179,7 +196,7 @@ export function aggregatePlayerForm(records, { sport, teamId, limit = 10 }) {
   }
   sampledMatches.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
   const players = [...totals.values()].map(player => ({
-    id: player.id, name: player.name, team: player.team, games: player.games,
+    id: player.id, name: player.name, team: player.team, headshot: player.headshot, games: player.games,
     minutes: player.minutes.length ? summarizeObservations(player.minutes, 'Minuty') : null,
     metrics: Object.fromEntries(definition.metrics.flatMap(metric => {
       const observations = player.observations.get(metric.key);

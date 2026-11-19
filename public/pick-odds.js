@@ -52,6 +52,8 @@ function quoteTiming(quote, data, current, start, observed) {
   const quoted = quote.quotedAt == null ? null : stamp(quote.quotedAt);
   if (quoted !== null && (!Number.isFinite(quoted) || quoted > observed || quoted >= start || current - quoted > 10 * MINUTE)) return null;
   if (quote.freshness === 'stale') return null;
+  const recordTime = quote.sourceRecordUpdatedAt == null ? null : stamp(quote.sourceRecordUpdatedAt);
+  if (recordTime !== null && (!Number.isFinite(recordTime) || recordTime > observed || recordTime >= start || current - recordTime > 24 * 60 * MINUTE)) return null;
   for (const validUntil of [data.observationValidUntil, quote.observationValidUntil]) {
     if (validUntil == null) continue;
     const until = stamp(validUntil);
@@ -59,13 +61,16 @@ function quoteTiming(quote, data, current, start, observed) {
   }
   const ownLimit = quote.maxObservationAgeMs ?? data.maxObservationAgeMs;
   if (ownLimit != null && (!Number.isFinite(ownLimit) || ownLimit <= 0 || ownLimit > MAX_OBSERVATION_AGE || current - observed > ownLimit)) return null;
-  return { quotedAt: quoted === null ? null : iso(quoted), freshness: quoted === null ? 'unverified' : 'fresh' };
+  return { quotedAt: quoted === null ? null : iso(quoted), freshness: quoted === null ? 'unverified' : 'fresh',
+    ...(recordTime !== null ? { sourceRecordUpdatedAt: iso(recordTime), timestampBasis: 'source-record-lastUpdated' } : {}) };
 }
 
 function outcomesFor(quote, wanted, event) {
-  if (!Array.isArray(quote.outcomes) || quote.outcomes.length < 2 || quote.outcomes.length > 6) return null;
+  const milestone = wanted.market === 'player_prop' && quote.quoteKind === 'milestone'
+    && Number.isSafeInteger(quote.threshold) && quote.threshold > 0 && quote.threshold - 0.5 === wanted.line;
+  if (!Array.isArray(quote.outcomes) || quote.outcomes.length < (milestone ? 1 : 2) || quote.outcomes.length > 6) return null;
   const allowed = wanted.market === 'winner' ? ['home', 'away', ...(event.sport === 'football' ? ['draw'] : [])]
-    : wanted.market === 'double_chance_90' ? ['home_draw', 'home_away', 'draw_away'] : ['over', 'under'];
+    : wanted.market === 'double_chance_90' ? ['home_draw', 'home_away', 'draw_away'] : milestone ? ['over'] : ['over', 'under'];
   const values = new Map();
   for (const outcome of quote.outcomes) {
     if (!outcome || !decimal(outcome.decimal)) return null;
@@ -73,7 +78,8 @@ function outcomesFor(quote, wanted, event) {
     if (!allowed.includes(selection) || outcome.direction != null && outcome.side != null && outcome.direction !== outcome.side
       || outcome.line != null && outcome.line !== wanted.line) return null;
     if (wanted.market === 'player_prop' && (outcome.playerId != null && outcome.playerId !== wanted.playerId
-      || outcome.teamId != null && outcome.teamId !== wanted.teamId || outcome.metric != null && outcome.metric !== wanted.metric)) return null;
+      || outcome.teamId != null && outcome.teamId !== wanted.teamId || outcome.metric != null && outcome.metric !== wanted.metric
+      || milestone && outcome.threshold != null && outcome.threshold !== quote.threshold)) return null;
     if (values.has(selection) && values.get(selection) !== outcome.decimal) return null;
     values.set(selection, outcome.decimal);
   }
@@ -100,7 +106,7 @@ export function matchPickQuote(data, event, pick, options = {}) {
   const wanted = selectionFor(pick, event, options);
   if (!wanted) return unavailable('Brak jednoznacznego rynku, wyboru lub zakresu rozliczenia tego typu.');
   const groups = new Map(), rejected = new Set();
-  for (const quote of data.quotes.slice(0, 100)) {
+  for (const quote of data.quotes.slice(0, 510)) {
     if (!matchesMarket(quote, wanted)) continue;
     const provider = text(quote.provider), providerId = text(quote.providerId, 80);
     if (!provider) continue;
@@ -142,7 +148,7 @@ const displayedTime = value => value ? new Date(value).toLocaleString('pl-PL', {
 const scopeLabel = { including_overtime: 'z dogrywką', including_overtime_shootout: 'z dogrywką i karnymi', regulation_90: '90 minut', including_overtime_excluding_shootout: 'z dogrywką, bez karnych' };
 function contentHTML(result) {
   if (result.status !== 'matched') return `<span class="pick-odds-unavailable" title="${esc(result.reason)}">Kurs niedostępny</span>`;
-  const title = `Odczyt: ${displayedTime(result.observedAt)}. Aktualizacja w źródle: ${displayedTime(result.quotedAt)}. ${result.freshness === 'unverified' ? 'Świeżość kursu niepotwierdzona. ' : ''}Zakres: ${scopeLabel[result.scope]}. Dane informacyjne — sprawdź ofertę.`;
+  const title = `Odczyt: ${displayedTime(result.observedAt)}. Potwierdzona aktualizacja ceny: ${displayedTime(result.quotedAt)}. ${result.sourceRecordUpdatedAt ? `Rekord źródła z: ${displayedTime(result.sourceRecordUpdatedAt)}; nie jest to potwierdzony czas zmiany ceny u bukmachera. ` : ''}${result.freshness === 'unverified' ? 'Świeżość kursu niepotwierdzona. ' : ''}Zakres: ${scopeLabel[result.scope]}. Dane informacyjne — sprawdź ofertę.`;
   return `<strong class="pick-odds-value" title="${esc(title)}">Kurs ${result.decimal.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong><small class="pick-odds-source" title="${esc(title)}">${esc(result.provider)} · odczyt</small>`;
 }
 

@@ -83,3 +83,25 @@ test('HTML badges escape provenance and keep a bounded descriptor without histor
   assert.ok(!html.includes('secret')); assert.ok(!html.includes('unsafe'));
   assert.equal(pickOddsContentHTML(null, event, winner, { now }).includes('Kurs niedostępny'), true);
 });
+
+test('an explicit N+ athlete milestone matches only over the equivalent half-point line', () => {
+  const milestone = quote('player_prop', { playerId: player.playerId, teamId: player.teamId, metric: 'PTS',
+    quoteKind: 'milestone', threshold: 25, outcomes: [{ side: 'over', direction: 'over', threshold: 25, decimal: 1.91 }] });
+  assert.equal(match(data([milestone]), player).decimal, 1.91);
+  assert.equal(match(data([milestone]), { ...player, direction: 'under' }).status, 'unavailable');
+  for (const overrides of [{ quoteKind: undefined }, { threshold: 24 }, { outcomes: [{ side: 'under', direction: 'under', decimal: 1.91 }] }]) {
+    assert.equal(match(data([{ ...milestone, ...overrides }]), player).status, 'unavailable');
+  }
+});
+
+test('source record metadata does not claim bookmaker freshness and rejects future or over-age records', () => {
+  const milestone = quote('player_prop', { playerId: player.playerId, teamId: player.teamId, metric: player.metric,
+    quoteKind: 'milestone', threshold: 25, sourceRecordUpdatedAt: '2026-11-18T19:40:00.000Z', outcomes: [{ direction: 'over', decimal: 1.8 }] });
+  const result = match(data([milestone]), player);
+  assert.equal(result.status, 'matched'); assert.equal(result.freshness, 'unverified'); assert.equal(result.quotedAt, null);
+  assert.equal(result.sourceRecordUpdatedAt, milestone.sourceRecordUpdatedAt);
+  assert.match(pickOddsHTML(data([milestone]), event, player, { now }), /Rekord źródła z:/);
+  for (const record of ['2026-11-18T20:02:00.000Z', '2026-11-17T19:59:00.000Z', 'bad']) {
+    assert.equal(match(data([{ ...milestone, sourceRecordUpdatedAt: record }]), player).status, 'unavailable');
+  }
+});

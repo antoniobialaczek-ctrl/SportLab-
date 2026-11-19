@@ -23,7 +23,7 @@ async function request(query, method = 'GET') {
 test('archive validates IDs, source coverage and query boundaries before storage reads', async () => {
   assert.equal((await request({}, 'POST')).statusCode, 405);
   for (const invalid of [{ sport: 'bad' }, { sport: ['nba'] }, { sport: 'nba', limit: '25' }, { sport: 'nba', cutoff: '2999-01-01T00:00:00Z' }, { sport: 'football', league: 'bad' }]) assert.equal((await request(invalid)).statusCode, 400);
-  for (const unavailable of [{ sport: 'cs2' }, { sport: 'football', league: 'pol.1' }]) {
+  for (const unavailable of [{ sport: 'cs2' }, { sport: 'football', league: 'pol.1', cutoff: '2026-11-18T00:00:00.000Z' }]) {
     const res = await request(unavailable); assert.equal(res.statusCode, 200); assert.deepEqual(res.body.events, []); assert.equal(res.body.status, 'unavailable');
   }
 });

@@ -9,8 +9,16 @@ const average = values => values.reduce((sum, value) => sum + value, 0) / values
 const median = values => { const sorted = [...values].sort((a, b) => a - b), middle = Math.floor(sorted.length / 2); return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2; };
 const timestamp = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value.slice(0, 10);
 const integer = value => Number.isInteger(value) && value >= 0;
-const validLine = value => Number.isFinite(value) && value >= 1 && value <= 599.5 && Number.isInteger(value * 2) && !Number.isInteger(value);
+const validLine = (value, minimum, maximum) => Number.isFinite(value) && value >= minimum && value <= maximum && Number.isInteger(value * 2) && !Number.isInteger(value);
 const response = (status, reason, totals = null, candidates = []) => ({ status, best: candidates[0] || null, candidates, totals, reason, note: NOTE });
+const separateSource = event => event?.sport === 'football' && event.route === 'soccer/pol.1';
+const fixtureIdPattern = event => separateSource(event) ? /^tsdb-\d{4,14}$/ : /^\d{4,14}$/;
+const participantIdPattern = event => separateSource(event) ? /^tsdb-\d{1,14}$/ : /^\d{1,14}$/;
+function totalConfiguration(event) {
+  if (event.sport === 'nba') return { market: 'total_points', scope: 'including_overtime', unit: 'pkt', labelUnit: 'punktu', minimum: 1.5, maximum: 599.5, defaultLine: null, settlement: 'z dogrywką' };
+  if (separateSource(event)) return { market: 'total_goals', scope: 'regulation_90', unit: 'gola', labelUnit: 'gola', minimum: 0.5, maximum: 15.5, defaultLine: 2.5, settlement: '90 minut' };
+  return null;
+}
 
 function fixtureContext(analysis, event, now) {
   if (!Number.isFinite(now) || !timestamp(event?.date)) return 'Nie można potwierdzić terminu spotkania.';
@@ -20,14 +28,15 @@ function fixtureContext(analysis, event, now) {
   if (!analysis || analysis.status !== 'available' || !timestamp(analysis.cutoff)
     || analysis.sport !== event.sport || analysis.route !== event.route
     || typeof event.route !== 'string' || typeof event.id !== 'string' || !event.id.startsWith(`${event.route}:`)
-    || !/^\d{4,14}$/.test(event.id.slice(event.route.length + 1))
-    || ![event.homeId, event.awayId].every(id => typeof id === 'string' && /^\d{1,14}$/.test(id))
+    || !fixtureIdPattern(event).test(event.id.slice(event.route.length + 1))
+    || separateSource(event) && event.sourceEventId !== event.id.slice(event.route.length + 1)
+    || ![event.homeId, event.awayId].every(id => typeof id === 'string' && participantIdPattern(event).test(id))
     || event.homeId === event.awayId || analysis.home?.id !== event.homeId || analysis.away?.id !== event.awayId
     || analysis.fixtureId && analysis.fixtureId !== event.id) return 'Historia nie potwierdza właściwego meczu i jego uczestników.';
   const cutoff = Date.parse(analysis.cutoff);
   if (cutoff > now || cutoff > start || now - cutoff > 15 * 60000) return 'Odśwież wcześniejsze wyniki przed porównaniem rynków.';
   if (!({ nba: ['basketball/nba'], nhl: ['hockey/nhl'], tennis: ['tennis/atp', 'tennis/wta'] }[event.sport]?.includes(event.route)
-    || event.sport === 'football' && /^soccer\/(?:eng\.1|esp\.1|ger\.1|ita\.1|fra\.1|uefa\.champions|uefa\.europa|eng\.2|ned\.1|por\.1)$/.test(event.route))) return 'Brak porównywalnego rynku dla tej dyscypliny.';
+    || event.sport === 'football' && /^soccer\/(?:eng\.1|esp\.1|ger\.1|ita\.1|fra\.1|pol\.1|uefa\.champions|uefa\.europa|eng\.2|ned\.1|por\.1)$/.test(event.route))) return 'Brak porównywalnego rynku dla tej dyscypliny.';
   return null;
 }
 
@@ -37,9 +46,11 @@ function observations(form, event, cutoff, now) {
   const seen = new Set(), rows = [];
   for (const row of form.recent) {
     if (typeof row?.id !== 'string' || !row.id.startsWith(`${event.route}:`)
-      || !/^\d{4,14}$/.test(row.id.slice(event.route.length + 1)) || row.id === event.id || seen.has(row.id)
+      || !fixtureIdPattern(event).test(row.id.slice(event.route.length + 1))
+      || separateSource(event) && row.sourceEventId !== row.id.slice(event.route.length + 1)
+      || row.id === event.id || seen.has(row.id)
       || row.route !== event.route || !timestamp(row.date) || Date.parse(row.date) >= cutoff
-      || ![row.scoreFor, row.scoreAgainst].every(value => integer(value) && value <= 300)
+      || ![row.scoreFor, row.scoreAgainst].every(value => integer(value) && value <= (separateSource(event) ? 30 : 300))
       || event.sport === 'nba' && row.scoreFor === row.scoreAgainst) return null;
     seen.add(row.id);
     rows.push({ id: row.id, matchId: row.id, date: row.date, total: row.scoreFor + row.scoreAgainst,
@@ -79,7 +90,7 @@ function resultCandidate(analysis, event, now) {
 /** Compare two transparent historical screens. Their support counts are not
  * calibrated forecasts; the selected total line is never optimized for hits.
  */
-export function buildMatchPicks(analysis, event, { now = Date.now(), totalLine } = {}) {
+export function buildMatchPicks(analysis, event, { now = Date.now(), totalLine, totalLineOrigin, oddsData } = {}) {
   const current = typeof now === 'number' ? now : Date.parse(now);
   const error = fixtureContext(analysis, event, current);
   if (error) return response(error === 'closed' ? 'closed' : 'unavailable', error === 'closed' ? 'Analiza archiwalna — bez aktywnych typów przedmeczowych.' : error);
@@ -87,8 +98,9 @@ export function buildMatchPicks(analysis, event, { now = Date.now(), totalLine }
   const homeRows = observations(analysis.home, event, cutoff, current), awayRows = observations(analysis.away, event, cutoff, current);
   if (!homeRows || !awayRows) return response('unavailable', 'Porównanie wymaga po 8–10 spójnych wcześniejszych meczów obu drużyn.');
   const winner = resultCandidate(analysis, event, current);
-  if (event.sport !== 'nba') return response(winner ? 'available' : 'neutral', event.sport === 'tennis' ? 'Kontekst nawierzchni nie pozwala wybrać rynku tenisowego.' : 'Sumę punktów porównujemy dla NBA; tutaj pozostają rynki wyniku.', null, winner ? [winner] : []);
-  if (totalLine !== undefined && !validLine(totalLine)) return response('unavailable', 'Podaj linię połówkową od 1,5 do 599,5 punktu.');
+  const config = totalConfiguration(event);
+  if (!config) return response(winner ? 'available' : 'neutral', event.sport === 'tennis' ? 'Kontekst nawierzchni nie pozwala wybrać rynku tenisowego.' : 'Sumy porównujemy dla NBA i potwierdzonych wyników 90 minut Ekstraklasy; tutaj pozostają rynki wyniku.', null, winner ? [winner] : []);
+  if (totalLine !== undefined && !validLine(totalLine, config.minimum, config.maximum)) return response('unavailable', `Podaj linię połówkową od ${number(config.minimum)} do ${number(config.maximum)} ${config.labelUnit}.`);
 
   // Equal-size windows avoid giving one team's longer history extra weight.
   const size = Math.min(homeRows.length, awayRows.length), homeWindow = homeRows.slice(0, size), awayWindow = awayRows.slice(0, size);
@@ -100,11 +112,13 @@ export function buildMatchPicks(analysis, event, { now = Date.now(), totalLine }
   }
   const uniqueObservations = [...unique.values()].sort((a, b) => Date.parse(b.date) - Date.parse(a.date) || a.id.localeCompare(b.id));
   const referenceAverage = average(uniqueObservations.map(row => row.total));
-  const line = totalLine ?? Math.floor(referenceAverage) + 0.5;
-  if (!validLine(line)) return response('unavailable', 'Dostępne wyniki nie tworzą poprawnej linii punktowej.');
+  const line = totalLine ?? config.defaultLine ?? Math.floor(referenceAverage) + 0.5;
+  if (!validLine(line, config.minimum, config.maximum)) return response('unavailable', 'Dostępne wyniki nie tworzą poprawnej linii sumy.');
   const home = summarize(homeWindow, line), away = summarize(awayWindow, line);
-  const totals = { line, lineOrigin: totalLine === undefined ? 'analytical' : 'manual', referenceAverage,
-    home, away, uniqueSample: uniqueObservations.length, uniqueObservations, scope: 'including_overtime',
+  const sourceLineVerified = totalLine !== undefined && totalLineOrigin === 'source' && ['over', 'under'].every(direction =>
+    matchPickQuote(oddsData, event, { kind: 'total', market: config.market, scope: config.scope, direction, line }, { now: current }).status === 'matched');
+  const totals = { line, lineOrigin: totalLine === undefined ? 'analytical' : sourceLineVerified ? 'source' : 'manual', referenceAverage,
+    home, away, uniqueSample: uniqueObservations.length, uniqueObservations, market: config.market, scope: config.scope, unit: config.unit,
     over: uniqueObservations.filter(row => row.total > line).length, under: uniqueObservations.filter(row => row.total < line).length };
   const candidates = winner ? [winner] : [];
   for (const direction of ['over', 'under']) {
@@ -112,8 +126,8 @@ export function buildMatchPicks(analysis, event, { now = Date.now(), totalLine }
     const trendAgrees = direction === 'over' ? home.last5Average > line && away.last5Average > line : home.last5Average < line && away.last5Average < line;
     if (homeHits * 2 < home.sample || awayHits * 2 < away.sample || uniqueHits < Math.ceil(totals.uniqueSample * 0.6) || !trendAgrees) continue;
     const word = direction === 'over' ? 'Powyżej' : 'Poniżej';
-    candidates.push({ kind: 'total', market: 'total_points', direction, line, lineOrigin: totals.lineOrigin,
-      label: `${word} ${number(line)} punktu w meczu (z dogrywką)`, scope: 'including_overtime',
+    candidates.push({ kind: 'total', market: config.market, direction, line, lineOrigin: totals.lineOrigin,
+      label: `${word} ${number(line)} ${config.labelUnit} w meczu (${config.settlement})`, scope: config.scope,
       support: { home: { hits: homeHits, sample: home.sample }, away: { hits: awayHits, sample: away.sample }, uniqueHits, uniqueSample: totals.uniqueSample },
       reasons: [`${event.home}: ${homeHits} z ${home.sample} wcześniejszych sum ${word.toLocaleLowerCase('pl')} linii.`,
         `${event.away}: ${awayHits} z ${away.sample} wcześniejszych sum ${word.toLocaleLowerCase('pl')} linii.`,
@@ -146,13 +160,20 @@ export function matchPicksHTML(analysis, event, options = {}) {
   const data = buildMatchPicks(analysis, event, options), compact = options.compact === true;
   if (data.status === 'closed') return '<section class="match-picks betting-closed"><p class="small">Analiza archiwalna — bez aktywnego typu przedmeczowego.</p></section>';
   if (data.status === 'unavailable') return `<section class="match-picks"><p class="small">${esc(data.reason)}</p></section>`;
+  const config = totalConfiguration(event), totalName = config?.market === 'total_goals' ? 'goli' : 'punktów';
+  const unit = config?.unit || 'pkt', settlement = config?.settlement || 'z dogrywką';
   const sourceMarkets = observedMarkets(options, event);
-  const best = data.best ? `<div class="match-best"><span class="small">Najmocniejszy sygnał z historii</span><div class="pick-title-row"><${compact ? 'h4' : 'h3'}>${esc(data.best.label)}</${compact ? 'h4' : 'h3'}>${pickOddsHTML(options.oddsData, event, data.best, options)}</div>${supportHTML(data.best, event)}</div>` : `<p class="small">${esc(data.reason)}</p>`;
-  if (compact) return `<section class="match-picks compact">${best}${!data.best || data.best.kind !== 'result' ? sourceMarkets.winnerPrices : ''}${sourceMarkets.totalPrices}${data.totals ? `<p class="small">Linia ${data.totals.lineOrigin === 'manual' ? 'wpisana' : 'analityczna'}: ${number(data.totals.line)} pkt • z dogrywką.</p>` : ''}</section>`;
+  const best = data.best ? `<div class="match-best"><span class="small">Najmocniejszy sygnał z historii · pierwszy do sprawdzenia</span><div class="pick-title-row"><${compact ? 'h4' : 'h3'}>${esc(data.best.label)}</${compact ? 'h4' : 'h3'}>${pickOddsHTML(options.oddsData, event, data.best, options)}</div>${supportHTML(data.best, event)}</div>` : `<p class="small">${esc(data.reason)}</p>`;
+  if (compact) return `<section class="match-picks compact">${best}${!data.best || data.best.kind !== 'result' ? sourceMarkets.winnerPrices : ''}${sourceMarkets.totalPrices}${data.totals ? `<p class="small">Linia ${data.totals.lineOrigin === 'source' ? 'ze źródła' : data.totals.lineOrigin === 'manual' ? 'wpisana' : 'analityczna'}: ${number(data.totals.line)} ${unit} • ${settlement}.</p>` : ''}</section>`;
   const winner = data.candidates.find(row => row.kind === 'result'), total = data.candidates.find(row => row.kind === 'total');
   const totals = data.totals;
-  const totalSelections = totals ? ['over', 'under'].map(direction => ({ kind: 'total', market: 'total_points', scope: 'including_overtime', direction, line: totals.line })) : [];
+  const totalSelections = totals ? ['over', 'under'].map(direction => ({ kind: 'total', market: totals.market, scope: totals.scope, direction, line: totals.line })) : [];
   const matchedTotals = totalSelections.length && totalSelections.every(pick => matchPickQuote(options.oddsData, event, pick, options).status === 'matched');
   const totalPrices = matchedTotals ? `<div class="total-odds-grid">${totalSelections.map(pick => `<div><span>${pick.direction === 'over' ? 'Powyżej' : 'Poniżej'} ${number(pick.line)}</span>${pickOddsHTML(options.oddsData, event, pick, options)}</div>`).join('')}</div>` : '';
-  return `<section class="match-picks"><h3>Wynik czy suma punktów?</h3>${best}<div class="match-market-grid"><section class="match-market-option"><h4>Wynik</h4>${winner ? `<div class="pick-title-row"><p><b>${esc(winner.label)}</b></p>${pickOddsHTML(options.oddsData, event, winner, options)}</div>${supportHTML(winner, event)}` : `<p class="small">Forma nie wskazuje wyraźnie jednej strony na rynku wyniku.</p>${sourceMarkets.winnerPrices}`}</section><section class="match-market-option"><h4>Suma punktów</h4>${totals ? `<p><b>${total ? esc(total.label) : `Linia ${number(totals.line)} pkt — kierunek nierozstrzygnięty`}</b></p>${total ? pickOddsHTML(options.oddsData, event, total, options) : ''}<p class="small">${esc(event.home)}: powyżej ${totals.home.over}/${totals.home.sample}, poniżej ${totals.home.under}/${totals.home.sample}.<br>${esc(event.away)}: powyżej ${totals.away.over}/${totals.away.sample}, poniżej ${totals.away.under}/${totals.away.sample}.</p><p class="small">${totals.uniqueSample} różnych spotkań. Średnia ich sum: ${number(totals.referenceAverage)} pkt.</p>${totalPrices}` : '<p class="small">Suma punktów jest dostępna dla NBA.</p>'}</section></div>${totals ? `<p class="small">${totals.lineOrigin === 'manual' ? 'Porównujesz własną linię.' : 'Linia analityczna jest najbliższą połówką średniej wcześniejszych sum; nie jest linią pobraną z oferty.'} Zakres: wynik końcowy NBA z dogrywką.</p><form data-match-line><label>Twoja linia sumy punktów<input name="totalLine" type="text" inputmode="decimal" value="${number(totals.line)}" required></label><button type="submit">Porównaj linię</button><p data-match-line-result class="small" role="status"></p></form>` : ''}<details><summary>Jak porównujemy rynki?</summary><p class="small">${esc(data.note)} Wyróżniamy kierunek mający większe poparcie w słabszej z dwóch historii, a przy remisie porównujemy oba bilanse łącznie. To porównanie opisowe, nie porównanie zysku lub kursów.</p></details></section>`;
+  const lineExplanation = totals?.lineOrigin === 'source' ? 'Porównujesz dokładną linię z odczytu źródła; sprawdź jej dostępność przed decyzją.'
+    : totals?.lineOrigin === 'manual' ? 'Porównujesz własną linię.'
+      : config?.defaultLine != null ? 'Stała linia analityczna 2,5 gola nie jest wybierana pod wcześniejszą trafność ani pobierana z oferty.'
+        : 'Linia analityczna jest najbliższą połówką średniej wcześniejszych sum; nie jest linią pobraną z oferty.';
+  const scopeExplanation = separateSource(event) ? '90 minut, bez dogrywki i karnych' : 'wynik końcowy NBA z dogrywką';
+  return `<section class="match-picks"><h3>Wynik czy suma ${totalName}?</h3>${best}<div class="match-market-grid"><section class="match-market-option"><h4>Wynik</h4>${winner ? `<div class="pick-title-row"><p><b>${esc(winner.label)}</b></p>${pickOddsHTML(options.oddsData, event, winner, options)}</div>${supportHTML(winner, event)}` : `<p class="small">Forma nie wskazuje wyraźnie jednej strony na rynku wyniku.</p>${sourceMarkets.winnerPrices}`}</section><section class="match-market-option"><h4>Suma ${totalName}</h4>${totals ? `<p><b>${total ? esc(total.label) : `Linia ${number(totals.line)} ${unit} — kierunek nierozstrzygnięty`}</b></p>${total ? pickOddsHTML(options.oddsData, event, total, options) : ''}<p class="small">${esc(event.home)}: powyżej ${totals.home.over}/${totals.home.sample}, poniżej ${totals.home.under}/${totals.home.sample}.<br>${esc(event.away)}: powyżej ${totals.away.over}/${totals.away.sample}, poniżej ${totals.away.under}/${totals.away.sample}.</p><p class="small">${totals.uniqueSample} różnych spotkań. Średnia ich sum: ${number(totals.referenceAverage)} ${unit}.</p>${totalPrices}` : '<p class="small">Sumy są dostępne dla NBA i potwierdzonych wyników 90 minut Ekstraklasy.</p>'}</section></div>${totals ? `<p class="small">${lineExplanation} Zakres: ${scopeExplanation}.</p><form data-match-line><label>Twoja linia sumy ${totalName}<input name="totalLine" type="text" inputmode="decimal" value="${number(totals.line)}" required></label><button type="submit">Porównaj linię</button><p data-match-line-result class="small" role="status"></p></form>` : ''}<details><summary>Jak porównujemy rynki?</summary><p class="small">${esc(data.note)} Wyróżniamy kierunek mający większe poparcie w słabszej z dwóch historii, a przy remisie porównujemy oba bilanse łącznie. To porównanie opisowe, nie porównanie zysku lub kursów.</p></details></section>`;
 }

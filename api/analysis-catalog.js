@@ -1,7 +1,8 @@
-import { ROUTES, ESPN_UNAVAILABLE_HISTORY_ROUTES } from '../src/data/catalog.js';
+import { ROUTES } from '../src/data/catalog.js';
 import { failure, getOnly, parseTimestamp, scalar } from '../src/server/http.js';
 import { readHistory } from '../src/server/storage.js';
 import { buildAnalysisCatalog } from '../src/server/analysis-catalog.js';
+import { loadEkstraklasaHistory } from '../src/server/ekstraklasa-history.js';
 
 export default async function handler(req, res) {
   if (!getOnly(req, res)) return;
@@ -18,9 +19,14 @@ export default async function handler(req, res) {
     if (league !== 'all' && !routes.length) throw new Error('Nieznana liga');
     if (parseTimestamp(cutoff) > Date.now()) throw new Error('Punkt odcięcia nie może być późniejszy niż teraz');
   } catch (error) { return failure(res, 400, error.message); }
-  if (sport === 'cs2' || routes.every(route => ESPN_UNAVAILABLE_HISTORY_ROUTES[route])) return res.json({ events: [], status: 'unavailable', reason: 'Brak zweryfikowanego źródła historii tej dyscypliny lub ligi.' });
+  if (sport === 'cs2') return res.json({ events: [], status: 'unavailable', reason: 'Brak podłączonego źródła historii CS2.' });
   try {
-    const history = await readHistory(sport);
+    let history;
+    if (routes.includes('soccer/pol.1')) {
+      const [extra, original] = await Promise.all([loadEkstraklasaHistory(), routes.some(route => route !== 'soccer/pol.1') ? readHistory(sport) : Promise.resolve(null)]);
+      history = { events: [...(original?.events || []), ...extra.events], updatedAt: [original?.updatedAt, extra.fetchedAt].filter(Boolean).sort().at(-1),
+        runtimeData: { sources: [original?.runtimeData, extra.runtimeData].filter(Boolean), fallback: Boolean(original?.runtimeData?.fallback || extra.runtimeData.fallback) } };
+    } else history = await readHistory(sport);
     const events = buildAnalysisCatalog(history.events, { sport, routes, cutoff, limit });
     res.setHeader('Cache-Control', 'public, s-maxage=300');
     res.json({ events, status: events.length ? 'available' : 'unavailable', cutoff, historyUpdatedAt: history.updatedAt, runtimeData: history.runtimeData,

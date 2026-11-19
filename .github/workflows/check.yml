@@ -1,7 +1,7 @@
 name: Testy SportLab
 on:
   push:
-    branches-ignore: [sportlab-data]
+    branches-ignore: [sportlab-data, sportlab-ekstraklasa-data]
   pull_request:
   workflow_dispatch:
 permissions:

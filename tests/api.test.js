@@ -108,7 +108,7 @@ test('brak wiarygodnego źródła CS2 jest jawny i nie uruchamia pobrań', async
   assert.equal(res.statusCode, 200);
   assert.deepEqual(res.body.events, []);
   assert.equal(res.body.source, 'none');
-  assert.match(res.body.errors[0], /brak zweryfikowanego/);
+  assert.match(res.body.errors[0], /brak podłączonego/);
   assert.equal(fetch.mock.callCount(), 0);
 });
 

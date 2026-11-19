@@ -102,3 +102,18 @@ test('rendered picks escape names and explain analytical lines once without repe
   assert.ok(!html.includes('brak potwierdzonej przewagi'));
   assert.ok(!html.includes('%'));
 });
+
+test('verified source milestones choose an offered qualifying line and never borrow another athlete price', () => {
+  const offer = line => ({ provider: 'DraftKings', providerId: '100', market: 'player_prop', quoteKind: 'milestone', threshold: line + 0.5,
+    playerId: '101', teamId: event.homeId, metric: 'PTS', line, scope: 'including_overtime', observedAt: new Date(now - 30000).toISOString(), quotedAt: new Date(now - 30000).toISOString(), freshness: 'fresh',
+    outcomes: [{ direction: 'over', side: 'over', decimal: 1.8 }] });
+  const oddsData = { fixtureId: event.id, sport: event.sport, route: event.route, homeId: event.homeId, awayId: event.awayId,
+    startTime: event.date, fetchedAt: new Date(now - 30000).toISOString(), status: 'available', quotes: [offer(19.5), offer(23.5)] };
+  const selected = build(fixture(), event, { oddsData }).picks.find(pick => pick.playerId === '101' && pick.metric === 'PTS');
+  assert.equal(selected.line, 23.5); assert.equal(selected.lineOrigin, 'source'); assert.equal(selected.priceAvailable, true);
+  assert.equal(selected.hits, 8); assert.equal(selected.sample, 10);
+  const other = build(fixture(), event, { oddsData: { ...oddsData, quotes: [{ ...offer(23.5), playerId: '999' }] } }).picks.find(pick => pick.playerId === '101' && pick.metric === 'PTS');
+  assert.equal(other.line, 24.5); assert.equal(other.lineOrigin, 'analytical'); assert.equal(other.priceAvailable, false);
+  const expired = build(fixture(), event, { oddsData: { ...oddsData, fetchedAt: new Date(now - 360000).toISOString() } }).picks.find(pick => pick.playerId === '101' && pick.metric === 'PTS');
+  assert.equal(expired.lineOrigin, 'analytical'); assert.equal(expired.priceAvailable, false);
+});

@@ -35,3 +35,25 @@ Bezpośredni Node `fetch` początkowo nie korzystał z proxy i zgłaszał błęd
 Źródło można włączyć po potwierdzeniu bezpłatnego dostępu zgodnego z zastosowaniem SportLab i sprawdzeniu rzeczywistych odpowiedzi. Adapter musi rozróżnić CS2 i CS:GO, serie i pojedyncze mapy, walkowery i normalne wyniki, zapewnić stabilne identyfikatory uczestników oraz walidować paginację, daty UTC, zakończenie, korekty i błędy. Bieżący ranking, skład lub agregat kariery nie może stać się cechą dawnych prognoz.
 
 Sam `finished_at` oznacza koniec meczu, a nie czas opublikowania danej wersji wyniku. Pobranie historii dzisiaj nie odtwarza jej dawnych korekt. Dopóki nie ma wiarygodnego archiwalnego stanu albo zebranych na bieżąco, niezmiennych obserwacji i dostatecznego niezależnego testu, prognozy pozostają wstrzymane. Pozostałe dyscypliny i testy aplikacji mogą działać bez CS2; nie należy czekać na brakujący klucz, by dokończyć ich wdrożenie.
+
+## Ponowne sprawdzenie 19 listopada 2026
+
+Użytkownik ponownie włączył CS2 do żądanego zakresu. Nie potwierdzono jeszcze źródła pozwalającego uruchomić automatyczny terminarz, formę profesjonalnych drużyn, statystyki zawodników i kursy w tym projekcie bez opłat. Poniższe wyniki uzupełniają audyt, a nie zastępują brakujących danych demonstracyjną historią.
+
+| Źródło | Sprawdzone fakty | Konsekwencja |
+| --- | --- | --- |
+| [PandaScore: plany](https://www.pandascore.co/pricing), [zakres endpointów](https://developers.pandascore.co/docs/plan-reference), [warunki](https://www.pandascore.co/terms-and-condition) | Darmowy plan Fixtures obejmuje listy nadchodzących i minionych meczów, wymaga tokenu. Endpoint pojedynczego meczu i szczegółowych gier wymaga planu Historical. Punkty 2.8 i 6.4 warunków zabraniają użycia danych subskrypcji do produktów związanych z kursami; cennik wyklucza zastosowania bukmacherskie ze standardowych planów statystycznych. | Samo uzyskanie darmowego tokenu nie uprawnia do tego zastosowania SportLab. Nie dodajemy integracji przez darmowy plan. |
+| [GGScore: dokumentacja](https://ggscore.net/docs), [cennik](https://ggscore.net/pricing), [warunki](https://ggscore.net/terms) | Istnieje darmowy plan bez karty: trzy żądania dziennie, te same endpointy co plany płatne. Udokumentowane listy `/api/v2/upcoming_matches` i `/api/v2/matches` mają limit 100 rekordów na stronę oraz filtry czasu i drużyny. Wymagany klucz konta w nagłówku `X-API-Key`. Warunki dopuszczają użycie w aplikacji zgodnie z planem, ale zabraniają redystrybucji lub sublicencjonowania danych bez pozwolenia. | Kandydat do ograniczonego importu po uzyskaniu rzeczywistego dostępu oraz wyjaśnieniu praw do publicznego udostępniania. Trzy żądania dziennie nie zapewniają bieżącego wyniku ani dowolnej historii każdej drużyny. Klucza projektu nie ma; nie uznajemy przykładów dokumentacji za rzeczywiste pobranie. |
+| [BO3: robots.txt](https://bo3.gg/robots.txt) | Wydawca jawnie wyłącza `/api/` z automatycznego indeksowania. Nie odnaleziono dokumentacji publicznego, przeznaczonego dla klientów darmowego API z potwierdzonymi warunkami użycia. | Nie budujemy zależności od nieudokumentowanego wewnętrznego interfejsu ani scrapera. Sam plik robots nie rozstrzyga licencji całej zawartości. |
+| [EsportsOdds: CS2 API](https://esportsodds.gg/cs2-api) | Darmowy sandbox obejmuje stałą próbkę dawnych meczów; aktualne dane i pełne endpointy wymagają planu płatnego. | Próbka służy nauce integracji i nie zasila bieżących analiz SportLab. |
+| [GRID: bieżące plany](https://grid.gg/plans/) | Ponownie potwierdzono przekierowanie starej strony Open Access na plany komercyjne ustalane indywidualnie. Bezpłatny portal dla kwalifikujących się drużyn LoL/VALORANT nie oznacza bezpłatnych danych CS2 dla SportLab. | Nie aktywujemy planu ani nie deklarujemy uprawnień, których projekt nie ma. |
+
+Pojedyncze próby rzeczywistego dostępu bez tokenu, przez proxy środowiska:
+
+| Zapytanie | Odpowiedź |
+| --- | --- |
+| `GET https://ggscore.net/api/v2/ping` | HTTP 200, JSON `{"message":"pong"}`. Potwierdza dostępność usługi, nie dostęp do meczów. |
+| `GET https://ggscore.net/api/v2/upcoming_matches?page=1&limit=1` | HTTP 401, JSON z informacją o wymaganym `X-API-Key` lub sesji konta. Nie ponawiano z przypadkowym ani cudzym kluczem. |
+| `GET https://api.pandascore.co/csgo/matches/upcoming?per_page=1` | HTTP 403, JSON `{"error":"Token is missing"}`. |
+
+Nie tworzono kont, nie akceptowano nowych subskrypcji, nie pozyskiwano cudzych kluczy i nie uruchamiano prób omijania ochrony. Brak dostępu do danych nie oznacza, że nie ma zaplanowanych meczów CS2.

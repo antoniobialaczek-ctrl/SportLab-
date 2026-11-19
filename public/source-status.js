@@ -1,0 +1,3 @@
+export function cs2SourceHTML() {
+  return `<section class="source-status-panel"><span class="pill">CS2</span><h3>Terminarz i typy czekają na podłączenie danych</h3><p>Nie ma jeszcze podłączonego źródła CS2 z potwierdzonym darmowym dostępem do tej aplikacji. To brak danych, a nie informacja, że dziś nie ma meczów.</p><p class="small">Bez terminarza, wcześniejszych wyników i kursów dla właściwego meczu nie możemy wskazać typu do rozważenia. Nie zastępujemy CS2 dawnymi wynikami CS:GO.</p><a href="https://www.hltv.org/matches" target="_blank" rel="noopener noreferrer">Sprawdź terminarz CS2 w HLTV ↗</a><p class="small">Link otwiera osobny serwis; jego dane i kursy nie są importowane do SportLab.</p></section>`;
+}

@@ -33,7 +33,7 @@ npm run check
 
 Zakres dat jest domknięty. Harmonogram i dane działają w UTC. Importer scala rekordy po stabilnym ID, sprawdza wynik i uczestników, ogranicza równoległe pobrania i stosuje timeouty. Przy błędzie źródła zachowuje poprzedni kompletny zbiór danej dyscypliny i kończy się kodem błędu. Nie generuje zastępczych wyników.
 
-Źródłem wyników jest bezpłatny, nieoficjalny ESPN API. NBA, NHL i 10 dostępnych lig piłkarskich mają osobne zbiory i modele. Domyślny import obejmuje wszystkie działające ligi; `--routes` zawęża zakres. ESPN nie obsługuje Ekstraklasy pod dotychczasową trasą — ta liga pozostaje jawnie niedostępna. Tenis wymaga poprawnie oznaczonych zakończonych pojedynczych meczów. CS2 pozostaje niedostępne do czasu pozyskania wiarygodnego darmowego źródła. Ograniczenia źródeł są opisane w [docs/sources.md](docs/sources.md).
+Źródłem wyników jest bezpłatny, nieoficjalny ESPN API. NBA, NHL i 10 dostępnych lig piłkarskich mają osobne zbiory i modele. Domyślny import obejmuje wszystkie działające ligi; `--routes` zawęża zakres. ESPN nie obsługuje Ekstraklasy pod dotychczasową trasą. Jej terminarz, wyniki i opisowa forma drużyn pochodzą teraz z oddzielnego darmowego TheSportsDB; nie trafiają do zamrożonego eksperymentu modeli. Tenis wymaga poprawnie oznaczonych zakończonych pojedynczych meczów. CS2 pozostaje niedostępne do czasu pozyskania wiarygodnego darmowego źródła. Ograniczenia źródeł są opisane w [docs/sources.md](docs/sources.md).
 
 Raport `data/reports/models.json` pochodzi wyłącznie z ponownego wykonania oceny na lokalnej historii. Dawnych, ręcznie wpisanych liczb skuteczności nie uznajemy za wyniki zweryfikowanego testu. Brak historii lub zbyt mała próba skutkują jawnym statusem braku walidacji.
 
@@ -61,7 +61,7 @@ Więcej: [architektura](docs/architecture.md), [kontrakt danych](docs/data-contr
 
 ## Stan przygotowanej wersji
 
-Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Przeszło 209 testów i build. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
+Kod i workflow są przygotowane do pracy w repozytorium `antoniobialaczek-ctrl/SportLab-`. Historia obejmuje 30 364 zakończone mecze, w tym 5 998 meczów 10 lig piłkarskich, oraz trzy jawne wykluczenia tenisowe. Weryfikacja obejmuje automatyczne testy, build i sprawdzenie pełnego przepływu w przeglądarce. Weryfikacja wdrożenia i identyfikatory publikacji są zapisywane w [raporcie](docs/release.md). Początkowy proces odzyskania aplikacji opisano w [docs/recovery.md](docs/recovery.md).
 
 Bieżące prawdopodobieństwa nadal są wstrzymane. Ani rozpoczęcie zbierania migawek, ani dodatni wynik badawczego testu retrospektywnego nie zastępują niezależnej walidacji przedmeczowej. CS2 pozostaje wyłączone z powodów opisanych w [audycie źródeł](docs/cs2-sources.md).
 
@@ -97,7 +97,7 @@ Dziennik działa lokalnie w tej przeglądarce, z importem i eksportem JSON. Nie 
 
 Kurs jest widoczny przy konkretnym typie, jeżeli odczyt ESPN odpowiada dokładnie temu samemu meczowi, rynkowi, kierunkowi, zasadom rozliczenia i linii. `/api/details` współdzieli odczyt z analizą meczu; dotychczasowy `/api/odds` pozostaje obsługiwany. Dane nadchodzących spotkań są pobierane automatycznie z ograniczoną równoległością. Oferta źródła może być pokazana osobno także bez zgodnego sygnału w historii. Przycisk „Porównaj typ dla tej linii” przenosi odczytaną linię NBA do istniejącego porównania i wykresu. Cena z innej linii, rynku lub zawodnika nie jest podstawiana.
 
-Przy cenie widnieje dostawca i oznaczenie „odczyt”; szczegóły wyjaśniają brak potwierdzonego czasu aktualizacji źródła. Odczyt wygasa po pięciu minutach lub przy rozpoczęciu meczu. Nie oznacza potwierdzonej aktualnej oferty i nie trafia automatycznie do EV ani dziennika. Brak dopasowania jest pokazany jako „Kurs niedostępny”. Obecne darmowe źródło nie udostępnia kompletnych kursów na statystyki konkretnych zawodników; ich analizy pozostają dostępne bez wymyślonych cen. Nie dodano płatnej usługi ani klucza. CS2 i Ekstraklasa pozostają poza zakresem tej rozbudowy.
+Przy cenie widnieje dostawca i oznaczenie „odczyt”; szczegóły wyjaśniają brak potwierdzonego czasu aktualizacji źródła. Odczyt wygasa po pięciu minutach lub przy rozpoczęciu meczu. Nie oznacza potwierdzonej aktualnej oferty i nie trafia automatycznie do EV ani dziennika. Brak dopasowania jest pokazany jako „Kurs niedostępny”. Dodatkowy odczyt ESPN core udostępnia jawne progi N+ na punkty, asysty i zbiórki NBA, strzały na bramkę NHL oraz strzały piłkarzy. Tożsamość zawodnika jest wiązana z aktualnym rosterem po ID. Próg 20+ oznacza powyżej 19,5; nie tworzymy przeciwnej ceny ani nie zgadujemy kolejności nieoznaczonych par. Najwyższa oferowana linia spełniająca dotychczasowe kryteria historii jest preferowana przed linią analityczną. Karty z dopasowaną ceną są pokazywane wcześniej. Brak ceny nadal pozostaje jawny. `lastUpdated` opisuje rekord ESPN, a nie potwierdzoną zmianę ceny u bukmachera: zachowujemy ten czas oddzielnie, nie deklarujemy świeżości oferty i odrzucamy przyszłe, błędne lub starsze niż 24 godziny rekordy. Nie dodano płatnej usługi ani klucza. Zakres i ograniczenia: [kursy zawodników](docs/player-odds-sources.md).
 
 Kontekst spotkania obejmuje znane obciążenie terminarza, czas od ostatniego meczu oraz wcześniejsze bilanse przeciwników mierzone przed każdym wcześniejszym spotkaniem. Kontuzje i zgłoszeni starterzy są powiązani z danym meczem; brak raportu nie oznacza zdrowego składu. Bieżące raporty są ukryte w analizach archiwalnych. Historia nie zawiera zweryfikowanych nawierzchni tenisa — nie tworzymy zastępczych oznaczeń.
 
@@ -121,3 +121,13 @@ Wykresy pokazują rzeczywiste sumy obu drużyn w ich wcześniejszych spotkaniach
 Potwierdzenie publikacji porównania rynków i wykresów: [docs/match-markets-release.json](docs/match-markets-release.json).
 
 Potwierdzenie publikacji kursów przy dokładnych typach, porównania linii źródłowej i sprawdzenia publicznej strony: [docs/pick-odds-release.json](docs/pick-odds-release.json).
+
+## Zdjęcia i nowe źródło Ekstraklasy
+
+Przy typach, pełnej formie i boxscore są zdjęcia udostępnione przez ESPN dla dokładnego ID zawodnika. Nie zgadujemy URL ani nie podstawiamy twarzy innej osoby. Brak lub błąd zdjęcia zostawia inicjały. Obrazy są ładowane leniwie i mają opisy dostępności.
+
+Ekstraklasa ma oddzielny zbiór opisowy: 95 rzeczywistych zakończonych meczów, 18 drużyn i 100 sprawdzonych dni w pierwszym pobraniu. Darmowy TheSportsDB zwraca do trzech spotkań na dzień, więc pokrycie jest jawnie niepełne. Daty i tożsamości są sprawdzane w osobnej przestrzeni `tsdb-…`. Forma wykorzystuje wyłącznie wyniki rzeczywiście zaobserwowane przed punktem odcięcia; nie udajemy, że dzisiejszy odczyt był dostępny przed dawnym meczem. Wynik i suma goli są porównywane dla 90 minut. Domyślna linia 2,5 gola jest stała, bez optymalizacji do historii; własne linie obejmują 0,5–15,5. Kryteria wskazania są takie same jak wcześniej: dostateczna spójna historia, zgodność obu stron i ostatnich pięciu wyników. TheSportsDB nie podaje w tym odczycie kursów, boxscore ani kontuzji zawodników tej ligi.
+
+Oddzielny workflow pobiera ostatnie siedem zakończonych dni raz dziennie, o 06:47 UTC. Publikuje wyłącznie sprawdzone dane i manifest SHA-256 na gałęzi `sportlab-ekstraklasa-data`. Kod produkcji nie jest automatycznie wdrażany. Dokumentacja: [źródło Ekstraklasy](docs/ekstraklasa-sources.md), [automatyzacja](docs/ekstraklasa-automation.md).
+
+Zakładka CS2 odróżnia brak podłączonego źródła od braku meczów i daje link do zewnętrznego terminarza. Nie znaleziono źródła z potwierdzonym darmowym dostępem i prawem do tego zastosowania; nie pokazujemy fikcyjnych meczów, kursów ani wskazań CS2. [Ponowny audyt](docs/cs2-sources.md) opisuje wymagany dostęp i ograniczenia usług.
