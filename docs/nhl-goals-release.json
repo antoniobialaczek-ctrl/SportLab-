@@ -1,0 +1,37 @@
+{
+  "verifiedAt": "2026-11-19T22:05:34.613892+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_EF5t1m6LkZ5hDwb1u8A3RNzLYnaV",
+  "sourceCommit": "15d11a2e46833dd432530e5d48197c5c85b72eb0",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44614883745",
+  "automatedTests": 303,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "fixtureId": "hockey/nhl:401892742",
+    "teams": [
+      "Toronto Maple Leafs",
+      "Los Angeles Kings"
+    ],
+    "winnerAndTotalGoals": true,
+    "goalCharts": 2,
+    "recentResults": 10,
+    "scoredAndConcededAverages": true,
+    "manualGoalLine": 6.5,
+    "officialFinalScoreScope": true,
+    "personalGoalJournalSave": true,
+    "desktop": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "defaultAnalyticalGoalLine": 5.5,
+  "manualHalfGoalLineRange": [
+    0.5,
+    25.5
+  ],
+  "settlementScope": "including_overtime_shootout",
+  "shootoutConvention": "One official winning goal, not the sum of shootout attempts",
+  "unverifiedOrMismatchedOddsExcluded": true,
+  "frozenScientificSourcesChanged": false,
+  "futureProbabilitiesPublished": false,
+  "paidServicesAdded": false
+}
