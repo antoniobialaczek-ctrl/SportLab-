@@ -119,3 +119,5 @@ W analizie można wpisać własną linię połówkową, np. 224,5. Liczniki, wyr
 Wykresy pokazują rzeczywiste sumy obu drużyn w ich wcześniejszych spotkaniach, z datami, rywalem, wynikiem, średnią i ostatnimi pięcioma meczami. Mają wspólną skalę od zera i nie łączą różnych spotkań w jedną fikcyjną serię. Błędne i sprzeczne wyniki są pomijane, a brak danych nie staje się zerem. Widok mobilny układa wykresy pionowo. Wskazanie jest usuwane także w otwartym oknie po utracie aktualności analizy lub rozpoczęciu meczu. Zamrożone źródła i protokół nie zostały zmienione.
 
 Potwierdzenie publikacji porównania rynków i wykresów: [docs/match-markets-release.json](docs/match-markets-release.json).
+
+Potwierdzenie publikacji kursów przy dokładnych typach, porównania linii źródłowej i sprawdzenia publicznej strony: [docs/pick-odds-release.json](docs/pick-odds-release.json).

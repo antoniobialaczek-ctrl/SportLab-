@@ -1,0 +1,44 @@
+{
+  "verifiedAt": "2026-11-19T09:56:25.349984+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_2DoCycgwLn96343kWwEXfGyDhF3b",
+  "previewDeploymentId": "dpl_Co1XQDoGwCoQZteJM9TsC7gFfcPF",
+  "sourceCommit": "0e799f40b20f52c0208b174adb50675a8b6cfafe",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44491532659",
+  "automatedTests": 209,
+  "productionBuildTests": 209,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "sourcePrice": "Kurs 1,32",
+    "matchedSourceLine": 226.5,
+    "totalPrices": [
+      "Kurs 1,94",
+      "Kurs 1,88"
+    ],
+    "pricesBesideChoices": true,
+    "exactLineOnly": true,
+    "sourceLineComparison": true,
+    "playerPricesNotFabricated": true,
+    "expiredPricesHidden": true,
+    "singleSummaryFetch": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "source": "ESPN — nieoficjalne darmowe API",
+  "quoteMatching": [
+    "exact fixture and start",
+    "exact market and settlement scope",
+    "exact selection and half-point line",
+    "athlete, team and statistic for player props",
+    "five-minute observation expiry and before kickoff"
+  ],
+  "sourceQuoteUpdateTimeVerified": false,
+  "sourceObservationIsCurrentBookmakerOffer": false,
+  "playerPropPricesAvailableFromCurrentSource": false,
+  "readOnlySourceObservations": true,
+  "futureProbabilitiesPublished": false,
+  "automaticExpectedValueOrJournalPopulation": false,
+  "frozenScientificSourcesChanged": false,
+  "paidServicesAdded": false,
+  "errorLogsObserved": 0
+}
