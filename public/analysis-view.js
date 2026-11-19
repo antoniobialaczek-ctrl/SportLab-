@@ -1,4 +1,5 @@
 import { playerPhotoHTML } from './player-photo.js';
+import { playerMetricChartHTML } from './player-charts.js';
 
 export const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const esc = escapeHTML;
@@ -29,11 +30,23 @@ export function matchDetailHTML(analysis, event) {
     <p class="small">Stan danych do ${esc(new Date(analysis.cutoff).toLocaleString('pl-PL'))}. ${esc(analysis.source)} • historia zaktualizowana ${esc(analysis.historyUpdatedAt ? new Date(analysis.historyUpdatedAt).toLocaleString('pl-PL') : '—')}.</p><details><summary class="small">Zakres i ograniczenia danych</summary>${analysis.notes.map(note => `<p class="small">${esc(note)}</p>`).join('')}</details>`;
 }
 
-export function playerFormHTML(data, name) {
-  const players = Array.isArray(data.players) ? data.players : [];
-  const regulars = players.filter(player => player.games >= 5);
-  const shorter = players.filter(player => !(player.games >= 5));
-  const table = rows => `<div class="scroll"><table><thead><tr><th>Zawodnik</th><th>Średnia / mediana / ostatnie 5</th><th>Występy</th></tr></thead><tbody>${rows.map(player => `<tr><td><span class="player-identity">${playerPhotoHTML(player, data.sport)}<span>${esc(player.name)}</span></span></td><td>${Object.values(player.metrics || {}).map(metric => `<div><b>${esc(metric.label)}: ${decimal(metric.average)}</b><br><span class="small">Mediana ${decimal(metric.median)} • ostatnie 5: ${decimal(metric.last5Average)}${metric.sample !== player.games ? ` • dane z ${esc(metric.sample)} występów` : ''}</span></div>`).join('')}</td><td>${esc(player.games)}</td></tr>`).join('')}</tbody></table></div>`;
-  const dates = (data.sampledMatches || []).filter(row => Number.isFinite(Date.parse(row.date))).map(row => esc(date(row.date)));
-  return `<section class="panel"><h4>${esc(name)}</h4>${players.length ? `<p class="small">Statystyki z ${esc(data.successfulMatches)} z ${esc(data.requestedMatches)} ostatnich dostępnych meczów drużyny. Każdy zawodnik ma własną liczbę występów.</p>${regulars.length ? table(regulars) : '<p class="small">Nie ma jeszcze zawodników z co najmniej 5 dostępnymi występami w tym zestawie.</p>'}${shorter.length ? `<details><summary>Pozostałe dostępne występy (${shorter.length})</summary><p class="small">Krótsze historie, poniżej 5 występów.</p>${table(shorter)}</details>` : ''}${dates.length ? `<details><summary class="small">Daty analizowanych meczów</summary><p class="small">${dates.join(', ')}.</p></details>` : ''}` : `<p class="small">${esc(data.reason || 'Źródło nie udostępniło porównywalnych statystyk zawodników.')}</p>`}${data.errors?.length ? `<details><summary class="small">Dostępność danych</summary><p class="small">${esc(data.errors.join(' '))}</p></details>` : ''}</section>`;
+export function playerFormHTML(data, name, options = {}) {
+  const players = (Array.isArray(data.players) ? data.players : []).filter(p => p && typeof p.id === 'string');
+  if (!players.length) return `<section class="panel player-explorer"><h4>${esc(name)}</h4><p class="small">${esc(data.reason || 'Źródło nie udostępniło porównywalnych statystyk zawodników.')}</p></section>`;
+  const player = players.find(p => p.id === options.playerId) || players[0];
+  if (!Object.keys(player.metrics || {}).length) return `<section class="panel player-explorer"><div class="pe-team">${esc(name)}</div><div class="player-identity">${playerPhotoHTML(player, data.sport)}<h4>${esc(player.name)}</h4></div><p class="small">Brak porównywalnych statystyk tego zawodnika.</p></section>`;
+  const preferred = data.sport === 'nba' ? 'PTS' : data.sport === 'nhl' ? 'S' : 'SH';
+  const metrics = Object.entries(player.metrics || {}), metricKey = metrics.some(([key]) => key === options.metric) ? options.metric : metrics.some(([key]) => key === preferred) ? preferred : metrics[0][0];
+  const metric = player.metrics[metricKey];
+  const observations = Array.isArray(metric.observations) ? metric.observations : [];
+  const validDates = observations.map(row => row.date).filter(value => Number.isFinite(Date.parse(value))).sort();
+  return `<section class="panel player-explorer" data-player-explorer data-team-id="${esc(data.teamId)}" data-event-id="${esc(options.eventId || '')}">
+    <div class="pe-team">${esc(name)}</div><div class="pe-controls"><label>Zawodnik<select data-player-inspector>${players.map(p => `<option value="${esc(p.id)}" ${p.id === player.id ? 'selected' : ''}>${esc(p.name)} · ${esc(p.games)} występów</option>`).join('')}</select></label><label>Statystyka<select data-player-metric>${metrics.map(([key, value]) => `<option value="${esc(key)}" ${key === metricKey ? 'selected' : ''}>${esc(value.label || key)}</option>`).join('')}</select></label></div>
+    <div class="player-identity pe-identity">${playerPhotoHTML(player, data.sport)}<div><h4>${esc(player.name)}</h4><span class="small">${esc(metric.label || metricKey)} · ${esc(metric.sample)} wcześniejszych występów</span></div></div>
+    <div class="pe-stats"><div><span>Średnia</span><b>${decimal(metric.average)}</b></div><div><span>Ostatnie 5</span><b>${decimal(metric.last5Average)}</b></div><div><span>Mediana</span><b>${decimal(metric.median)}</b></div></div>
+    ${playerMetricChartHTML(metric, { label: `${player.name} — ${metric.label || metricKey}` })}
+    <p class="small pe-dates">${validDates.length ? `${esc(date(validDates[0]))} — ${esc(date(validDates.at(-1)))}. ` : ''}Każdy słupek to rzeczywisty występ; brak danych nie jest zerem. Historia nie potwierdza przyszłego składu.</p>
+    <details class="pe-table"><summary>Wartości i daty występów</summary><div class="scroll"><table><thead><tr><th>Data</th><th>${esc(metric.label || metricKey)}</th></tr></thead><tbody>${observations.map(row => `<tr><td>${esc(date(row.date))}</td><td>${esc(row.value)}</td></tr>`).join('')}</tbody></table></div></details>
+    ${data.errors?.length ? `<details><summary class="small">Dostępność danych</summary><p class="small">${esc(data.errors.join(' '))}</p></details>` : ''}
+  </section>`;
 }

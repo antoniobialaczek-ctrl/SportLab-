@@ -30,6 +30,7 @@ let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
 let marketView = 'matches';
 const previews = new Map();
 const matchLines = new Map();
+const playerInspectors = new Map();
 const playerForms = new Map(), fixtureDetails = new Map(), playerDrafts = new Map(), matchDrafts = new Map();
 let playerQueue = [], playerWorkers = 0;
 let detailRequests = 0;
@@ -147,6 +148,12 @@ function playerPreviewContent(event) {
     ? picks.map(pick => `<div class="player-preview-pick"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<b>${esc(pick.statement)}</b></span>${pickOddsHTML(oddsFor(event), event, pick)}<span class="small">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej linii</span></div>`).join('')
     : `<p class="small">${entries.some(entry => entry?.status === 'loading') ? 'Analizowanie do 10 wcześniejszych meczów…' : entries.every(entry => entry?.data) ? 'Dostępne wyniki nie spełniają kryteriów typu zawodnika. Pełna forma w analizie.' : 'Punkty, asysty, zbiórki i strzały — otwórz typy zawodników.'}</p>`}`;
 }
+function playerOverviewHTML(event, teamId) {
+  const entry = playerForms.get(playerKey(event, teamId)), data = entry?.data;
+  if (entry?.status === 'error') return '<p class="small">Statystyki zawodników są chwilowo niedostępne. Otwórz analizę ponownie, aby powtórzyć pobranie.</p>';
+  if (!data) return '<p class="small">Wczytywanie występów zawodników…</p>';
+  return playerFormHTML(data, teamId === event.homeId ? event.home : event.away, { ...playerInspectors.get(`${event.id}:${teamId}`), eventId: event.id });
+}
 function updatePlayerViews(event) {
   document.querySelectorAll('[data-player-preview]').forEach(node => { if (node.dataset.playerPreview === event.id) node.innerHTML = playerPreviewContent(event); });
   if (detailEvent?.id === event.id && $('modal').classList.contains('on')) {
@@ -156,9 +163,10 @@ function updatePlayerViews(event) {
         const key = `${entry.data.fetchedAt}:${Date.now() - Date.parse(entry.data.fetchedAt) > 15 * 60000}:${oddsFor(event)?.fetchedAt || ''}:${excludedPlayers(event).join(',')}:${event.state}:${Date.parse(event.date) <= Date.now()}`;
         const pickNode = $(`player-picks-${side}`), formNode = $(`players-${side}`);
         if (pickNode && pickNode.dataset.renderKey !== key) { renderPlayerPickNode(pickNode, entry.data, event); pickNode.dataset.renderKey = key; }
-        if (formNode && formNode.dataset.renderKey !== entry.data.fetchedAt) { formNode.innerHTML = playerFormHTML(entry.data, name); formNode.dataset.renderKey = entry.data.fetchedAt; }
+        if (formNode && formNode.dataset.renderKey !== entry.data.fetchedAt) { formNode.innerHTML = playerOverviewHTML(event, teamId); formNode.dataset.renderKey = entry.data.fetchedAt; }
       } else if (entry?.status === 'error') {
         if ($(`player-picks-${side}`)) $(`player-picks-${side}`).innerHTML = `<p class="small">Statystyki ${esc(name)} są chwilowo niedostępne. Otwórz analizę ponownie, aby powtórzyć pobranie.</p>`;
+        if ($(`players-${side}`)) $(`players-${side}`).innerHTML = playerOverviewHTML(event, teamId);
       }
     }
   }
@@ -284,10 +292,12 @@ function renderBetting() {
   const ready = upcoming.filter(event => [event.homeId, event.awayId].every(id => playerForms.get(playerKey(event, id))?.data));
   const loading = upcoming.some(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.status === 'loading'));
   const remaining = upcoming.filter(event => !ready.includes(event));
+  const overviewEvent = upcoming.find(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.data?.players?.length));
+  const overview = overviewEvent ? `<section class="player-summary-overview"><h3>Forma zawodników · ${esc(overviewEvent.home)} — ${esc(overviewEvent.away)}</h3><div class="analysis-sides">${playerOverviewHTML(overviewEvent, overviewEvent.homeId)}${playerOverviewHTML(overviewEvent, overviewEvent.awayId)}</div></section>` : '';
   const watch = upcoming.flatMap(event => { const data = previews.get(previewKey(event))?.data; const assessment = data && assessBetting(data, event); return assessment?.candidate ? [{ event, assessment }] : []; });
   $('betting-summary').innerHTML = !upcoming.length
     ? '<p class="small">W wybranym zestawie nie ma nadchodzących spotkań. Analizy rozegranych meczów znajdziesz poniżej.</p>'
-    : `${selected.length ? `<div class="player-picks-grid picks-summary-grid">${selected.map(({ event, pick }) => `<article class="player-pick" data-pick-metric="${esc(pick.metric)}"><span class="small">${esc(event.home)} — ${esc(event.away)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h3>${esc(pick.statement)}</h3></span>${pickOddsHTML(oddsFor(event), event, pick)}</div><p class="player-pick-market">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej tej linii</p><p class="small">Średnia: ${Number(pick.average).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} • mediana: ${Number(pick.median).toLocaleString('pl-PL', { maximumFractionDigits: 1 })}</p>${journalPickButtonHTML(event, pick)}<button data-bet-id="${esc(event.id)}">Zobacz formę i pozostałe typy</button></article>`).join('')}</div>`
+    : `${overview}${selected.length ? `<div class="player-picks-grid picks-summary-grid">${selected.map(({ event, pick }) => `<article class="player-pick" data-pick-metric="${esc(pick.metric)}"><span class="small">${esc(event.home)} — ${esc(event.away)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h3>${esc(pick.statement)}</h3></span>${pickOddsHTML(oddsFor(event), event, pick)}</div><p class="player-pick-market">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej tej linii</p><p class="small">Średnia: ${Number(pick.average).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} • mediana: ${Number(pick.median).toLocaleString('pl-PL', { maximumFractionDigits: 1 })}</p>${journalPickButtonHTML(event, pick)}<button data-bet-id="${esc(event.id)}">Zobacz formę i pozostałe typy</button></article>`).join('')}</div>`
       : `<p class="small">${loading ? 'Analizowanie ostatnich 10 meczów zawodników…' : ready.length ? 'Dla wybranego rynku nie ma wskazania spełniającego kryteria. Możesz sprawdzić własną linię w analizie zawodnika.' : 'Typy zawodników pojawią się po wczytaniu dłuższej formy.'}</p>`}
       <div class="picks-load"><span class="small">Forma zawodników wczytana dla ${ready.length} z ${upcoming.length} meczów.</span>${remaining.length ? `<button data-more-player-picks ${loading ? 'disabled' : ''}>${loading ? 'Wczytywanie…' : 'Wczytaj typy kolejnych meczów'}</button>` : ''}</div>
       ${watch.length ? `<details class="team-picks-list"><summary>Typy z formy drużyn (${watch.length})</summary><ul class="betting-watchlist">${watch.map(({ event, assessment }) => `<li><div><b>${esc(assessment.candidate.label)}</b><span class="small">${esc(event.home)} — ${esc(event.away)}</span></div><button data-bet-id="${esc(event.id)}">Uzasadnienie</button></li>`).join('')}</ul></details>` : ''}`;
@@ -402,11 +412,11 @@ async function detail(id, button) {
   lastDetailButton = button; $('modal').classList.add('on'); $('close').focus();
   $('mtitle').textContent = `${event.home} — ${event.away}`;
   $('detail').innerHTML = `<p class="small">${esc(event.league)} • ${esc(localDate(event.date))}</p>
+    ${event.sport !== 'tennis' ? `<section class="player-analysis-section"><h3>Zawodnicy — forma i wykresy</h3><p class="small">Wybierz zawodnika i statystykę. Wykres pokazuje jego wcześniejsze występy, także gdy nie ma aktywnego typu.</p><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div></section>` : ''}
     <div id="betting-detail"><p class="small">Porównywanie wyniku i sumy punktów…</p></div>
     ${event.sport !== 'tennis' ? `<section class="match-player-picks"><h3>Typy na zawodników</h3><p class="small">Linie źródłowe lub analityczne porównane z wcześniejszymi występami. Sprawdź ofertę i dostępność zawodnika przed decyzją.</p><div class="analysis-sides"><div id="player-picks-home"><h4>${esc(event.home)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Poniżej pozostaje analiza archiwalna.'}</p></div><div id="player-picks-away"><h4>${esc(event.away)}</h4><p class="small">${event.state === 'pre' && Date.parse(event.date) > Date.now() ? 'Analizowanie do 10 wcześniejszych meczów…' : 'Typy zawodników są dostępne przed rozpoczęciem spotkania. Poniżej pozostaje analiza archiwalna.'}</p></div></div></section>` : ''}
     <div id="availability"><p class="small">Sprawdzanie dostępności zawodników…</p></div>
     <details class="panel detail-section"><summary>Pełna forma drużyn i bezpośrednie spotkania</summary><div id="match-detail"><p>Wczytywanie porównania…</p></div></details>
-    ${event.sport !== 'tennis' ? `<details class="panel detail-section"><summary>Pełna forma zawodników — do 10 meczów</summary><div class="analysis-sides"><div id="players-home"><p class="small">Ładowanie: ${esc(event.home)}…</p></div><div id="players-away"><p class="small">Ładowanie: ${esc(event.away)}…</p></div></div></details>` : ''}
     <details class="panel detail-section"><summary>Kursy i linie ze źródła</summary><div id="source-odds"></div></details>
     <details class="panel detail-section"><summary>Kalkulator kursu i dziennik własnych typów</summary><div id="journal-form"></div></details>
     <details id="game-boxscore" class="panel detail-section" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dodatkowe informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
@@ -522,6 +532,19 @@ document.addEventListener('click', async click => {
   form.elements.namedItem('totalLine').value = String(line).replace('.', ',');
   form.requestSubmit();
   $('betting-detail').scrollIntoView({ block: 'start' });
+});
+document.addEventListener('change', change => {
+  const select = change.target.closest('[data-player-inspector], [data-player-metric]');
+  if (!select) return;
+  const host = select.closest('[data-player-explorer]');
+  const event = [...events, ...archiveEvents].find(row => row.id === host.dataset.eventId);
+  if (!event) return;
+  const teamId = host.dataset.teamId;
+  playerInspectors.set(`${event.id}:${teamId}`, { playerId: host.querySelector('[data-player-inspector]').value, metric: host.querySelector('[data-player-metric]').value });
+  const parent = host.parentElement, playerChanged = select.hasAttribute('data-player-inspector');
+  host.outerHTML = playerOverviewHTML(event, teamId);
+  const updated = [...parent.querySelectorAll('[data-player-explorer]')].find(node => node.dataset.teamId === teamId && node.dataset.eventId === event.id);
+  updated?.querySelector(playerChanged ? '[data-player-inspector]' : '[data-player-metric]')?.focus({ preventScroll: true });
 });
 document.addEventListener('keydown', event => {
   if (!$('modal').classList.contains('on')) return;

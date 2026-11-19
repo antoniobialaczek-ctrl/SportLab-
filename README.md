@@ -149,3 +149,7 @@ MLS (`soccer/usa.1`) ma terminarz, formę drużyn, bezpośrednie spotkania i dos
 Wynik i suma goli MLS używają 90 minut oraz tych samych opisowych kryteriów formy. Domyślna linia goli to stałe 2,5; można sprawdzić własną linię. Kurs jest pokazywany tylko dla dokładnie dopasowanego rynku i wyboru, jeżeli źródło go udostępnia. Dziennik obsługuje również MLS. Brak zweryfikowanego modelu tej ligi nie blokuje analiz opisowych, ale pozostawia prawdopodobieństwa wstrzymane.
 
 Ikony przeglądarki i skrótu aplikacji pochodzą z grafiki przesłanej przez użytkownika (SHA-256 oryginału `1344ea1eb48abde48fa1f7812c2f4fcd35957dd55dd491f583984375501afd55`). Przygotowano wyłącznie wersje rozmiarowe, bez zmiany kompozycji. Manifest i nazwy plików ikon obsługują aktualizację cache.
+
+## Widoczna analiza zawodników
+
+Zakładka „Zawodnicy i typy” oraz szczegóły meczu pokazują profile obu drużyn także bez aktywnych typów. Wybór gracza i statystyki zmienia zdjęcie, średnią, medianę, średnią ostatnich pięciu występów i wykres do dziesięciu rzeczywistych wyników z datami. Zmiana wyboru wykorzystuje już pobrane dane. Słupki mają skalę od zera; brak statystyki nie jest zerem, a sprzeczne lub przyszłe obserwacje blokują wykres. Historia opisuje wcześniejsze występy i nie potwierdza przyszłego składu ani prawdopodobieństwa zakładu.
