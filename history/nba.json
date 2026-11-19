@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-19T01:20:50.009Z",
+  "updatedAt": "2026-11-19T05:13:57.724Z",
   "events": [
     {
       "id": "basketball/nba:401705021",
@@ -60442,7 +60442,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60467,7 +60467,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60492,7 +60492,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60517,7 +60517,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261112&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60542,7 +60542,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60567,7 +60567,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60592,7 +60592,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60617,7 +60617,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60642,7 +60642,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60667,7 +60667,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60692,7 +60692,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60717,7 +60717,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60742,7 +60742,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261113&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60767,7 +60767,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60792,7 +60792,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60817,7 +60817,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60842,7 +60842,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60867,7 +60867,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261114&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60892,7 +60892,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60917,7 +60917,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60942,7 +60942,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60967,7 +60967,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -60992,7 +60992,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61017,7 +61017,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61042,7 +61042,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61067,7 +61067,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61092,7 +61092,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261115&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61117,7 +61117,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61142,7 +61142,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61167,7 +61167,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61192,7 +61192,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61217,7 +61217,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61242,7 +61242,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61267,7 +61267,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61292,7 +61292,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261116&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61317,7 +61317,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61342,7 +61342,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61367,7 +61367,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61392,7 +61392,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     },
     {
@@ -61417,7 +61417,232 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261117&limit=1000",
-        "fetchedAt": "2026-11-19T01:20:50.009Z"
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910007",
+      "sourceEventId": "401910007",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T00:00:00.000Z",
+      "resultAvailableAt": "2026-11-20T00:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "5",
+      "awayId": "29",
+      "home": "Cleveland Cavaliers",
+      "away": "Memphis Grizzlies",
+      "homeScore": 121,
+      "awayScore": 124,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910008",
+      "sourceEventId": "401910008",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T00:00:00.000Z",
+      "resultAvailableAt": "2026-11-20T00:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "11",
+      "awayId": "10",
+      "home": "Indiana Pacers",
+      "away": "Houston Rockets",
+      "homeScore": 104,
+      "awayScore": 119,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910009",
+      "sourceEventId": "401910009",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T00:00:00.000Z",
+      "resultAvailableAt": "2026-11-20T00:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "14",
+      "awayId": "15",
+      "home": "Miami Heat",
+      "away": "Milwaukee Bucks",
+      "homeScore": 137,
+      "awayScore": 130,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910010",
+      "sourceEventId": "401910010",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T00:00:00.000Z",
+      "resultAvailableAt": "2026-11-20T00:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "19",
+      "awayId": "20",
+      "home": "Orlando Magic",
+      "away": "Philadelphia 76ers",
+      "homeScore": 116,
+      "awayScore": 121,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910011",
+      "sourceEventId": "401910011",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T00:30:00.000Z",
+      "resultAvailableAt": "2026-11-20T00:30:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "17",
+      "awayId": "4",
+      "home": "Brooklyn Nets",
+      "away": "Chicago Bulls",
+      "homeScore": 107,
+      "awayScore": 137,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910012",
+      "sourceEventId": "401910012",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T00:30:00.000Z",
+      "resultAvailableAt": "2026-11-20T00:30:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "28",
+      "awayId": "27",
+      "home": "Toronto Raptors",
+      "away": "Washington Wizards",
+      "homeScore": 99,
+      "awayScore": 103,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910013",
+      "sourceEventId": "401910013",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T01:00:00.000Z",
+      "resultAvailableAt": "2026-11-20T01:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "3",
+      "awayId": "8",
+      "home": "New Orleans Pelicans",
+      "away": "Detroit Pistons",
+      "homeScore": 109,
+      "awayScore": 122,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910014",
+      "sourceEventId": "401910014",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T01:00:00.000Z",
+      "resultAvailableAt": "2026-11-20T01:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "25",
+      "awayId": "1",
+      "home": "Oklahoma City Thunder",
+      "away": "Atlanta Hawks",
+      "homeScore": 112,
+      "awayScore": 117,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
+      }
+    },
+    {
+      "id": "basketball/nba:401910016",
+      "sourceEventId": "401910016",
+      "sport": "nba",
+      "route": "basketball/nba",
+      "league": "nba",
+      "season": "2027",
+      "startTime": "2026-11-19T01:00:00.000Z",
+      "resultAvailableAt": "2026-11-20T01:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "6",
+      "awayId": "9",
+      "home": "Dallas Mavericks",
+      "away": "Golden State Warriors",
+      "homeScore": 116,
+      "awayScore": 94,
+      "neutralSite": false,
+      "neutralSiteBasis": "source",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20261118&limit=1000",
+        "fetchedAt": "2026-11-19T05:13:57.724Z"
       }
     }
   ],
@@ -61426,7 +61651,7 @@
   "unavailableSources": [],
   "coverage": {
     "lastFetch": {
-      "from": "2026-11-11",
+      "from": "2026-11-12",
       "to": "2026-11-18",
       "routes": [
         "basketball/nba"
