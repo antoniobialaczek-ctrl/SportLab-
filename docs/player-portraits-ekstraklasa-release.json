@@ -1,0 +1,89 @@
+{
+  "verifiedAt": "2026-11-19T15:02:51.219269+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_AKRB7AfVUqTyYomfzELsX3gMY8Nz",
+  "previewDeploymentId": "dpl_9cVEdfBRMtwYiaHBEpCofVkVu3WE",
+  "sourceCommit": "3bea756f8c61be2ecbc90fe34976dfe6466817ce",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44538732996",
+  "automatedTests": 247,
+  "productionBuildTests": 247,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "playerStatement": "Easton Cowan — powyżej 0,5 strzału na bramkę",
+    "playerPrice": "Kurs 1,15",
+    "playerDescriptor": {
+      "kind": "player",
+      "market": "player_prop",
+      "direction": "over",
+      "scope": "including_overtime_excluding_shootout",
+      "playerId": "5149211",
+      "metric": "S",
+      "teamId": "21",
+      "line": 0.5
+    },
+    "loadedPhotos": 4,
+    "playerLineExactMatch": true,
+    "imageFallback": true,
+    "expiredPriceHidden": true,
+    "ekstraklasaNextFixture": "Najbliższy mecz Ekstraklasy\n\nPiast Gliwice — Korona Kielce\n\n20.11.2026, 18:00:00 • inna data niż wybrana w filtrze.\n\nPokaż mecze tego dnia i ich analizy",
+    "ekstraklasaGoals90": true,
+    "ekstraklasaManualGoals": true,
+    "noInventedEkstraklasaPrice": true,
+    "cs2MissingConnectionExplicit": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "ekstraklasa": {
+    "completedMatches": 95,
+    "teams": 18,
+    "observedDays": 100,
+    "provider": "TheSportsDB",
+    "coverageComplete": false,
+    "freeDailyResponseLimit": 3,
+    "sourceIdsNamespaced": true,
+    "resultsAvailableOnlyAfterActualObservation": true,
+    "modelExperimentEligible": false,
+    "automaticDataWorkflow": {
+      "url": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44538831569",
+      "status": "success",
+      "scheduleUTC": "47 6 * * *",
+      "productionCodeDeployment": false,
+      "publishedDataCommit": "8b2298670d23f7e1a2456e69ed83fab82b11d647",
+      "manifestPublishedAt": "2026-11-19T13:59:34.771Z",
+      "publicAPIOrigin": "github",
+      "publicAPIFallback": false,
+      "publicAPISamples": [
+        8,
+        10
+      ]
+    },
+    "playerStatisticsAvailable": false,
+    "bookmakerPricesAvailable": false
+  },
+  "playerOdds": {
+    "provider": "ESPN core — nieoficjalne API",
+    "supportedExplicitMilestones": [
+      "NBA PTS",
+      "NBA AST",
+      "NBA REB",
+      "NHL S",
+      "football SH"
+    ],
+    "exactFixtureAthleteTeamMetricLineAndScope": true,
+    "quoteUpdateTimeVerified": false,
+    "recordTimeRetainedSeparately": true,
+    "observationMaxAgeMs": 300000,
+    "sourceRecordMaxPresentationAgeMs": 86400000,
+    "futureMalformedOrMissingRecordTimesRejected": true,
+    "automaticExpectedValueOrJournalPopulation": false
+  },
+  "nhlShotsSemanticKeyFixed": true,
+  "cs2DataConnectionAvailable": false,
+  "cs2Limitation": "No verified free source with access and rights for this use; external schedule link only.",
+  "futureProbabilitiesPublished": false,
+  "frozenScientificSourcesChanged": false,
+  "frozenHistoryWorkflowChanged": false,
+  "ciTriggerChange": "Ignore the supplemental data-only branch",
+  "paidServicesAdded": false,
+  "errorLogsObserved": 0
+}

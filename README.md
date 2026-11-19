@@ -131,3 +131,5 @@ Ekstraklasa ma oddzielny zbiór opisowy: 95 rzeczywistych zakończonych meczów,
 Oddzielny workflow pobiera ostatnie siedem zakończonych dni raz dziennie, o 06:47 UTC. Publikuje wyłącznie sprawdzone dane i manifest SHA-256 na gałęzi `sportlab-ekstraklasa-data`. Kod produkcji nie jest automatycznie wdrażany. Dokumentacja: [źródło Ekstraklasy](docs/ekstraklasa-sources.md), [automatyzacja](docs/ekstraklasa-automation.md).
 
 Zakładka CS2 odróżnia brak podłączonego źródła od braku meczów i daje link do zewnętrznego terminarza. Nie znaleziono źródła z potwierdzonym darmowym dostępem i prawem do tego zastosowania; nie pokazujemy fikcyjnych meczów, kursów ani wskazań CS2. [Ponowny audyt](docs/cs2-sources.md) opisuje wymagany dostęp i ograniczenia usług.
+
+Potwierdzenie publikacji zdjęć, kursów zawodników, Ekstraklasy i pierwszego udanego uruchomienia jej automatyzacji: [docs/player-portraits-ekstraklasa-release.json](docs/player-portraits-ekstraklasa-release.json).
