@@ -1,0 +1,35 @@
+{
+  "verifiedAt": "2026-11-19T21:29:50.617424+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_5YcW5dcdczNBaACPi1G4aF9G4DBM",
+  "sourceCommit": "5159a458e702f88640c56cbee9f5b6d2a19d31e1",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44608852036",
+  "automatedTests": 296,
+  "publicBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "athlete": "Stephon Castle",
+    "openedCompletedFixture": "basketball/nba:401910004",
+    "latestProfileGame": {
+      "id": "basketball/nba:401910004",
+      "date": "2026-11-18T01:00:00.000Z",
+      "value": 10
+    },
+    "observations": 10,
+    "currentProfileInOlderMatch": true,
+    "desktop": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "liveSourceChecks": {
+    "nbaBostonLatest": "2026-11-19T02:30:00.000Z",
+    "nbaBostonHistoricalLatest": "2026-11-17T00:00:00.000Z",
+    "nhlTeam1Latest": "2026-11-19T00:30:00.000Z",
+    "mlsOrlandoLatest": "2026-11-07T21:00:00.000Z",
+    "schedulesRefreshed": true
+  },
+  "currentProfilesIndependentOfSelectedFixture": true,
+  "historyEndpointCutoffPreserved": true,
+  "sourceCoverageComplete": false,
+  "frozenScientificSourcesChanged": false,
+  "paidServicesAdded": false
+}
