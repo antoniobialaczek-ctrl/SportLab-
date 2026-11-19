@@ -17,14 +17,15 @@
     "seasonLimit": 15
   },
   "createdAt": "2026-11-19T10:01:10.307Z",
-  "fetchedAt": "2026-11-19T10:01:10.307Z",
+  "fetchedAt": "2026-11-19T13:59:30.508Z",
   "modelExperimentEligible": false,
   "coverage": {
     "complete": false,
     "from": "2026-08-11",
     "to": "2026-11-18",
     "dayLimit": 3,
-    "note": "Darmowy oficjalny dzienny odczyt TheSportsDB: do 3 spotkań, bez gwarancji pełnego sezonu. Dostępność wyniku zaczyna się przy rzeczywistej obserwacji z co najmniej 24h od rozpoczęcia meczu."
+    "refreshDays": 7,
+    "note": "Darmowy dzienny odczyt TheSportsDB: do 3 spotkań, bez gwarancji pełnego sezonu. Wynik jest dostępny od rzeczywistej obserwacji, z co najmniej 24h od rozpoczęcia meczu."
   },
   "events": [
     {
@@ -4384,7 +4385,7 @@
     {
       "day": "2026-11-12",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-12&l=4422",
-      "observedAt": "2026-11-19T10:00:34.271Z",
+      "observedAt": "2026-11-19T13:58:54.640Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4393,7 +4394,7 @@
     {
       "day": "2026-11-13",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-13&l=4422",
-      "observedAt": "2026-11-19T10:00:40.257Z",
+      "observedAt": "2026-11-19T13:59:00.540Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4402,7 +4403,7 @@
     {
       "day": "2026-11-14",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-14&l=4422",
-      "observedAt": "2026-11-19T10:00:46.246Z",
+      "observedAt": "2026-11-19T13:59:06.535Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4411,7 +4412,7 @@
     {
       "day": "2026-11-15",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-15&l=4422",
-      "observedAt": "2026-11-19T10:00:52.296Z",
+      "observedAt": "2026-11-19T13:59:12.526Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4420,7 +4421,7 @@
     {
       "day": "2026-11-16",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-16&l=4422",
-      "observedAt": "2026-11-19T10:00:58.317Z",
+      "observedAt": "2026-11-19T13:59:18.540Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4429,7 +4430,7 @@
     {
       "day": "2026-11-17",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-17&l=4422",
-      "observedAt": "2026-11-19T10:01:04.253Z",
+      "observedAt": "2026-11-19T13:59:24.541Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4438,7 +4439,7 @@
     {
       "day": "2026-11-18",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-18&l=4422",
-      "observedAt": "2026-11-19T10:01:10.305Z",
+      "observedAt": "2026-11-19T13:59:30.508Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
