@@ -1,0 +1,39 @@
+{
+  "verifiedAt": "2026-11-20T18:23:55.791782+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_3UeoCXcc22QLGPaDwfmFvuQ6sreM",
+  "sourceCommit": "1702f3b5193288b054b34d48979762f36ef38b30",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44782455741",
+  "automatedTests": 317,
+  "policyBrowserWithTestFixtures": {
+    "target": "http://127.0.0.1:3190",
+    "mockedSources": true,
+    "defaultDailyView": true,
+    "collapsedSettings": true,
+    "compactPricedListTested": true,
+    "onePickPerFixtureTested": true,
+    "lowPriceExcludedTested": true,
+    "detailsRetainedTested": true,
+    "sportAndDayIsolationTested": true,
+    "filterPersistence": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "publicLiveUI": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "defaultDailyView": true,
+    "collapsedSettings": true,
+    "filterPersistence": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "publicVerificationScope": "Real schedule and default UI loaded. Ranking, price exclusion, fixture diversity, details and sport/day isolation separately checked using isolated test fixtures; live bookmaker availability is not asserted.",
+  "maximumDailySelections": 5,
+  "maximumSelectionsPerFixture": 1,
+  "rankingBasis": "Descriptive historical consistency, not a validated probability or expected return",
+  "minimumOddsPreferencePreserved": true,
+  "modelValidationUnlocked": false,
+  "frozenScientificSourcesChanged": false,
+  "paidServicesAdded": false
+}
