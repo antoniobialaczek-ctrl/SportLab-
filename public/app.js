@@ -13,6 +13,7 @@ import { journalPickButtonHTML } from '/pick-actions.js';
 import { createAvailabilityMemory } from '/availability-memory.js';
 import { screenPick } from '/pick-screening.js';
 import { dailyPicksHTML } from '/daily-picks.js';
+import { playerFormCardsHTML } from '/player-form-cards.js';
 const availabilityMemory = createAvailabilityMemory();
 installPlayerPhotoFallback(document);
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
@@ -200,6 +201,13 @@ function requestPlayerForm(event, teamId, signal) {
   updatePlayerViews(event);
   return entry.promise;
 }
+function queuePricedPlayerForms(selected) {
+  if (!['daily', 'players'].includes(marketView)) return;
+  const eligible = selected.filter(event => events.some(row => row.id === event.id) && oddsFor(event)?.quotes?.some(quote => quote.market === 'player_prop'
+    && ({ nba: ['PTS', 'AST', 'REB'], nhl: ['S'], football: ['SH'] }[event.sport] || []).includes(quote.metric)
+    && ['over', 'under'].some(direction => screenPick({ kind: 'player', market: 'player_prop', playerId: quote.playerId, teamId: quote.teamId, metric: quote.metric, line: quote.line, direction, scope: quote.scope }, event, { ...pickScreening, oddsData: oddsFor(event) }).eligible)));
+  if (eligible.length) queuePlayerForms(eligible, eligible.length, true);
+}
 function requestFixtureDetails(event, signal) {
   const cached = fixtureDetails.get(event.id);
   if (cached?.promise) return cached.promise;
@@ -208,6 +216,7 @@ function requestFixtureDetails(event, signal) {
   const entry = { ...(cached?.data ? { data: cached.data } : {}) };
   entry.promise = boundedDetails(`/api/details?${params}`, signal).then(data => {
     entry.data = data; delete entry.promise; availabilityMemory.observe(event, data); updateOddsNodes(event); updatePreviewNodes(event); updatePlayerViews(event);
+    queuePricedPlayerForms([event]);
     updateCurrentDetails(event, data);
     return data;
   })
@@ -290,14 +299,15 @@ function renderBetting() {
       const matchPicks = analysis ? buildMatchPicks(analysis, event, marketOptions(event)).candidates : [];
       return [...matchPicks, ...eventPlayerPicks(event)].map(pick => ({ event, pick, oddsData: oddsFor(event) }));
     });
+    const playerCards = playerFormCardsHTML(candidates, { sport, ...pickScreening, limit: 4 });
     const analysed = upcoming.filter(event => previews.get(previewKey(event))?.data).length;
     const playerEvents = upcoming.filter(event => ['nba', 'nhl', 'football'].includes(event.sport) && event.route !== 'soccer/pol.1');
     const remaining = playerEvents.filter(event => ![event.homeId, event.awayId].every(id => playerEntryFresh(playerForms.get(playerKey(event, id)))));
-    const playerFormsAvailable = playerEvents.filter(event => [event.homeId, event.awayId].every(id => playerForms.get(playerKey(event, id))?.data?.players?.length)).length;
+    const playerFormsAvailable = playerEvents.filter(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.data?.players?.length)).length;
     const loading = upcoming.some(event => previews.get(previewKey(event))?.status === 'loading') || playerEvents.some(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.status === 'loading'));
     $('betting-summary').innerHTML = !upcoming.length
       ? '<p class="small">Brak nadchodzących spotkań w wybranym zestawie. Zmień sport lub dzień; rozegrane mecze znajdziesz poniżej.</p>'
-      : `<p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5 })}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
+      : `<p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5 })}${playerCards ? `<section class="daily-player-section"><h3>Zawodnicy — typ i ostatnie mecze</h3><p class="small">Konkretna linia i wcześniejsze występy. To osobne porównania historyczne, bez potwierdzonej skuteczności prognoz.</p>${playerCards}</section>` : ''}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
     document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
     const more = document.querySelector('[data-more-daily-players]');
     if (more) more.onclick = () => queuePlayerForms(remaining, 2);
@@ -528,7 +538,7 @@ function closeDetail() {
   if (lastDetailButton?.isConnected) lastDetailButton.focus();
 }
 let searchTimer;
-document.querySelectorAll('[data-market-view]').forEach(button => button.onclick = () => { marketView = button.dataset.marketView; renderBetting(); });
+document.querySelectorAll('[data-market-view]').forEach(button => button.onclick = () => { marketView = button.dataset.marketView; renderBetting(); queuePricedPlayerForms(events); });
 $('pick-market').onchange = renderBetting;
 $('q').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(render, 150); }; $('status').onchange = render; $('date').onchange = () => { closeDetail(); load(); };
 $('refresh').onclick = () => { closeDetail(); load(); loadModel(); loadReadiness(); };
@@ -593,6 +603,7 @@ $('pick-screening-form').addEventListener('submit', submit => {
     updatePlayerViews(detailEvent);
   }
   renderBetting();
+  queuePricedPlayerForms(events);
 });
 document.addEventListener('change', change => {
   const select = change.target.closest('[data-player-inspector], [data-player-metric]');
