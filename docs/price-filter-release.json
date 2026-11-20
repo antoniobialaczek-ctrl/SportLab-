@@ -1,0 +1,45 @@
+{
+  "verifiedAt": "2026-11-20T07:49:25.376172+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_Fp36SYNcjmdtUTgReMgER1jW6ugf",
+  "sourceCommit": "b483964ab3b610d5aed66f4e2d1588fc3862ee45",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44690145820",
+  "automatedTests": 312,
+  "policyBrowserWithTestFixtures": {
+    "target": "http://127.0.0.1:3180",
+    "mockedSources": true,
+    "defaultMinimum": 1.5,
+    "twoPriceBands": true,
+    "belowMinimumExcluded": true,
+    "matchingPriceRequired": true,
+    "statisticsRetained": true,
+    "filterPersistence": true,
+    "expiredQuotesRemovedFromOpenAnalysis": true,
+    "invalidMinimumRejected": true,
+    "unverifiedRiskDisclosed": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "publicLiveUI": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "defaultMinimum": 1.5,
+    "filterPersistence": true,
+    "invalidMinimumRejected": true,
+    "unverifiedRiskDisclosed": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "publicLiveUICheckScope": "Real scores loaded and filter controls/persistence checked; price inclusion, exclusion and expiry paths verified with isolated explicit test fixtures, not asserted as live bookmaker availability.",
+  "priceBands": [
+    "below2",
+    "atLeast2"
+  ],
+  "priceBandsAreRiskRatings": false,
+  "unpricedAndBelowMinimumAutomaticSelectionsHidden": true,
+  "unverifiedQuoteFreshnessRetained": true,
+  "historicalStatisticsAndManualComparisonsRetained": true,
+  "frozenScientificSourcesChanged": false,
+  "futureProbabilitiesPublished": false,
+  "paidServicesAdded": false
+}
