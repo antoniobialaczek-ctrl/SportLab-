@@ -1,0 +1,52 @@
+{
+  "verifiedAt": "2026-11-20T19:41:03.212091+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_BzM96hzb9pUHy47pjJpUGs4FrmXM",
+  "sourceCommit": "bf01c9a6f4ef8501b717705c2c3c857e7c1c19c1",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/44794616627",
+  "automatedTests": 322,
+  "playerCardBrowserWithTestFixtures": {
+    "target": "http://127.0.0.1:3200",
+    "mockedSources": true,
+    "example": "Cade Cunningham powyżej 6,5 asysty",
+    "matchedOdds": 1.85,
+    "latestFirstValues": [
+      8,
+      11,
+      7,
+      9,
+      10,
+      8,
+      12,
+      6,
+      9,
+      8
+    ],
+    "automaticHistoryBeyondFirstTwoFixtures": true,
+    "oneHistoryRequestPerTeam": true,
+    "dailyListRetained": true,
+    "detailsRetained": true,
+    "minimumOddsHonored": true,
+    "expiredCardsRemoved": true,
+    "desktop": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "publicLiveUI": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "defaultDailyView": true,
+    "filterPersistence": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "publicPlayerCardModuleServed": true,
+  "verificationScope": "Card line, price, actual latest-first observations, automatic history beyond first two fixtures and expiry/minimum gating checked with isolated test fixtures. Public real-source UI and module delivery checked; live availability of the illustrative Cade line is not asserted.",
+  "maximumVisiblePlayerCards": 4,
+  "maximumPlayerCardsPerFixture": 2,
+  "dailyListRetained": true,
+  "minimumOddsPreferencePreserved": true,
+  "unverifiedProbabilitiesPublished": false,
+  "frozenScientificSourcesChanged": false,
+  "paidServicesAdded": false
+}
