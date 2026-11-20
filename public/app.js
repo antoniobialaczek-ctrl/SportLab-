@@ -12,6 +12,7 @@ import { cs2SourceHTML } from '/source-status.js';
 import { journalPickButtonHTML } from '/pick-actions.js';
 import { createAvailabilityMemory } from '/availability-memory.js';
 import { screenPick } from '/pick-screening.js';
+import { dailyPicksHTML } from '/daily-picks.js';
 const availabilityMemory = createAvailabilityMemory();
 installPlayerPhotoFallback(document);
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
@@ -27,7 +28,7 @@ const localDate = value => value ? new Date(value).toLocaleString('pl-PL') : '�
 let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = null, readinessReport = null, detailEvent = null, nextFixture = null;
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
-let marketView = 'matches';
+let marketView = 'daily';
 let pickScreening = { minOdds: 1.5, band: 'all' };
 try {
   const saved = JSON.parse(localStorage.getItem('sportlab.pick-screening.v1'));
@@ -279,7 +280,29 @@ function renderBetting() {
     const active = button.dataset.marketView === marketView;
     button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active));
   });
+  document.body.classList.toggle('daily-mode', marketView === 'daily');
+  const dayLabel = $('date').value ? $('date').value.split('-').reverse().join('.') : '';
+  $('betting-title').textContent = marketView === 'daily' ? `Typy dnia · ${sports[sport]} · ${dayLabel}` : marketView === 'players' ? 'Zawodnicy — forma i porównania' : 'Drużyny — wynik i sumy';
   if (sport === 'cs2' && !events.length) { $('betting-summary').innerHTML = cs2SourceHTML(); return; }
+  if (marketView === 'daily') {
+    const candidates = upcoming.flatMap(event => {
+      const analysis = previews.get(previewKey(event))?.data;
+      const matchPicks = analysis ? buildMatchPicks(analysis, event, marketOptions(event)).candidates : [];
+      return [...matchPicks, ...eventPlayerPicks(event)].map(pick => ({ event, pick, oddsData: oddsFor(event) }));
+    });
+    const analysed = upcoming.filter(event => previews.get(previewKey(event))?.data).length;
+    const playerEvents = upcoming.filter(event => ['nba', 'nhl', 'football'].includes(event.sport) && event.route !== 'soccer/pol.1');
+    const remaining = playerEvents.filter(event => ![event.homeId, event.awayId].every(id => playerEntryFresh(playerForms.get(playerKey(event, id)))));
+    const playerFormsAvailable = playerEvents.filter(event => [event.homeId, event.awayId].every(id => playerForms.get(playerKey(event, id))?.data?.players?.length)).length;
+    const loading = upcoming.some(event => previews.get(previewKey(event))?.status === 'loading') || playerEvents.some(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.status === 'loading'));
+    $('betting-summary').innerHTML = !upcoming.length
+      ? '<p class="small">Brak nadchodzących spotkań w wybranym zestawie. Zmień sport lub dzień; rozegrane mecze znajdziesz poniżej.</p>'
+      : `<p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5 })}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
+    document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
+    const more = document.querySelector('[data-more-daily-players]');
+    if (more) more.onclick = () => queuePlayerForms(remaining, 2);
+    return;
+  }
   if (marketView === 'matches') {
     const rows = upcoming.flatMap(event => {
       const data = previews.get(previewKey(event))?.data;
@@ -349,7 +372,7 @@ function card(event, eager) {
   return `<article class="card"><div class="row small"><span>${esc(event.league)}</span><span>${esc(event.state === 'post' ? `${localDate(event.date)} • zakończony` : event.state === 'in' ? 'Na żywo' : localDate(event.date))}</span></div>
     <div class="teams"><span>${esc(event.home)}</span><small>${event.state === 'pre' ? 'VS' : `${esc(event.homeScore ?? '—')} : ${esc(event.awayScore ?? '—')}`}</small><span>${esc(event.away)}</span></div>
     <div class="match-preview" data-preview="${esc(event.id)}">${eager || previews.has(previewKey(event)) ? previewContent(event) : '<p class="small">Porównanie wcześniejszych wyników i formy dostępne w analizie meczu.</p>'}</div>
-    <div class="player-card-preview" data-player-preview="${esc(event.id)}">${playerPreviewContent(event)}</div><button data-id="${esc(event.id)}">Zobacz typy i analizę</button></article>`;
+    <div class="player-card-preview" data-player-preview="${esc(event.id)}">${playerPreviewContent(event)}</div><button data-id="${esc(event.id)}">Szczegóły meczu</button></article>`;
 }
 function render() {
   const query = $('q').value.toLocaleLowerCase('pl'), status = $('status').value;
