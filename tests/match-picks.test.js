@@ -246,7 +246,7 @@ test('rendering highlights the chosen historical screen, labels analytical lines
   const detail = matchPicksHTML(analysis(), fixture, { now });
   const compact = matchPicksHTML(analysis(), fixture, { now, compact: true });
   for (const html of [detail, compact]) {
-    assert.match(html, /Najmocniejszy sygnał z historii/); assert.match(html, /220,5/);
+    assert.match(html, /Porównanie historyczne/); assert.match(html, /220,5/);
     assert.ok(!html.includes('<img')); assert.match(html, /&lt;img/); assert.ok(!html.includes('%'));
   }
   assert.match(detail, /data-match-line/); assert.match(detail, /name="totalLine"/);

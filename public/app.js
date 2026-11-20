@@ -1,5 +1,4 @@
 import { previewHTML, matchDetailHTML, playerFormHTML } from '/analysis-view.js';
-import { assessBetting } from '/betting-view.js';
 import { createJournalUI } from '/journal-ui.js';
 import { contextHTML, availabilityHTML } from '/context-view.js';
 import { readinessHTML } from '/readiness-view.js';
@@ -12,6 +11,7 @@ import { playerPhotoHTML, installPlayerPhotoFallback } from '/player-photo.js';
 import { cs2SourceHTML } from '/source-status.js';
 import { journalPickButtonHTML } from '/pick-actions.js';
 import { createAvailabilityMemory } from '/availability-memory.js';
+import { screenPick } from '/pick-screening.js';
 const availabilityMemory = createAvailabilityMemory();
 installPlayerPhotoFallback(document);
 const sports = { football: '⚽ Piłka', nba: '🏀 NBA', nhl: '🏒 NHL', tennis: '🎾 Tenis', cs2: '🎮 CS2' };
@@ -28,6 +28,19 @@ let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = nul
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
 let marketView = 'matches';
+let pickScreening = { minOdds: 1.5, band: 'all' };
+try {
+  const saved = JSON.parse(localStorage.getItem('sportlab.pick-screening.v1'));
+  if (Number.isFinite(saved?.minOdds) && saved.minOdds >= 1.01 && saved.minOdds <= 1000 && ['all', 'lower', 'higher'].includes(saved.band)) pickScreening = { minOdds: saved.minOdds, band: saved.band };
+} catch { /* Missing or corrupt preferences keep the default 1.50 filter. */ }
+const priceLabel = value => value.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const noPricedPicks = () => `Brak pozycji z pasującym odczytem kursu od ${priceLabel(pickScreening.minOdds)} w wybranym zakresie. Statystyki i wykresy pozostają dostępne w analizie.`;
+function pricedGroups(rows, pickOf, render, gridClass) {
+  return ['lower', 'higher'].map(band => {
+    const group = rows.filter(row => { const item = screenPick(pickOf(row), row.event, { ...pickScreening, oddsData: oddsFor(row.event) }); return item.eligible && item.band === band; });
+    return group.length ? `<section class="priced-group" data-price-band="${band}"><h3>${band === 'lower' ? 'Kurs poniżej 2,00' : 'Kurs od 2,00'}</h3><p class="small">Zakres ceny · ryzyko niezweryfikowane</p><div class="${gridClass}">${group.map(render).join('')}</div></section>` : '';
+  }).join('');
+}
 const previews = new Map();
 const matchLines = new Map();
 const playerInspectors = new Map();
@@ -57,10 +70,10 @@ async function boundedDetails(url, signal) {
 function oddsFor(event) { return fixtureDetails.get(event.id)?.data?.odds || null; }
 function marketOptions(event) {
   const oddsData = oddsFor(event);
-  if (matchLines.has(event.id)) return { totalLine: matchLines.get(event.id), oddsData };
+  if (matchLines.has(event.id)) return { totalLine: matchLines.get(event.id), oddsData, screening: pickScreening };
   const sourceLine = oddsData?.quotes?.find(quote => quote?.market === (event.sport === 'nhl' ? 'total_goals' : 'total_points') && quote.scope === (event.sport === 'nhl' ? 'including_overtime_shootout' : 'including_overtime')
     && ['over', 'under'].every(direction => matchPickQuote(oddsData, event, { kind: 'total', market: quote.market, scope: quote.scope, line: quote.line, direction }).status === 'matched'));
-  return { ...(sourceLine ? { totalLine: sourceLine.line, totalLineOrigin: 'source' } : {}), oddsData };
+  return { ...(sourceLine ? { totalLine: sourceLine.line, totalLineOrigin: 'source' } : {}), oddsData, screening: pickScreening };
 }
 function updateOddsNodes(event) {
   document.querySelectorAll('[data-pick-odds]').forEach(node => {
@@ -93,7 +106,7 @@ function renderPlayerPickNode(node, data, event) {
       open: form.closest('details')?.open, compared: Boolean(form.querySelector('[data-line-result]')?.textContent), focus: form.contains(field) ? field.name : null });
   }
   playerDrafts.set(key, drafts);
-  node.innerHTML = playerPicksHTML(data, event, { excludedPlayerIds: excludedPlayers(event), showNote: false, oddsData: oddsFor(event) });
+  node.innerHTML = playerPicksHTML(data, event, { excludedPlayerIds: excludedPlayers(event), showNote: false, oddsData: oddsFor(event), screening: pickScreening });
   for (const form of node.querySelectorAll('[data-player-line]')) {
     const draft = drafts.get(`${form.dataset.playerId}:${form.dataset.metric}`);
     if (!draft) continue;
@@ -106,7 +119,7 @@ function renderPlayerPickNode(node, data, event) {
 function updateMatchDetail(event, data) {
   if (detailEvent?.id !== event.id || !$('modal').classList.contains('on') || !$('betting-detail')) return;
   const options = marketOptions(event), picks = buildMatchPicks(data, event, options), node = $('betting-detail');
-  const key = `${data.cutoff}:${oddsFor(event)?.fetchedAt}:${options.totalLine}:${picks.status}`;
+  const key = `${data.cutoff}:${oddsFor(event)?.fetchedAt}:${options.totalLine}:${picks.status}:${pickScreening.minOdds}:${pickScreening.band}`;
   if (node.dataset.renderKey !== key) {
     const input = node.querySelector('[name=totalLine]');
     if (input && (input.value !== input.defaultValue || document.activeElement === input)) matchDrafts.set(event.id, { value: input.value.slice(0, 50), focus: document.activeElement === input });
@@ -127,7 +140,7 @@ function updateCurrentDetails(event, data, failed = false) {
 }
 
 function eventPlayerPicks(event) {
-  const options = { excludedPlayerIds: excludedPlayers(event), oddsData: oddsFor(event) };
+  const options = { excludedPlayerIds: excludedPlayers(event), oddsData: oddsFor(event), screening: pickScreening };
   const home = playerForms.get(playerKey(event, event.homeId))?.data;
   const away = playerForms.get(playerKey(event, event.awayId))?.data;
   const lists = [home, away].map(data => data ? buildPlayerPicks(data, event, options).picks.map(pick => ({
@@ -146,7 +159,7 @@ function playerPreviewContent(event) {
   const entries = [event.homeId, event.awayId].map(id => playerForms.get(playerKey(event, id)));
   return `<div class="preview-heading">Typy na zawodników</div>${picks.length
     ? picks.map(pick => `<div class="player-preview-pick"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<b>${esc(pick.statement)}</b></span>${pickOddsHTML(oddsFor(event), event, pick)}<span class="small">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej linii</span></div>`).join('')
-    : `<p class="small">${entries.some(entry => entry?.status === 'loading') ? 'Analizowanie do 10 wcześniejszych meczów…' : entries.every(entry => entry?.data) ? 'Dostępne wyniki nie spełniają kryteriów typu zawodnika. Pełna forma w analizie.' : 'Punkty, asysty, zbiórki i strzały — otwórz typy zawodników.'}</p>`}`;
+    : `<p class="small">${entries.some(entry => entry?.status === 'loading') ? 'Analizowanie do 10 wcześniejszych meczów…' : entries.every(entry => entry?.data) ? 'Brak pozycji z odczytem kursu spełniającym filtr. Pełna forma w analizie.' : 'Punkty, asysty, zbiórki i strzały — otwórz typy zawodników.'}</p>`}`;
 }
 function playerOverviewHTML(event, teamId) {
   const entry = playerForms.get(playerKey(event, teamId)), data = entry?.data;
@@ -160,7 +173,8 @@ function updatePlayerViews(event) {
     for (const [side, teamId, name] of [['home', event.homeId, event.home], ['away', event.awayId, event.away]]) {
       const entry = playerForms.get(playerKey(event, teamId));
       if (entry?.data) {
-        const key = `${entry.data.fetchedAt}:${Date.now() - Date.parse(entry.data.fetchedAt) > 15 * 60000}:${oddsFor(event)?.fetchedAt || ''}:${excludedPlayers(event).join(',')}:${event.state}:${Date.parse(event.date) <= Date.now()}`;
+        const eligible = buildPlayerPicks(entry.data, event, { excludedPlayerIds: excludedPlayers(event), oddsData: oddsFor(event), screening: pickScreening }).picks.map(pick => `${pick.playerId}:${pick.metric}:${pick.line}`).join(',');
+        const key = `${entry.data.fetchedAt}:${Date.now() - Date.parse(entry.data.fetchedAt) > 15 * 60000}:${oddsFor(event)?.fetchedAt || ''}:${excludedPlayers(event).join(',')}:${event.state}:${Date.parse(event.date) <= Date.now()}:${pickScreening.minOdds}:${pickScreening.band}:${eligible}`;
         const pickNode = $(`player-picks-${side}`), formNode = $(`players-${side}`);
         if (pickNode && pickNode.dataset.renderKey !== key) { renderPlayerPickNode(pickNode, entry.data, event); pickNode.dataset.renderKey = key; }
         if (formNode && formNode.dataset.renderKey !== entry.data.fetchedAt) { formNode.innerHTML = playerOverviewHTML(event, teamId); formNode.dataset.renderKey = entry.data.fetchedAt; }
@@ -272,12 +286,11 @@ function renderBetting() {
       const options = marketOptions(event);
       return data ? [{ event, data, options, picks: buildMatchPicks(data, event, options) }] : [];
     });
-    const strength = row => row.picks.best ? Math.min(row.picks.best.support.home.hits / row.picks.best.support.home.sample, row.picks.best.support.away.hits / row.picks.best.support.away.sample) : -1;
-    const highlighted = rows.filter(row => row.picks.best).sort((a, b) => strength(b) - strength(a));
-    const shown = (highlighted.length ? highlighted : rows).slice(0, 4);
+    const highlighted = rows.filter(row => row.picks.best).sort((a, b) => Date.parse(a.event.date) - Date.parse(b.event.date));
+    const shown = highlighted.slice(0, 6);
     $('betting-summary').innerHTML = !upcoming.length ? '<p class="small">W wybranej dacie nie ma nadchodzących spotkań. Poniżej znajdziesz analizy archiwalne.</p>'
-      : `${shown.length ? `<div class="match-pick-summary-grid">${shown.map(({ event, data, options, picks }) => `<article class="match-signal-card"><div class="match-signal-header"><span class="small">${esc(event.league)} • ${esc(localDate(event.date))}</span><h3>${esc(event.home)} — ${esc(event.away)}</h3></div>${matchPicksHTML(data, event, { ...options, compact: true })}${matchChartsHTML(data, event, { line: picks.totals?.line ?? null, compact: true })}<button data-bet-id="${esc(event.id)}">${event.sport === 'nhl' || ['soccer/pol.1', 'soccer/usa.1'].includes(event.route) ? 'Porównaj wynik i gole' : event.sport === 'nba' ? 'Porównaj wynik i punkty' : 'Porównaj wynik meczu'}</button></article>`).join('')}</div>` : '<p class="small">Porównywanie ostatnich wyników i sum punktów…</p>'}
-      <p class="small dashboard-summary-note">${highlighted.length ? `Wyraźniejsze wskazanie z historii: ${highlighted.length} z ${upcoming.length} meczów.` : rows.length ? 'Porównaj pokazane wyniki z własną linią punktową w analizie meczu.' : 'Wczytywanie wcześniejszych spotkań…'}</p>`;
+      : `${shown.length ? pricedGroups(shown, row => row.picks.best, ({ event, data, options, picks }) => `<article class="match-signal-card"><div class="match-signal-header"><span class="small">${esc(event.league)} • ${esc(localDate(event.date))}</span><h3>${esc(event.home)} — ${esc(event.away)}</h3></div>${matchPicksHTML(data, event, { ...options, compact: true })}${matchChartsHTML(data, event, { line: picks.totals?.line ?? null, compact: true })}<button data-bet-id="${esc(event.id)}">${event.sport === 'nhl' || ['soccer/pol.1', 'soccer/usa.1'].includes(event.route) ? 'Porównaj wynik i gole' : event.sport === 'nba' ? 'Porównaj wynik i punkty' : 'Porównaj wynik meczu'}</button></article>`, 'match-pick-summary-grid') : `<p class="small">${rows.length ? noPricedPicks() : 'Wczytywanie wcześniejszych spotkań…'}</p>`}
+      <p class="small dashboard-summary-note">${highlighted.length ? `Pozycje z pasującym odczytem kursu: ${highlighted.length} z ${upcoming.length} meczów. To filtr ceny, bez potwierdzonej oceny ryzyka.` : rows.length ? 'Pełną historię i porównanie własnej linii znajdziesz w analizie meczu.' : 'Wczytywanie wcześniejszych spotkań…'}</p>`;
     document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
     return;
   }
@@ -294,13 +307,13 @@ function renderBetting() {
   const remaining = upcoming.filter(event => !ready.includes(event));
   const overviewEvent = upcoming.find(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.data?.players?.length));
   const overview = overviewEvent ? `<section class="player-summary-overview"><h3>Forma zawodników · ${esc(overviewEvent.home)} — ${esc(overviewEvent.away)}</h3><div class="analysis-sides">${playerOverviewHTML(overviewEvent, overviewEvent.homeId)}${playerOverviewHTML(overviewEvent, overviewEvent.awayId)}</div></section>` : '';
-  const watch = upcoming.flatMap(event => { const data = previews.get(previewKey(event))?.data; const assessment = data && assessBetting(data, event); return assessment?.candidate ? [{ event, assessment }] : []; });
+  const watch = upcoming.flatMap(event => { const data = previews.get(previewKey(event))?.data; const pick = data && buildMatchPicks(data, event, marketOptions(event)).candidates.find(candidate => candidate.kind === 'result'); return pick ? [{ event, assessment: { candidate: pick } }] : []; });
   $('betting-summary').innerHTML = !upcoming.length
     ? '<p class="small">W wybranym zestawie nie ma nadchodzących spotkań. Analizy rozegranych meczów znajdziesz poniżej.</p>'
-    : `${overview}${selected.length ? `<div class="player-picks-grid picks-summary-grid">${selected.map(({ event, pick }) => `<article class="player-pick" data-pick-metric="${esc(pick.metric)}"><span class="small">${esc(event.home)} — ${esc(event.away)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h3>${esc(pick.statement)}</h3></span>${pickOddsHTML(oddsFor(event), event, pick)}</div><p class="player-pick-market">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej tej linii</p><p class="small">Średnia: ${Number(pick.average).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} • mediana: ${Number(pick.median).toLocaleString('pl-PL', { maximumFractionDigits: 1 })}</p>${journalPickButtonHTML(event, pick)}<button data-bet-id="${esc(event.id)}">Zobacz formę i pozostałe typy</button></article>`).join('')}</div>`
-      : `<p class="small">${loading ? 'Analizowanie ostatnich 10 meczów zawodników…' : ready.length ? 'Dla wybranego rynku nie ma wskazania spełniającego kryteria. Możesz sprawdzić własną linię w analizie zawodnika.' : 'Typy zawodników pojawią się po wczytaniu dłuższej formy.'}</p>`}
+    : `${overview}${selected.length ? pricedGroups(selected, row => row.pick, ({ event, pick }) => `<article class="player-pick" data-pick-metric="${esc(pick.metric)}"><span class="small">${esc(event.home)} — ${esc(event.away)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h3>${esc(pick.statement)}</h3></span>${pickOddsHTML(oddsFor(event), event, pick)}</div><p class="player-pick-market">${pick.hits} z ${pick.sample} wcześniejszych występów powyżej tej linii</p><p class="small">Średnia: ${Number(pick.average).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} • mediana: ${Number(pick.median).toLocaleString('pl-PL', { maximumFractionDigits: 1 })}</p>${journalPickButtonHTML(event, pick)}<button data-bet-id="${esc(event.id)}">Zobacz formę zawodnika</button></article>`, 'player-picks-grid picks-summary-grid')
+      : `<p class="small">${loading ? 'Analizowanie ostatnich 10 meczów zawodników…' : ready.length ? noPricedPicks() : 'Typy zawodników pojawią się po wczytaniu dłuższej formy.'}</p>`}
       <div class="picks-load"><span class="small">Forma zawodników wczytana dla ${ready.length} z ${upcoming.length} meczów.</span>${remaining.length ? `<button data-more-player-picks ${loading ? 'disabled' : ''}>${loading ? 'Wczytywanie…' : 'Wczytaj typy kolejnych meczów'}</button>` : ''}</div>
-      ${watch.length ? `<details class="team-picks-list"><summary>Typy z formy drużyn (${watch.length})</summary><ul class="betting-watchlist">${watch.map(({ event, assessment }) => `<li><div><b>${esc(assessment.candidate.label)}</b><span class="small">${esc(event.home)} — ${esc(event.away)}</span></div><button data-bet-id="${esc(event.id)}">Uzasadnienie</button></li>`).join('')}</ul></details>` : ''}`;
+      ${watch.length ? `<details class="team-picks-list"><summary>Pozycje drużyn z odczytanym kursem (${watch.length})</summary><ul class="betting-watchlist">${watch.map(({ event, assessment }) => `<li><div><b>${esc(assessment.candidate.label)}</b><span class="small">${esc(event.home)} — ${esc(event.away)}</span></div><button data-bet-id="${esc(event.id)}">Uzasadnienie</button></li>`).join('')}</ul></details>` : ''}`;
   document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
   const more = document.querySelector('[data-more-player-picks]');
   if (more) more.onclick = () => queuePlayerForms(remaining, 2);
@@ -533,6 +546,30 @@ document.addEventListener('click', async click => {
   form.elements.namedItem('totalLine').value = String(line).replace('.', ',');
   form.requestSubmit();
   $('betting-detail').scrollIntoView({ block: 'start' });
+});
+$('pick-min-odds').value = priceLabel(pickScreening.minOdds);
+$('pick-price-band').value = pickScreening.band;
+$('pick-screening-status').textContent = `Minimum ${priceLabel(pickScreening.minOdds)}. Podział według ceny; ryzyko i opłacalność nie są potwierdzone.`;
+$('pick-screening-form').addEventListener('submit', submit => {
+  submit.preventDefault();
+  const raw = $('pick-min-odds').value.trim(), minOdds = /^\d+(?:[,.]\d{1,2})?$/.test(raw) ? Number(raw.replace(',', '.')) : NaN;
+  if (!Number.isFinite(minOdds) || minOdds < 1.01 || minOdds > 1000) {
+    $('pick-screening-status').textContent = 'Podaj minimalny kurs od 1,01 do 1000. Dotychczasowy filtr pozostaje aktywny.';
+    return;
+  }
+  pickScreening = { minOdds, band: $('pick-price-band').value };
+  try { localStorage.setItem('sportlab.pick-screening.v1', JSON.stringify(pickScreening)); } catch { /* The filter still works in this tab. */ }
+  $('pick-min-odds').value = priceLabel(minOdds);
+  $('pick-screening-status').textContent = `Minimum ${priceLabel(minOdds)}. Podział według ceny; ryzyko i opłacalność nie są potwierdzone.`;
+  const all = [...events, ...archiveEvents];
+  document.querySelectorAll('[data-preview]').forEach(node => { const event = all.find(row => row.id === node.dataset.preview); if (event) node.innerHTML = previewContent(event); });
+  document.querySelectorAll('[data-player-preview]').forEach(node => { const event = all.find(row => row.id === node.dataset.playerPreview); if (event) node.innerHTML = playerPreviewContent(event); });
+  if (detailEvent) {
+    const data = previews.get(previewKey(detailEvent))?.data;
+    if (data) updateMatchDetail(detailEvent, data);
+    updatePlayerViews(detailEvent);
+  }
+  renderBetting();
 });
 document.addEventListener('change', change => {
   const select = change.target.closest('[data-player-inspector], [data-player-metric]');

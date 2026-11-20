@@ -2,6 +2,7 @@ import { escapeHTML as esc } from './analysis-view.js';
 import { matchPickQuote, pickOddsHTML } from './pick-odds.js';
 import { playerPhotoHTML, playerPhotoURL } from './player-photo.js';
 import { journalPickButtonHTML } from './pick-actions.js';
+import { filterPricedPicks, screenPick } from './pick-screening.js';
 
 const DAY = 86400000;
 const FORM_MAX_AGE = 15 * 60000;
@@ -150,7 +151,7 @@ export function buildPlayerPicks(data, event, options = {}) {
       const descriptor = { kind: 'player', market: 'player_prop', playerId: player.id, teamId: data.teamId, metric: metricKey, direction: 'over', scope };
       const quotes = Array.isArray(options.oddsData?.quotes) ? options.oddsData.quotes.slice(0, 510) : [];
       const sourceLines = [...new Set(quotes.filter(quote => quote?.playerId === player.id && quote.teamId === data.teamId && quote.metric === metricKey
-        && validLine(quote.line) && matchPickQuote(options.oddsData, event, { ...descriptor, line: quote.line }, { now: state.now }).status === 'matched').map(quote => quote.line))];
+        && validLine(quote.line) && (!options.screening || screenPick({ ...descriptor, line: quote.line }, event, { ...options.screening, oddsData: options.oddsData, now: state.now }).eligible) && matchPickQuote(options.oddsData, event, { ...descriptor, line: quote.line }, { now: state.now }).status === 'matched').map(quote => quote.line))];
       const select = lines => [...lines].sort((a, b) => b - a).map(line => summarizeLine(player, metricKey, line, observations, event.sport)).find(pick => pick.qualifies);
       const fromSource = override === undefined ? select(sourceLines) : null;
       const selected = fromSource || select(override === undefined ? definition.lines : validLine(override) ? [override] : []);
@@ -158,7 +159,8 @@ export function buildPlayerPicks(data, event, options = {}) {
         priceAvailable: matchPickQuote(options.oddsData, event, { ...descriptor, line: selected.line }, { now: state.now }).status === 'matched' });
     }
   }
-  const ranked = candidates.sort((a, b) => Number(b.priceAvailable) - Number(a.priceAvailable) || b.hits / b.sample - a.hits / a.sample || b.sample - a.sample
+  const selected = options.screening ? filterPricedPicks(candidates, event, { ...options.screening, oddsData: options.oddsData, now: state.now }) : candidates;
+  const ranked = selected.sort((a, b) => Number(b.priceAvailable) - Number(a.priceAvailable) || b.hits / b.sample - a.hits / a.sample || b.sample - a.sample
     || (b.median - b.line) / b.line - (a.median - a.line) / a.line || a.playerName.localeCompare(b.playerName, 'pl'));
   const picks = [], perPlayer = new Map(), selectedKeys = new Set();
   function add(pick) {
@@ -171,13 +173,26 @@ export function buildPlayerPicks(data, event, options = {}) {
   for (const metricKey of Object.keys(definitions)) add(ranked.find(pick => pick.metric === metricKey && (perPlayer.get(pick.playerId) || 0) < 2));
   for (const pick of ranked) add(pick);
   return output(picks.length ? 'available' : 'unavailable', picks.length ? null
-    : 'Wskazania pojawią się, gdy zawodnik ma co najmniej 8 występów, zagrał ostatnio, a jego wyniki regularnie przekraczają jedną z analizowanych linii.', data, event, picks);
+    : options.screening ? 'Brak pozycji spełniającej warunki historii i filtr dopasowanego kursu. Statystyki oraz porównanie własnej linii pozostają dostępne w profilu zawodnika.' : 'Wskazania pojawią się, gdy zawodnik ma co najmniej 8 występów, zagrał ostatnio, a jego wyniki regularnie przekraczają jedną z analizowanych linii.', data, event, picks);
+}
+
+function priceBandHTML(pick, event, options) {
+  if (!options.screening) return '';
+  const screened = screenPick(pick, event, { ...options.screening, oddsData: options.oddsData, now: options.now ?? Date.now() });
+  return screened.eligible ? `<p class="small pick-price-band" data-price-band="${esc(screened.band)}">${esc(screened.label)} · ryzyko niezweryfikowane</p>` : '';
+}
+
+function manualComparisonsHTML(data, event, options) {
+  if (!options.screening) return '';
+  const historical = buildPlayerPicks(data, event, { ...options, screening: undefined }).picks;
+  if (!historical.length) return '';
+  return `<details class="manual-player-comparisons"><summary>Porównaj własną linię — bez rekomendacji</summary><p class="small">Wpisz linię ze swojej oferty. To porównanie statystyk, bez oceny prawdopodobieństwa i opłacalności.</p>${historical.map(pick => `<div class="manual-player-comparison"><h4>${esc(pick.playerName)} — ${esc(pick.label)}</h4><form class="player-line-form" data-player-line data-player-id="${esc(pick.playerId)}" data-team-id="${esc(data.teamId)}" data-metric="${esc(pick.metric)}"><label>Twoja linia<input type="text" name="line" inputmode="decimal" value="" pattern="[0-9]+([,.][0-9]+)?" required title="Podaj dodatnią linię połówkową"></label><label>Kierunek<select name="direction"><option value="over">Powyżej</option><option value="under">Poniżej</option></select></label><button type="submit">Porównaj z historią</button><p class="small" data-line-result role="status"></p></form></div>`).join('')}</details>`;
 }
 
 export function playerPicksHTML(data, event, options = {}) {
   const result = buildPlayerPicks(data, event, options);
   const name = result.teamName ? ` — ${esc(result.teamName)}` : '';
   return `<section class="player-picks" data-player-picks-team="${esc(result.teamId || '')}"><h4>Typy na zawodników${name}</h4>${result.picks.length
-    ? `${options.showNote === false ? '' : `<p class="small player-picks-note">${esc(result.note)}</p>`}<div class="player-picks-grid">${result.picks.map(pick => `<article class="player-pick"><span class="pill">${esc(pick.label)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h4 class="player-pick-market">${esc(pick.statement)}</h4></span>${pickOddsHTML(options.oddsData, event, { ...pick, kind: 'player', market: 'player_prop', teamId: data.teamId, scope: event.sport === 'nba' ? 'including_overtime' : event.sport === 'football' ? 'regulation_90' : 'including_overtime_excluding_shootout' }, options)}</div><p class="small player-line-origin">${pick.lineOrigin === 'source' ? 'Linia z odczytu źródła' : pick.lineOrigin === 'manual' ? 'Twoja linia' : 'Linia analityczna — sprawdź ofertę'}</p><p><b>${pick.hits} z ${pick.sample}</b> wcześniejszych występów powyżej tej linii.</p><div class="player-pick-metrics"><span>Średnia <b>${decimal(pick.average)}</b></span><span>Mediana <b>${decimal(pick.median)}</b></span><span>Ostatnie 5 <b>${decimal(pick.last5Average)}</b></span></div><div class="player-trend" aria-label="Wyniki od najnowszego: ${pick.observations.map(row => row.value).join(', ')}">${pick.observations.map(row => `<span class="${row.value > pick.line ? 'player-trend-hit' : 'player-trend-miss'}" title="${esc(new Date(row.date).toLocaleDateString('pl-PL'))}">${row.value}</span>`).join('')}</div>${journalPickButtonHTML(event, pick)}<details class="player-line-details"><summary>Sprawdź własną linię</summary><form class="player-line-form" data-player-line data-player-id="${esc(pick.playerId)}" data-team-id="${esc(result.teamId)}" data-metric="${esc(pick.metric)}"><label>Twoja linia<input type="text" name="line" inputmode="decimal" value="${esc(decimal(pick.line))}" pattern="[0-9]+([,.][0-9]+)?" required title="Podaj linię połówkową, np. 24,5"></label><label>Kierunek<select name="direction"><option value="over">Powyżej</option><option value="under">Poniżej</option></select></label><button type="submit">Porównaj z historią</button><p class="small" data-line-result role="status"></p></form></details></article>`).join('')}</div>`
-    : `<p class="small">${esc(result.reason)}</p>`}</section>`;
+    ? `${options.showNote === false ? '' : `<p class="small player-picks-note">${esc(result.note)}</p>`}<div class="player-picks-grid">${result.picks.map(pick => `<article class="player-pick"><span class="pill">${esc(pick.label)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h4 class="player-pick-market">${esc(pick.statement)}</h4></span>${pickOddsHTML(options.oddsData, event, { ...pick, kind: 'player', market: 'player_prop', teamId: data.teamId, scope: event.sport === 'nba' ? 'including_overtime' : event.sport === 'football' ? 'regulation_90' : 'including_overtime_excluding_shootout' }, options)}</div><p class="small player-line-origin">${pick.lineOrigin === 'source' ? 'Linia z odczytu źródła' : pick.lineOrigin === 'manual' ? 'Twoja linia' : 'Linia analityczna — sprawdź ofertę'}</p>${priceBandHTML(pick, event, options)}<p><b>${pick.hits} z ${pick.sample}</b> wcześniejszych występów powyżej tej linii.</p><div class="player-pick-metrics"><span>Średnia <b>${decimal(pick.average)}</b></span><span>Mediana <b>${decimal(pick.median)}</b></span><span>Ostatnie 5 <b>${decimal(pick.last5Average)}</b></span></div><div class="player-trend" aria-label="Wyniki od najnowszego: ${pick.observations.map(row => row.value).join(', ')}">${pick.observations.map(row => `<span class="${row.value > pick.line ? 'player-trend-hit' : 'player-trend-miss'}" title="${esc(new Date(row.date).toLocaleDateString('pl-PL'))}">${row.value}</span>`).join('')}</div>${journalPickButtonHTML(event, pick)}<details class="player-line-details"><summary>Sprawdź własną linię</summary><form class="player-line-form" data-player-line data-player-id="${esc(pick.playerId)}" data-team-id="${esc(result.teamId)}" data-metric="${esc(pick.metric)}"><label>Twoja linia<input type="text" name="line" inputmode="decimal" value="${esc(decimal(pick.line))}" pattern="[0-9]+([,.][0-9]+)?" required title="Podaj linię połówkową, np. 24,5"></label><label>Kierunek<select name="direction"><option value="over">Powyżej</option><option value="under">Poniżej</option></select></label><button type="submit">Porównaj z historią</button><p class="small" data-line-result role="status"></p></form></details></article>`).join('')}</div>`
+    : `<p class="small">${esc(result.reason)}</p>${manualComparisonsHTML(data, event, options)}`}</section>`;
 }
