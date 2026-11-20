@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-19T20:59:40.607Z",
+  "generatedAt": "2026-11-20T01:14:43.756Z",
   "kind": "prospective",
   "modelVersion": "3.2.0",
   "validation": {
@@ -39,9 +39,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 9,
+            "recorded": 15,
             "settled": 0,
-            "pending": 9,
+            "pending": 15,
             "void": 0,
             "frozenAt": null
           },
@@ -78,9 +78,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 14,
             "settled": 0,
-            "pending": 0,
+            "pending": 14,
             "void": 0,
             "frozenAt": null
           },
@@ -117,9 +117,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 7,
             "settled": 0,
-            "pending": 0,
+            "pending": 7,
             "void": 0,
             "frozenAt": null
           },
@@ -156,9 +156,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 1,
+            "recorded": 5,
             "settled": 0,
-            "pending": 1,
+            "pending": 5,
             "void": 0,
             "frozenAt": null
           },
@@ -195,9 +195,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 1,
+            "recorded": 7,
             "settled": 0,
-            "pending": 1,
+            "pending": 7,
             "void": 0,
             "frozenAt": null
           },
@@ -234,9 +234,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 4,
             "settled": 0,
-            "pending": 0,
+            "pending": 4,
             "void": 0,
             "frozenAt": null
           },
@@ -273,9 +273,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 1,
+            "recorded": 6,
             "settled": 0,
-            "pending": 1,
+            "pending": 6,
             "void": 0,
             "frozenAt": null
           },
@@ -390,9 +390,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 11,
             "settled": 0,
-            "pending": 0,
+            "pending": 11,
             "void": 0,
             "frozenAt": null
           },
@@ -429,9 +429,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 0,
+            "recorded": 5,
             "settled": 0,
-            "pending": 0,
+            "pending": 5,
             "void": 0,
             "frozenAt": null
           },
@@ -507,9 +507,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 2,
+            "recorded": 4,
             "settled": 0,
-            "pending": 2,
+            "pending": 4,
             "void": 0,
             "frozenAt": null
           },
@@ -546,9 +546,9 @@
           "calibration": {
             "target": 60,
             "minimumValid": 40,
-            "recorded": 4,
+            "recorded": 6,
             "settled": 0,
-            "pending": 4,
+            "pending": 6,
             "void": 0,
             "frozenAt": null
           },
@@ -579,9 +579,9 @@
     ]
   },
   "audit": {
-    "verified": 18,
+    "verified": 84,
     "legacyResearch": 43,
-    "checkedAt": "2026-11-19T20:59:40.607Z"
+    "checkedAt": "2026-11-20T01:14:43.756Z"
   },
   "note": "Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.",
   "sports": {
@@ -597,10 +597,10 @@
         ]
       },
       "samples": {
-        "recorded": 25,
+        "recorded": 31,
         "settled": 12,
         "hiddenTestResults": 0,
-        "pending": 13,
+        "pending": 19,
         "void": 0
       },
       "metrics": {
@@ -784,10 +784,10 @@
             ]
           },
           "samples": {
-            "recorded": 25,
+            "recorded": 31,
             "settled": 12,
             "hiddenTestResults": 0,
-            "pending": 13,
+            "pending": 19,
             "void": 0
           },
           "metrics": {
@@ -974,10 +974,10 @@
         ]
       },
       "samples": {
-        "recorded": 15,
+        "recorded": 29,
         "settled": 3,
         "hiddenTestResults": 0,
-        "pending": 12,
+        "pending": 26,
         "void": 0
       },
       "metrics": {
@@ -1161,10 +1161,10 @@
             ]
           },
           "samples": {
-            "recorded": 15,
+            "recorded": 29,
             "settled": 3,
             "hiddenTestResults": 0,
-            "pending": 12,
+            "pending": 26,
             "void": 0
           },
           "metrics": {
@@ -1351,10 +1351,10 @@
         ]
       },
       "samples": {
-        "recorded": 3,
+        "recorded": 45,
         "settled": 0,
         "hiddenTestResults": 0,
-        "pending": 3,
+        "pending": 45,
         "void": 0
       },
       "metrics": null,
@@ -1372,10 +1372,10 @@
             ]
           },
           "samples": {
-            "recorded": 1,
+            "recorded": 5,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 1,
+            "pending": 5,
             "void": 0
           },
           "metrics": null,
@@ -1393,10 +1393,10 @@
             ]
           },
           "samples": {
-            "recorded": 1,
+            "recorded": 7,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 1,
+            "pending": 7,
             "void": 0
           },
           "metrics": null,
@@ -1414,10 +1414,94 @@
             ]
           },
           "samples": {
-            "recorded": 1,
+            "recorded": 6,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 1,
+            "pending": 6,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        },
+        {
+          "route": "soccer/eng.1",
+          "league": "eng.1",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 7,
+            "settled": 0,
+            "hiddenTestResults": 0,
+            "pending": 7,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        },
+        {
+          "route": "soccer/ita.1",
+          "league": "ita.1",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 4,
+            "settled": 0,
+            "hiddenTestResults": 0,
+            "pending": 4,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        },
+        {
+          "route": "soccer/eng.2",
+          "league": "eng.2",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 11,
+            "settled": 0,
+            "hiddenTestResults": 0,
+            "pending": 11,
+            "void": 0
+          },
+          "metrics": null,
+          "baselineMetrics": null,
+          "finalTestMetrics": null
+        },
+        {
+          "route": "soccer/ned.1",
+          "league": "ned.1",
+          "status": "research",
+          "publication": {
+            "eligible": false,
+            "reasons": [
+              "Rejestr prospektywny służy ocenie badawczej. Kalibracja i niezależny późniejszy test wymagają osobnego zatwierdzenia po zebraniu danych."
+            ]
+          },
+          "samples": {
+            "recorded": 5,
+            "settled": 0,
+            "hiddenTestResults": 0,
+            "pending": 5,
             "void": 0
           },
           "metrics": null,
@@ -1438,11 +1522,11 @@
         ]
       },
       "samples": {
-        "recorded": 18,
+        "recorded": 22,
         "settled": 0,
         "hiddenTestResults": 0,
-        "pending": 8,
-        "void": 10
+        "pending": 10,
+        "void": 12
       },
       "metrics": null,
       "baselineMetrics": null,
@@ -1459,11 +1543,11 @@
             ]
           },
           "samples": {
-            "recorded": 6,
+            "recorded": 8,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 3,
-            "void": 3
+            "pending": 4,
+            "void": 4
           },
           "metrics": null,
           "baselineMetrics": null,
@@ -1480,11 +1564,11 @@
             ]
           },
           "samples": {
-            "recorded": 12,
+            "recorded": 14,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 5,
-            "void": 7
+            "pending": 6,
+            "void": 8
           },
           "metrics": null,
           "baselineMetrics": null,

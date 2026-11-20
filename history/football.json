@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-19T20:59:42.239Z",
+  "updatedAt": "2026-11-20T01:14:48.052Z",
   "events": [
     {
       "id": "soccer/eng.2:707917",
@@ -149967,7 +149967,7 @@
   "coverage": {
     "lastFetch": {
       "from": "2026-11-12",
-      "to": "2026-11-18",
+      "to": "2026-11-19",
       "routes": [
         "soccer/eng.1",
         "soccer/esp.1",
