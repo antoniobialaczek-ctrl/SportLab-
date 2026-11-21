@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-20T20:57:38.969Z",
+  "updatedAt": "2026-11-21T01:18:22.233Z",
   "events": [
     {
       "id": "soccer/eng.2:707917",
@@ -149951,6 +149951,81 @@
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard?dates=20261108&limit=1000",
         "fetchedAt": "2026-11-18T10:23:55.811Z"
       }
+    },
+    {
+      "id": "soccer/ger.1:401884736",
+      "sourceEventId": "401884736",
+      "sport": "football",
+      "route": "soccer/ger.1",
+      "league": "ger.1",
+      "season": "2026",
+      "startTime": "2026-11-20T19:30:00.000Z",
+      "resultAvailableAt": "2026-11-21T19:30:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "132",
+      "awayId": "122",
+      "home": "Bayern Munich",
+      "away": "FC Cologne",
+      "homeScore": 1,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261120&limit=1000",
+        "fetchedAt": "2026-11-21T01:18:22.233Z"
+      }
+    },
+    {
+      "id": "soccer/fra.1:401876395",
+      "sourceEventId": "401876395",
+      "sport": "football",
+      "route": "soccer/fra.1",
+      "league": "fra.1",
+      "season": "2026",
+      "startTime": "2026-11-20T19:45:00.000Z",
+      "resultAvailableAt": "2026-11-21T19:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "170",
+      "awayId": "3236",
+      "home": "Troyes",
+      "away": "Le Havre AC",
+      "homeScore": 3,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261120&limit=1000",
+        "fetchedAt": "2026-11-21T01:18:22.233Z"
+      }
+    },
+    {
+      "id": "soccer/esp.1:401882805",
+      "sourceEventId": "401882805",
+      "sport": "football",
+      "route": "soccer/esp.1",
+      "league": "esp.1",
+      "season": "2026",
+      "startTime": "2026-11-20T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-21T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "93",
+      "awayId": "88",
+      "home": "Athletic Club",
+      "away": "Espanyol",
+      "homeScore": 0,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261120&limit=1000",
+        "fetchedAt": "2026-11-21T01:18:22.233Z"
+      }
     }
   ],
   "errors": [],
@@ -149967,7 +150042,7 @@
   "coverage": {
     "lastFetch": {
       "from": "2026-11-13",
-      "to": "2026-11-19",
+      "to": "2026-11-20",
       "routes": [
         "soccer/eng.1",
         "soccer/esp.1",
