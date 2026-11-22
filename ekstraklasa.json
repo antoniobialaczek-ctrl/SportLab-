@@ -17,12 +17,12 @@
     "seasonLimit": 15
   },
   "createdAt": "2026-11-19T10:01:10.307Z",
-  "fetchedAt": "2026-11-21T07:56:57.048Z",
+  "fetchedAt": "2026-11-22T07:57:15.542Z",
   "modelExperimentEligible": false,
   "coverage": {
     "complete": false,
     "from": "2026-08-11",
-    "to": "2026-11-20",
+    "to": "2026-11-21",
     "dayLimit": 3,
     "refreshDays": 7,
     "note": "Darmowy dzienny odczyt TheSportsDB: do 3 spotkań, bez gwarancji pełnego sezonu. Wynik jest dostępny od rzeczywistej obserwacji, z co najmniej 24h od rozpoczęcia meczu."
@@ -3570,7 +3570,7 @@
       "source": {
         "provider": "TheSportsDB",
         "url": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-20&l=4422",
-        "fetchedAt": "2026-11-21T07:56:57.048Z"
+        "fetchedAt": "2026-11-22T07:57:09.556Z"
       },
       "startTime": "2026-11-20T17:00:00.000Z",
       "status": "completed",
@@ -3607,12 +3607,123 @@
       "source": {
         "provider": "TheSportsDB",
         "url": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-20&l=4422",
-        "fetchedAt": "2026-11-21T07:56:57.048Z"
+        "fetchedAt": "2026-11-22T07:57:09.556Z"
       },
       "startTime": "2026-11-20T19:30:00.000Z",
       "status": "completed",
       "firstObservedAt": "2026-11-21T07:56:57.048Z",
       "resultAvailableAt": "2026-11-21T19:30:00.000Z",
+      "availabilityBasis": "observed-result",
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral"
+    },
+    {
+      "id": "soccer/pol.1:tsdb-2490319",
+      "sourceEventId": "tsdb-2490319",
+      "sourceRawEventId": "2490319",
+      "provider": "TheSportsDB",
+      "sport": "football",
+      "route": "soccer/pol.1",
+      "league": "pol.1",
+      "leagueId": "pol.1",
+      "date": "2026-11-21T13:45:00.000Z",
+      "home": "Cracovia",
+      "away": "Jagiellonia Białystok",
+      "homeId": "tsdb-135294",
+      "awayId": "tsdb-135297",
+      "homeScore": 3,
+      "awayScore": 1,
+      "state": "post",
+      "statusDetail": "Koniec meczu",
+      "homeRecord": null,
+      "awayRecord": null,
+      "forecast": {
+        "status": "withheld",
+        "reason": "Osobne źródło opisowe — bez zweryfikowanego modelu Ekstraklasy."
+      },
+      "source": {
+        "provider": "TheSportsDB",
+        "url": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-21&l=4422",
+        "fetchedAt": "2026-11-22T07:57:15.542Z"
+      },
+      "startTime": "2026-11-21T13:45:00.000Z",
+      "status": "completed",
+      "firstObservedAt": "2026-11-22T07:57:15.542Z",
+      "resultAvailableAt": "2026-11-22T13:45:00.000Z",
+      "availabilityBasis": "observed-result",
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral"
+    },
+    {
+      "id": "soccer/pol.1:tsdb-2490316",
+      "sourceEventId": "tsdb-2490316",
+      "sourceRawEventId": "2490316",
+      "provider": "TheSportsDB",
+      "sport": "football",
+      "route": "soccer/pol.1",
+      "league": "pol.1",
+      "leagueId": "pol.1",
+      "date": "2026-11-21T16:30:00.000Z",
+      "home": "Zagłębie Lubin",
+      "away": "Górnik Zabrze",
+      "homeId": "tsdb-135496",
+      "awayId": "tsdb-135296",
+      "homeScore": 2,
+      "awayScore": 0,
+      "state": "post",
+      "statusDetail": "Koniec meczu",
+      "homeRecord": null,
+      "awayRecord": null,
+      "forecast": {
+        "status": "withheld",
+        "reason": "Osobne źródło opisowe — bez zweryfikowanego modelu Ekstraklasy."
+      },
+      "source": {
+        "provider": "TheSportsDB",
+        "url": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-21&l=4422",
+        "fetchedAt": "2026-11-22T07:57:15.542Z"
+      },
+      "startTime": "2026-11-21T16:30:00.000Z",
+      "status": "completed",
+      "firstObservedAt": "2026-11-22T07:57:15.542Z",
+      "resultAvailableAt": "2026-11-22T16:30:00.000Z",
+      "availabilityBasis": "observed-result",
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral"
+    },
+    {
+      "id": "soccer/pol.1:tsdb-2490322",
+      "sourceEventId": "tsdb-2490322",
+      "sourceRawEventId": "2490322",
+      "provider": "TheSportsDB",
+      "sport": "football",
+      "route": "soccer/pol.1",
+      "league": "pol.1",
+      "leagueId": "pol.1",
+      "date": "2026-11-21T19:15:00.000Z",
+      "home": "Radomiak Radom",
+      "away": "Wisła Kraków",
+      "homeId": "tsdb-138916",
+      "awayId": "tsdb-135303",
+      "homeScore": 0,
+      "awayScore": 0,
+      "state": "post",
+      "statusDetail": "Koniec meczu",
+      "homeRecord": null,
+      "awayRecord": null,
+      "forecast": {
+        "status": "withheld",
+        "reason": "Osobne źródło opisowe — bez zweryfikowanego modelu Ekstraklasy."
+      },
+      "source": {
+        "provider": "TheSportsDB",
+        "url": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-21&l=4422",
+        "fetchedAt": "2026-11-22T07:57:15.542Z"
+      },
+      "startTime": "2026-11-21T19:15:00.000Z",
+      "status": "completed",
+      "firstObservedAt": "2026-11-22T07:57:15.542Z",
+      "resultAvailableAt": "2026-11-22T19:15:00.000Z",
       "availabilityBasis": "observed-result",
       "neutralSite": true,
       "neutralSiteBasis": "unknown-assume-neutral"
@@ -4486,7 +4597,7 @@
     {
       "day": "2026-11-15",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-15&l=4422",
-      "observedAt": "2026-11-21T07:56:27.070Z",
+      "observedAt": "2026-11-22T07:56:39.618Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4495,7 +4606,7 @@
     {
       "day": "2026-11-16",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-16&l=4422",
-      "observedAt": "2026-11-21T07:56:33.073Z",
+      "observedAt": "2026-11-22T07:56:45.538Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4504,7 +4615,7 @@
     {
       "day": "2026-11-17",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-17&l=4422",
-      "observedAt": "2026-11-21T07:56:39.083Z",
+      "observedAt": "2026-11-22T07:56:51.540Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4513,7 +4624,7 @@
     {
       "day": "2026-11-18",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-18&l=4422",
-      "observedAt": "2026-11-21T07:56:45.052Z",
+      "observedAt": "2026-11-22T07:56:57.556Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4522,7 +4633,7 @@
     {
       "day": "2026-11-19",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-19&l=4422",
-      "observedAt": "2026-11-21T07:56:51.055Z",
+      "observedAt": "2026-11-22T07:57:03.541Z",
       "rawCount": 0,
       "completedCount": 0,
       "possiblyTruncated": false,
@@ -4531,10 +4642,19 @@
     {
       "day": "2026-11-20",
       "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-20&l=4422",
-      "observedAt": "2026-11-21T07:56:57.048Z",
+      "observedAt": "2026-11-22T07:57:09.556Z",
       "rawCount": 2,
       "completedCount": 2,
       "possiblyTruncated": false,
+      "exclusions": []
+    },
+    {
+      "day": "2026-11-21",
+      "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=2026-11-21&l=4422",
+      "observedAt": "2026-11-22T07:57:15.542Z",
+      "rawCount": 3,
+      "completedCount": 3,
+      "possiblyTruncated": true,
       "exclusions": []
     }
   ]
