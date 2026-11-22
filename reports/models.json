@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-21T20:51:05.471Z",
+  "generatedAt": "2026-11-22T01:14:45.060Z",
   "sports": {
     "nba": {
       "sport": "nba",
       "modelVersion": "3.2.0",
       "modelName": "NBA: Elo z przewagą parkietu i malejącą wagą różnicy punktów",
-      "generatedAt": "2026-11-21T20:51:05.471Z",
+      "generatedAt": "2026-11-22T01:14:45.060Z",
       "status": "research",
       "reason": "nba: Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
       "method": "Podział chronologiczny 50/20/10/20% według terminów. Wyniki uczą model dopiero po resultAvailableAt < termin prognozy. Temperatura dopasowana na kalibracji, wybrana na osobnym oknie, oceniona na końcowym teście. Parametry i kalibracja są zamrożone w teście; stan drużyn uczy się kolejnych znanych wyników (walk-forward).",
@@ -15,23 +15,23 @@
         "away"
       ],
       "samples": {
-        "total": 2529,
-        "train": 1275,
-        "calibration": 496,
-        "selection": 247,
+        "total": 2535,
+        "train": 1280,
+        "calibration": 492,
+        "selection": 243,
         "test": 502
       },
       "metrics": {
         "count": 502,
-        "correct": 332,
-        "accuracy": 0.6613545816733067,
+        "correct": 330,
+        "accuracy": 0.6573705179282868,
         "accuracyInterval": {
-          "lower": 0.6188698831543377,
-          "upper": 0.7013885637860983,
+          "lower": 0.6148002635205084,
+          "upper": 0.6975505674460895,
           "level": 0.95
         },
-        "brier": 0.21552039320172464,
-        "logLoss": 0.6282882765054476,
+        "brier": 0.2166386738478191,
+        "logLoss": 0.6307880507161605,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -71,30 +71,30 @@
           {
             "lower": 0.5,
             "upper": 0.6,
-            "count": 121,
-            "confidence": 0.5503622863262807,
-            "accuracy": 0.45454545454545453
+            "count": 119,
+            "confidence": 0.5510158057673213,
+            "accuracy": 0.44537815126050423
           },
           {
             "lower": 0.6,
             "upper": 0.7,
-            "count": 123,
-            "confidence": 0.6500524561348199,
-            "accuracy": 0.6991869918699187
+            "count": 121,
+            "confidence": 0.6507124500017849,
+            "accuracy": 0.6942148760330579
           },
           {
             "lower": 0.7,
             "upper": 0.8,
-            "count": 127,
-            "confidence": 0.7460740119062178,
-            "accuracy": 0.6929133858267716
+            "count": 129,
+            "confidence": 0.7460197442298632,
+            "accuracy": 0.689922480620155
           },
           {
             "lower": 0.8,
             "upper": 0.9,
-            "count": 95,
-            "confidence": 0.8482793933527082,
-            "accuracy": 0.7894736842105263
+            "count": 97,
+            "confidence": 0.848524100379402,
+            "accuracy": 0.7835051546391752
           },
           {
             "lower": 0.9,
@@ -107,15 +107,15 @@
       },
       "rawMetrics": {
         "count": 502,
-        "correct": 332,
-        "accuracy": 0.6613545816733067,
+        "correct": 330,
+        "accuracy": 0.6573705179282868,
         "accuracyInterval": {
-          "lower": 0.6188698831543377,
-          "upper": 0.7013885637860983,
+          "lower": 0.6148002635205084,
+          "upper": 0.6975505674460895,
           "level": 0.95
         },
-        "brier": 0.21552039320172464,
-        "logLoss": 0.6282882765054476,
+        "brier": 0.2166386738478191,
+        "logLoss": 0.6307880507161605,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -155,30 +155,30 @@
           {
             "lower": 0.5,
             "upper": 0.6,
-            "count": 121,
-            "confidence": 0.5503622863262807,
-            "accuracy": 0.45454545454545453
+            "count": 119,
+            "confidence": 0.5510158057673213,
+            "accuracy": 0.44537815126050423
           },
           {
             "lower": 0.6,
             "upper": 0.7,
-            "count": 123,
-            "confidence": 0.6500524561348199,
-            "accuracy": 0.6991869918699187
+            "count": 121,
+            "confidence": 0.6507124500017849,
+            "accuracy": 0.6942148760330579
           },
           {
             "lower": 0.7,
             "upper": 0.8,
-            "count": 127,
-            "confidence": 0.7460740119062178,
-            "accuracy": 0.6929133858267716
+            "count": 129,
+            "confidence": 0.7460197442298632,
+            "accuracy": 0.689922480620155
           },
           {
             "lower": 0.8,
             "upper": 0.9,
-            "count": 95,
-            "confidence": 0.8482793933527082,
-            "accuracy": 0.7894736842105263
+            "count": 97,
+            "confidence": 0.848524100379402,
+            "accuracy": 0.7835051546391752
           },
           {
             "lower": 0.9,
@@ -191,15 +191,15 @@
       },
       "baselineMetrics": {
         "count": 502,
-        "correct": 273,
-        "accuracy": 0.5438247011952191,
+        "correct": 272,
+        "accuracy": 0.5418326693227091,
         "accuracyInterval": {
-          "lower": 0.5000859649836079,
-          "upper": 0.5868978107286092,
+          "lower": 0.49809425017369235,
+          "upper": 0.5849357175516058,
           "level": 0.95
         },
-        "brier": 0.248188423983065,
-        "logLoss": 0.6895212360614695,
+        "brier": 0.248374391514581,
+        "logLoss": 0.6898942573244128,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -240,8 +240,8 @@
             "lower": 0.5,
             "upper": 0.6,
             "count": 502,
-            "confidence": 0.5495588099072124,
-            "accuracy": 0.5438247011952191
+            "confidence": 0.5495573165894235,
+            "accuracy": 0.5418326693227091
           },
           {
             "lower": 0.6,
@@ -289,14 +289,14 @@
           "ESPN"
         ],
         "firstEventAt": "2025-01-02T00:00:00.000Z",
-        "lastEventAt": "2026-11-20T01:00:00.000Z",
+        "lastEventAt": "2026-11-21T01:00:00.000Z",
         "availabilityBases": [
           "conservative-24h"
         ],
         "pointInTimeVerified": false,
         "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
       },
-      "dataFingerprint": "175c14cedcf9783efe46c5a21c68c44ba9958ca80b5da31e57153752a0f375d6",
+      "dataFingerprint": "c913a7143fd3bc4a9b3be0c562f115d60e7523c7bac1bdf9189c94dd7d38f5b8",
       "leagues": [
         {
           "sport": "nba",
@@ -304,7 +304,7 @@
           "route": "basketball/nba",
           "modelVersion": "3.2.0",
           "modelName": "NBA: Elo z przewagą parkietu i malejącą wagą różnicy punktów",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -313,28 +313,28 @@
           ],
           "method": "Podział chronologiczny 50/20/10/20% według terminów. Wyniki uczą model dopiero po resultAvailableAt < termin prognozy. Temperatura dopasowana na kalibracji, wybrana na osobnym oknie, oceniona na końcowym teście. Parametry i kalibracja są zamrożone w teście; stan drużyn uczy się kolejnych znanych wyników (walk-forward).",
           "samples": {
-            "total": 2529,
-            "train": 1275,
-            "calibration": 496,
-            "selection": 247,
+            "total": 2535,
+            "train": 1280,
+            "calibration": 492,
+            "selection": 243,
             "test": 502
           },
           "boundaries": {
-            "calibrationAt": "2025-12-13T00:00:00.000Z",
-            "selectionAt": "2026-02-25T00:30:00.000Z",
-            "testAt": "2026-03-29T22:00:00.000Z"
+            "calibrationAt": "2025-12-13T01:30:00.000Z",
+            "selectionAt": "2026-02-25T02:00:00.000Z",
+            "testAt": "2026-03-30T02:00:00.000Z"
           },
           "metrics": {
             "count": 502,
-            "correct": 332,
-            "accuracy": 0.6613545816733067,
+            "correct": 330,
+            "accuracy": 0.6573705179282868,
             "accuracyInterval": {
-              "lower": 0.6188698831543377,
-              "upper": 0.7013885637860983,
+              "lower": 0.6148002635205084,
+              "upper": 0.6975505674460895,
               "level": 0.95
             },
-            "brier": 0.21552039320172464,
-            "logLoss": 0.6282882765054476,
+            "brier": 0.2166386738478191,
+            "logLoss": 0.6307880507161605,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -374,30 +374,30 @@
               {
                 "lower": 0.5,
                 "upper": 0.6,
-                "count": 121,
-                "confidence": 0.5503622863262807,
-                "accuracy": 0.45454545454545453
+                "count": 119,
+                "confidence": 0.5510158057673213,
+                "accuracy": 0.44537815126050423
               },
               {
                 "lower": 0.6,
                 "upper": 0.7,
-                "count": 123,
-                "confidence": 0.6500524561348199,
-                "accuracy": 0.6991869918699187
+                "count": 121,
+                "confidence": 0.6507124500017849,
+                "accuracy": 0.6942148760330579
               },
               {
                 "lower": 0.7,
                 "upper": 0.8,
-                "count": 127,
-                "confidence": 0.7460740119062178,
-                "accuracy": 0.6929133858267716
+                "count": 129,
+                "confidence": 0.7460197442298632,
+                "accuracy": 0.689922480620155
               },
               {
                 "lower": 0.8,
                 "upper": 0.9,
-                "count": 95,
-                "confidence": 0.8482793933527082,
-                "accuracy": 0.7894736842105263
+                "count": 97,
+                "confidence": 0.848524100379402,
+                "accuracy": 0.7835051546391752
               },
               {
                 "lower": 0.9,
@@ -410,15 +410,15 @@
           },
           "rawMetrics": {
             "count": 502,
-            "correct": 332,
-            "accuracy": 0.6613545816733067,
+            "correct": 330,
+            "accuracy": 0.6573705179282868,
             "accuracyInterval": {
-              "lower": 0.6188698831543377,
-              "upper": 0.7013885637860983,
+              "lower": 0.6148002635205084,
+              "upper": 0.6975505674460895,
               "level": 0.95
             },
-            "brier": 0.21552039320172464,
-            "logLoss": 0.6282882765054476,
+            "brier": 0.2166386738478191,
+            "logLoss": 0.6307880507161605,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -458,30 +458,30 @@
               {
                 "lower": 0.5,
                 "upper": 0.6,
-                "count": 121,
-                "confidence": 0.5503622863262807,
-                "accuracy": 0.45454545454545453
+                "count": 119,
+                "confidence": 0.5510158057673213,
+                "accuracy": 0.44537815126050423
               },
               {
                 "lower": 0.6,
                 "upper": 0.7,
-                "count": 123,
-                "confidence": 0.6500524561348199,
-                "accuracy": 0.6991869918699187
+                "count": 121,
+                "confidence": 0.6507124500017849,
+                "accuracy": 0.6942148760330579
               },
               {
                 "lower": 0.7,
                 "upper": 0.8,
-                "count": 127,
-                "confidence": 0.7460740119062178,
-                "accuracy": 0.6929133858267716
+                "count": 129,
+                "confidence": 0.7460197442298632,
+                "accuracy": 0.689922480620155
               },
               {
                 "lower": 0.8,
                 "upper": 0.9,
-                "count": 95,
-                "confidence": 0.8482793933527082,
-                "accuracy": 0.7894736842105263
+                "count": 97,
+                "confidence": 0.848524100379402,
+                "accuracy": 0.7835051546391752
               },
               {
                 "lower": 0.9,
@@ -494,15 +494,15 @@
           },
           "baselineMetrics": {
             "count": 502,
-            "correct": 273,
-            "accuracy": 0.5438247011952191,
+            "correct": 272,
+            "accuracy": 0.5418326693227091,
             "accuracyInterval": {
-              "lower": 0.5000859649836079,
-              "upper": 0.5868978107286092,
+              "lower": 0.49809425017369235,
+              "upper": 0.5849357175516058,
               "level": 0.95
             },
-            "brier": 0.248188423983065,
-            "logLoss": 0.6895212360614695,
+            "brier": 0.248374391514581,
+            "logLoss": 0.6898942573244128,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -543,8 +543,8 @@
                 "lower": 0.5,
                 "upper": 0.6,
                 "count": 502,
-                "confidence": 0.5495588099072124,
-                "accuracy": 0.5438247011952191
+                "confidence": 0.5495573165894235,
+                "accuracy": 0.5418326693227091
               },
               {
                 "lower": 0.6,
@@ -579,10 +579,10 @@
           "calibration": {
             "method": "temperature",
             "temperature": 1,
-            "candidateTemperature": 1.5,
+            "candidateTemperature": 2,
             "selected": false,
-            "selectionRawBrier": 0.1695386509596954,
-            "selectionCalibratedBrier": 0.18033823290953807,
+            "selectionRawBrier": 0.17012231223173088,
+            "selectionCalibratedBrier": 0.19048867304427589,
             "reason": "Brak poprawy na wcześniejszym oknie; użyto modelu surowego."
           },
           "publication": {
@@ -596,14 +596,14 @@
               "ESPN"
             ],
             "firstEventAt": "2025-01-02T00:00:00.000Z",
-            "lastEventAt": "2026-11-20T01:00:00.000Z",
+            "lastEventAt": "2026-11-21T01:00:00.000Z",
             "availabilityBases": [
               "conservative-24h"
             ],
             "pointInTimeVerified": false,
             "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
           },
-          "dataFingerprint": "175c14cedcf9783efe46c5a21c68c44ba9958ca80b5da31e57153752a0f375d6"
+          "dataFingerprint": "c913a7143fd3bc4a9b3be0c562f115d60e7523c7bac1bdf9189c94dd7d38f5b8"
         }
       ],
       "dataQuality": {
@@ -611,20 +611,20 @@
         "coverage": {
           "lastFetch": {
             "from": "2026-11-14",
-            "to": "2026-11-20",
+            "to": "2026-11-21",
             "routes": [
               "basketball/nba"
             ]
           }
         },
-        "historyUpdatedAt": "2026-11-21T20:51:01.564Z"
+        "historyUpdatedAt": "2026-11-22T01:14:41.102Z"
       }
     },
     "football": {
       "sport": "football",
       "modelVersion": "3.2.0",
       "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-      "generatedAt": "2026-11-21T20:51:05.471Z",
+      "generatedAt": "2026-11-22T01:14:45.060Z",
       "status": "research",
       "reason": "eng.2: Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
       "method": "Podział chronologiczny 50/20/10/20% według terminów. Wyniki uczą model dopiero po resultAvailableAt < termin prognozy. Temperatura dopasowana na kalibracji, wybrana na osobnym oknie, oceniona na końcowym teście. Parametry i kalibracja są zamrożone w teście; stan drużyn uczy się kolejnych znanych wyników (walk-forward).",
@@ -931,7 +931,7 @@
         "pointInTimeVerified": false,
         "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
       },
-      "dataFingerprint": "1910413335895c08594b69a2c9162063ca469c25d7df0102492074aad24f50c0",
+      "dataFingerprint": "2b52b23c9a0cff6ae14f10811d57e4221a89a1edce4c800fc7ae9ee1fb8fa969",
       "leagues": [
         {
           "sport": "football",
@@ -939,7 +939,7 @@
           "route": "soccer/eng.2",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -1248,7 +1248,7 @@
           "route": "soccer/eng.1",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -1556,7 +1556,7 @@
           "route": "soccer/esp.1",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -1856,7 +1856,7 @@
             "pointInTimeVerified": false,
             "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
           },
-          "dataFingerprint": "d88f8834173d771246ef395275ace5c56f99eb0b4724a48e0e9597e769ca52a8"
+          "dataFingerprint": "0ec6f057f17b40ec7e2a6dc5a1762e67353fa52ac5626b3414c8bad7ac45a28f"
         },
         {
           "sport": "football",
@@ -1864,7 +1864,7 @@
           "route": "soccer/fra.1",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -2164,7 +2164,7 @@
             "pointInTimeVerified": false,
             "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
           },
-          "dataFingerprint": "8e7678ef27b275d25388e4cbfb31462b3a6424b6a5b64eb125b555d3477487e3"
+          "dataFingerprint": "00929a8de9a790762304d11cffb19efe710b83a920869cece87c33c66a0d8c77"
         },
         {
           "sport": "football",
@@ -2172,7 +2172,7 @@
           "route": "soccer/por.1",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -2480,7 +2480,7 @@
           "route": "soccer/ita.1",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -2788,7 +2788,7 @@
           "route": "soccer/ned.1",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -3096,7 +3096,7 @@
           "route": "soccer/ger.1",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -3396,7 +3396,7 @@
             "pointInTimeVerified": false,
             "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
           },
-          "dataFingerprint": "ae55b1ecf5d3fff271c9fdc67dc3b7fabcde5573c93b1b1c3b096c6868247fb2"
+          "dataFingerprint": "99f1d3990d97fdec4aa64122cca2216db035994bcf6ba9dd40dbbcd771efdd94"
         },
         {
           "sport": "football",
@@ -3404,7 +3404,7 @@
           "route": "soccer/uefa.europa",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Za mała próba total: 332/400.",
           "outcomes": [
@@ -3715,7 +3715,7 @@
           "route": "soccer/uefa.champions",
           "modelVersion": "3.2.0",
           "modelName": "Piłka nożna: osobne siły ataku i obrony, Poisson 1/X/2",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Za mała próba total: 335/400.",
           "outcomes": [
@@ -4026,7 +4026,7 @@
         "coverage": {
           "lastFetch": {
             "from": "2026-11-14",
-            "to": "2026-11-20",
+            "to": "2026-11-21",
             "routes": [
               "soccer/eng.1",
               "soccer/esp.1",
@@ -4041,14 +4041,14 @@
             ]
           }
         },
-        "historyUpdatedAt": "2026-11-21T20:51:01.564Z"
+        "historyUpdatedAt": "2026-11-22T01:14:41.102Z"
       }
     },
     "nhl": {
       "sport": "nhl",
       "modelVersion": "3.2.0",
       "modelName": "NHL: Poisson bramek końcowych, masa remisu rozdzielona 50/50",
-      "generatedAt": "2026-11-21T20:51:05.471Z",
+      "generatedAt": "2026-11-22T01:14:45.060Z",
       "status": "research",
       "reason": "nhl: Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
       "method": "Podział chronologiczny 50/20/10/20% według terminów. Wyniki uczą model dopiero po resultAvailableAt < termin prognozy. Temperatura dopasowana na kalibracji, wybrana na osobnym oknie, oceniona na końcowym teście. Parametry i kalibracja są zamrożone w teście; stan drużyn uczy się kolejnych znanych wyników (walk-forward).",
@@ -4338,7 +4338,7 @@
         "pointInTimeVerified": false,
         "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
       },
-      "dataFingerprint": "91da63e3007db96b62f054d5f845c2dd27e2a281a88bf1a61d825663546c88b5",
+      "dataFingerprint": "77e9ddf4a81e0178579009b74b9fb39b56c3230f2d9672e5b434511133b079ee",
       "leagues": [
         {
           "sport": "nhl",
@@ -4346,7 +4346,7 @@
           "route": "hockey/nhl",
           "modelVersion": "3.2.0",
           "modelName": "NHL: Poisson bramek końcowych, masa remisu rozdzielona 50/50",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -4645,7 +4645,7 @@
             "pointInTimeVerified": false,
             "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
           },
-          "dataFingerprint": "91da63e3007db96b62f054d5f845c2dd27e2a281a88bf1a61d825663546c88b5"
+          "dataFingerprint": "77e9ddf4a81e0178579009b74b9fb39b56c3230f2d9672e5b434511133b079ee"
         }
       ],
       "dataQuality": {
@@ -4653,20 +4653,20 @@
         "coverage": {
           "lastFetch": {
             "from": "2026-11-14",
-            "to": "2026-11-20",
+            "to": "2026-11-21",
             "routes": [
               "hockey/nhl"
             ]
           }
         },
-        "historyUpdatedAt": "2026-11-21T20:51:01.564Z"
+        "historyUpdatedAt": "2026-11-22T01:14:41.102Z"
       }
     },
     "tennis": {
       "sport": "tennis",
       "modelVersion": "3.2.0",
       "modelName": "Tenis: ranking Bradley–Terry zawodników, oddzielnie ATP i WTA",
-      "generatedAt": "2026-11-21T20:51:05.471Z",
+      "generatedAt": "2026-11-22T01:14:45.060Z",
       "status": "research",
       "reason": "wta: Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
       "method": "Podział chronologiczny 50/20/10/20% według terminów. Wyniki uczą model dopiero po resultAvailableAt < termin prognozy. Temperatura dopasowana na kalibracji, wybrana na osobnym oknie, oceniona na końcowym teście. Parametry i kalibracja są zamrożone w teście; stan drużyn uczy się kolejnych znanych wyników (walk-forward).",
@@ -4675,23 +4675,23 @@
         "away"
       ],
       "samples": {
-        "total": 19160,
-        "train": 9647,
-        "calibration": 3742,
-        "selection": 1953,
-        "test": 3747
+        "total": 19161,
+        "train": 9648,
+        "calibration": 3743,
+        "selection": 1952,
+        "test": 3748
       },
       "metrics": {
-        "count": 3747,
+        "count": 3748,
         "correct": 2313,
-        "accuracy": 0.6172938350680545,
+        "accuracy": 0.6171291355389541,
         "accuracyInterval": {
-          "lower": 0.6016185151112807,
-          "upper": 0.632728899902194,
+          "lower": 0.6014548199993996,
+          "upper": 0.6325635972596226,
           "level": 0.95
         },
-        "brier": 0.22840486818038933,
-        "logLoss": 0.6475724433274724,
+        "brier": 0.22842686738259316,
+        "logLoss": 0.6476172264150605,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -4731,9 +4731,9 @@
           {
             "lower": 0.5,
             "upper": 0.6,
-            "count": 2037,
-            "confidence": 0.5459785711164649,
-            "accuracy": 0.5493372606774669
+            "count": 2038,
+            "confidence": 0.5459842471371401,
+            "accuracy": 0.5490677134445535
           },
           {
             "lower": 0.6,
@@ -4766,16 +4766,16 @@
         ]
       },
       "rawMetrics": {
-        "count": 3747,
+        "count": 3748,
         "correct": 2313,
-        "accuracy": 0.6172938350680545,
+        "accuracy": 0.6171291355389541,
         "accuracyInterval": {
-          "lower": 0.6016185151112807,
-          "upper": 0.632728899902194,
+          "lower": 0.6014548199993996,
+          "upper": 0.6325635972596226,
           "level": 0.95
         },
-        "brier": 0.22840486818038933,
-        "logLoss": 0.6475724433274724,
+        "brier": 0.22842686738259313,
+        "logLoss": 0.6476172264150605,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -4815,9 +4815,9 @@
           {
             "lower": 0.5,
             "upper": 0.6,
-            "count": 2037,
-            "confidence": 0.5459785711164649,
-            "accuracy": 0.5493372606774669
+            "count": 2038,
+            "confidence": 0.5459842471371401,
+            "accuracy": 0.5490677134445535
           },
           {
             "lower": 0.6,
@@ -4850,16 +4850,16 @@
         ]
       },
       "baselineMetrics": {
-        "count": 3747,
-        "correct": 1920,
-        "accuracy": 0.5124099279423538,
+        "count": 3748,
+        "correct": 1921,
+        "accuracy": 0.5125400213447172,
         "accuracyInterval": {
-          "lower": 0.49640089872530746,
-          "upper": 0.5283935376754356,
+          "lower": 0.49653309804013507,
+          "upper": 0.528521265538849,
           "level": 0.95
         },
-        "brier": 0.24990658532517124,
-        "logLoss": 0.6929603579888338,
+        "brier": 0.24990388822744408,
+        "logLoss": 0.6929549630240579,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -4899,9 +4899,9 @@
           {
             "lower": 0.5,
             "upper": 0.6,
-            "count": 3747,
-            "confidence": 0.5085592735658684,
-            "accuracy": 0.5124099279423538
+            "count": 3748,
+            "confidence": 0.5085597402484997,
+            "accuracy": 0.5125400213447172
           },
           {
             "lower": 0.6,
@@ -4953,14 +4953,14 @@
           "ESPN"
         ],
         "firstEventAt": "2025-01-01T00:30:00.000Z",
-        "lastEventAt": "2026-11-20T20:35:00.000Z",
+        "lastEventAt": "2026-11-20T23:35:00.000Z",
         "availabilityBases": [
           "conservative-24h"
         ],
         "pointInTimeVerified": false,
         "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
       },
-      "dataFingerprint": "90cac400109352b99c9d28c754428d623aa3077636c125df2ca8974a9e0a2fe5",
+      "dataFingerprint": "7501e9230ff57b86a8aece3585bc766b44dece4f2fe658fc910e9649bcdb9b8f",
       "leagues": [
         {
           "sport": "tennis",
@@ -4968,7 +4968,7 @@
           "route": "tennis/wta",
           "modelVersion": "3.2.0",
           "modelName": "Tenis: ranking Bradley–Terry zawodników, oddzielnie ATP i WTA",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -4977,28 +4977,28 @@
           ],
           "method": "Podział chronologiczny 50/20/10/20% według terminów. Wyniki uczą model dopiero po resultAvailableAt < termin prognozy. Temperatura dopasowana na kalibracji, wybrana na osobnym oknie, oceniona na końcowym teście. Parametry i kalibracja są zamrożone w teście; stan drużyn uczy się kolejnych znanych wyników (walk-forward).",
           "samples": {
-            "total": 11739,
-            "train": 5904,
-            "calibration": 2303,
-            "selection": 1171,
-            "test": 2321
+            "total": 11740,
+            "train": 5905,
+            "calibration": 2304,
+            "selection": 1170,
+            "test": 2322
           },
           "boundaries": {
-            "calibrationAt": "2026-01-15T10:15:00.000Z",
-            "selectionAt": "2026-05-28T09:15:00.000Z",
+            "calibrationAt": "2026-01-15T12:35:00.000Z",
+            "selectionAt": "2026-05-28T11:35:00.000Z",
             "testAt": "2026-07-21T11:30:00.000Z"
           },
           "metrics": {
-            "count": 2321,
+            "count": 2322,
             "correct": 1439,
-            "accuracy": 0.6199913830245584,
+            "accuracy": 0.619724375538329,
             "accuracyInterval": {
-              "lower": 0.6000614879934317,
-              "upper": 0.6395247418058877,
+              "lower": 0.5997965746761912,
+              "upper": 0.6392566926440658,
               "level": 0.95
             },
-            "brier": 0.2283227798397264,
-            "logLoss": 0.6472280589353212,
+            "brier": 0.2283583246709928,
+            "logLoss": 0.6473004927840174,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -5038,9 +5038,9 @@
               {
                 "lower": 0.5,
                 "upper": 0.6,
-                "count": 1310,
-                "confidence": 0.545917039083382,
-                "accuracy": 0.5610687022900763
+                "count": 1311,
+                "confidence": 0.5459259096113523,
+                "accuracy": 0.5606407322654462
               },
               {
                 "lower": 0.6,
@@ -5073,16 +5073,16 @@
             ]
           },
           "rawMetrics": {
-            "count": 2321,
+            "count": 2322,
             "correct": 1439,
-            "accuracy": 0.6199913830245584,
+            "accuracy": 0.619724375538329,
             "accuracyInterval": {
-              "lower": 0.6000614879934317,
-              "upper": 0.6395247418058877,
+              "lower": 0.5997965746761912,
+              "upper": 0.6392566926440658,
               "level": 0.95
             },
-            "brier": 0.2283227798397264,
-            "logLoss": 0.6472280589353212,
+            "brier": 0.2283583246709928,
+            "logLoss": 0.6473004927840174,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -5122,9 +5122,9 @@
               {
                 "lower": 0.5,
                 "upper": 0.6,
-                "count": 1310,
-                "confidence": 0.545917039083382,
-                "accuracy": 0.5610687022900763
+                "count": 1311,
+                "confidence": 0.5459259096113523,
+                "accuracy": 0.5606407322654462
               },
               {
                 "lower": 0.6,
@@ -5157,16 +5157,16 @@
             ]
           },
           "baselineMetrics": {
-            "count": 2321,
-            "correct": 1180,
-            "accuracy": 0.5084015510555795,
+            "count": 2322,
+            "correct": 1181,
+            "accuracy": 0.5086132644272179,
             "accuracyInterval": {
-              "lower": 0.488065960721725,
-              "upper": 0.5287093767328055,
+              "lower": 0.4882818457144803,
+              "upper": 0.5289162310711496,
               "level": 0.95
             },
-            "brier": 0.2499601705747816,
-            "logLoss": 0.693067541272074,
+            "brier": 0.24995579404268384,
+            "logLoss": 0.6930587869605911,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -5206,9 +5206,9 @@
               {
                 "lower": 0.5,
                 "upper": 0.6,
-                "count": 2321,
-                "confidence": 0.5098794851308718,
-                "accuracy": 0.5084015510555795
+                "count": 2322,
+                "confidence": 0.5098796698487603,
+                "accuracy": 0.5086132644272179
               },
               {
                 "lower": 0.6,
@@ -5245,8 +5245,8 @@
             "temperature": 1,
             "candidateTemperature": 0.8,
             "selected": false,
-            "selectionRawBrier": 0.22944987753576207,
-            "selectionCalibratedBrier": 0.22982153438259312,
+            "selectionRawBrier": 0.22952962385972092,
+            "selectionCalibratedBrier": 0.2299201272597023,
             "reason": "Brak poprawy na wcześniejszym oknie; użyto modelu surowego."
           },
           "publication": {
@@ -5262,27 +5262,27 @@
               "ESPN"
             ],
             "firstEventAt": "2025-01-01T00:30:00.000Z",
-            "lastEventAt": "2026-11-20T20:35:00.000Z",
+            "lastEventAt": "2026-11-20T23:35:00.000Z",
             "availabilityBases": [
               "conservative-24h"
             ],
             "pointInTimeVerified": false,
             "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
           },
-          "dataFingerprint": "dece9e377888d4f9dd618d479cc935fb41a6d6531ba4c21592ec61395a0ec523",
+          "dataFingerprint": "deed14ea3dc316463ca8a7897f297f8124843b64906cbb0284728be69e985433",
           "dataQuality": {
             "excludedRecords": 1,
             "coverage": {
               "lastFetch": {
                 "from": "2026-11-14",
-                "to": "2026-11-20",
+                "to": "2026-11-21",
                 "routes": [
                   "tennis/atp",
                   "tennis/wta"
                 ]
               }
             },
-            "historyUpdatedAt": "2026-11-21T20:51:01.564Z"
+            "historyUpdatedAt": "2026-11-22T01:14:41.102Z"
           }
         },
         {
@@ -5291,7 +5291,7 @@
           "route": "tennis/atp",
           "modelVersion": "3.2.0",
           "modelName": "Tenis: ranking Bradley–Terry zawodników, oddzielnie ATP i WTA",
-          "generatedAt": "2026-11-21T20:51:05.471Z",
+          "generatedAt": "2026-11-22T01:14:45.060Z",
           "status": "research",
           "reason": "Brak archiwalnych migawek potwierdzających dostępność danych w czasie prognozy.",
           "outcomes": [
@@ -5592,20 +5592,20 @@
             "pointInTimeVerified": false,
             "limitation": "ESPN jest źródłem nieoficjalnym. Retrospektywne wyniki mogą zawierać późniejsze korekty. Bufor 24h nie jest dowodem dostępności informacji w przeszłości."
           },
-          "dataFingerprint": "1e5a10645786e82bb7816344352c1d3a24a5f1ca929bdddb59617893afea3b25",
+          "dataFingerprint": "92677d86e042c36cfca6b3eba5513914d09b707eb01db79e6449338d5f306aab",
           "dataQuality": {
             "excludedRecords": 2,
             "coverage": {
               "lastFetch": {
                 "from": "2026-11-14",
-                "to": "2026-11-20",
+                "to": "2026-11-21",
                 "routes": [
                   "tennis/atp",
                   "tennis/wta"
                 ]
               }
             },
-            "historyUpdatedAt": "2026-11-21T20:51:01.564Z"
+            "historyUpdatedAt": "2026-11-22T01:14:41.102Z"
           }
         }
       ],
@@ -5614,21 +5614,21 @@
         "coverage": {
           "lastFetch": {
             "from": "2026-11-14",
-            "to": "2026-11-20",
+            "to": "2026-11-21",
             "routes": [
               "tennis/atp",
               "tennis/wta"
             ]
           }
         },
-        "historyUpdatedAt": "2026-11-21T20:51:01.564Z"
+        "historyUpdatedAt": "2026-11-22T01:14:41.102Z"
       }
     },
     "cs2": {
       "sport": "cs2",
       "modelVersion": "3.2.0",
       "modelName": "Model niedostępny",
-      "generatedAt": "2026-11-21T20:51:05.471Z",
+      "generatedAt": "2026-11-22T01:14:45.060Z",
       "status": "unavailable",
       "reason": "CS2: brak zweryfikowanego darmowego źródła historii map, składów i wyników.",
       "method": "Podział chronologiczny 50/20/10/20% według terminów. Wyniki uczą model dopiero po resultAvailableAt < termin prognozy. Temperatura dopasowana na kalibracji, wybrana na osobnym oknie, oceniona na końcowym teście. Parametry i kalibracja są zamrożone w teście; stan drużyn uczy się kolejnych znanych wyników (walk-forward).",
