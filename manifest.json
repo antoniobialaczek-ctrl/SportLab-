@@ -3,12 +3,12 @@
   "repository": "antoniobialaczek-ctrl/SportLab-",
   "branch": "sportlab-ekstraklasa-data",
   "source": "TheSportsDB",
-  "generatedAt": "2026-11-22T07:57:21.080Z",
-  "dataCommit": "3ce5527f6dc2b15dd16a412e04d64ffbc92b3c76",
+  "generatedAt": "2026-11-23T08:15:09.155Z",
+  "dataCommit": "7df6bf617ffff8846743e9254699f0670d2f3cb5",
   "files": {
     "ekstraklasa.json": {
-      "bytes": 157202,
-      "sha256": "3c11df933dc459fe8728bd857d8010da79616c246c12603a27d317efacebf2f2"
+      "bytes": 161272,
+      "sha256": "d8619cd0cae474f4f008756194308669d4ea776f819f8e325dd94ffa5372b71d"
     }
   }
 }
