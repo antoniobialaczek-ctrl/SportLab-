@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T13:25:33.968Z",
+  "generatedAt": "2026-11-24T17:11:41.539Z",
   "kind": "prospective",
   "modelVersion": "3.2.0",
   "validation": {
@@ -548,8 +548,8 @@
             "minimumValid": 40,
             "recorded": 35,
             "settled": 0,
-            "pending": 17,
-            "void": 18,
+            "pending": 13,
+            "void": 22,
             "frozenAt": null
           },
           "selection": {
@@ -581,7 +581,7 @@
   "audit": {
     "verified": 224,
     "legacyResearch": 43,
-    "checkedAt": "2026-11-24T13:25:33.968Z"
+    "checkedAt": "2026-11-24T17:11:41.539Z"
   },
   "note": "Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.",
   "sports": {
@@ -2874,8 +2874,8 @@
         "recorded": 52,
         "settled": 0,
         "hiddenTestResults": 0,
-        "pending": 17,
-        "void": 35
+        "pending": 13,
+        "void": 39
       },
       "metrics": null,
       "baselineMetrics": null,
@@ -2916,8 +2916,8 @@
             "recorded": 43,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 17,
-            "void": 26
+            "pending": 13,
+            "void": 30
           },
           "metrics": null,
           "baselineMetrics": null,
