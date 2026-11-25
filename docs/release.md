@@ -29,3 +29,8 @@ Rozpoczęto rzeczywiste zbieranie archiwalnych migawek i niezmiennych prognoz ba
 CS2 oraz Ekstraklasa pozostają niedostępne po sprawdzeniu źródeł. Szczegóły CS2: [audyt](cs2-sources.md). Trasa ESPN `soccer/pol.1` zwraca HTTP 400; alternatywa football-data.co.uk ogranicza automatyczne zastosowania AI w swoich warunkach, a sprawdzone publiczne katalogi OpenFootball nie miały aktualnego archiwum polskiej ligi. Nie obchodzono ograniczeń i nie zastępowano braków danymi losowymi.
 
 Nie włączono płatnych usług, planów ani dostawców danych. Potwierdzenie działania systemu nie oznacza potwierdzenia przyszłej skuteczności modeli; dalsza walidacja wymaga rzeczywistych przyszłych spotkań.
+
+
+## Piłkarskie typy dnia i zdjęcia — 25 listopada 2026
+
+Opublikowano wynik po 90 minutach, sumy goli z dokładnymi kursami, wykresy ostatnich wyników oraz cztery zweryfikowane zdjęcia piłkarzy. Wszystkie 354 testy i build przeszły lokalnie oraz w CI; publiczny przepływ sprawdzono na rzeczywistych danych, osobno od kontrolowanych dodatnich przypadków listy dnia. Szczegóły, zakres i ograniczenia: [dowody wydania](football-daily-picks-release.json).

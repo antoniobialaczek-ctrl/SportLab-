@@ -1,0 +1,127 @@
+{
+  "verifiedAt": "2026-11-25T17:12:15.529231+00:00",
+  "sourceCommit": "a4f5886b12b218bbe7acf54428b2d41199bdb5c0",
+  "featureCommit": "bf6a8afc3127573b0ee2dac1f0602d8cbdac0671",
+  "productionURL": "https://sportlab-2-analizy.vercel.app",
+  "deploymentId": "dpl_9F8aFbgLLCbtHyAHjLhxY8efyB85",
+  "deploymentState": "READY",
+  "ci": {
+    "runId": 45661906180,
+    "conclusion": "success",
+    "tests": 354,
+    "failures": 0,
+    "command": "npm run check"
+  },
+  "localRealSources": {
+    "target": "http://127.0.0.1:3220",
+    "mockedSources": false,
+    "fixture": "soccer/eng.2:401880139",
+    "scope": "regulation_90",
+    "teamSamples": [
+      10,
+      10
+    ],
+    "sourceGoalLine": 2.5,
+    "sourceGoalPrices": [
+      1.740741,
+      2.05
+    ],
+    "goalCharts": 2,
+    "recentResults": 10,
+    "chartValuesMatchActualAPI": true,
+    "manualGoalLine": 3.5,
+    "personalGoalJournalSave": true,
+    "footballDailyBeforePlayers": true,
+    "dailyVisible": [],
+    "photoPlayer": "Lamine Yamal",
+    "photoURL": "https://r2.thesportsdb.com/images/media/player/cutout/m9n4ja1761512633.png",
+    "photoLoaded": true,
+    "mobileNoOverflow": true,
+    "desktop": true,
+    "pageErrors": []
+  },
+  "productionRealSources": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "fixture": "soccer/eng.2:401880139",
+    "scope": "regulation_90",
+    "teamSamples": [
+      10,
+      10
+    ],
+    "sourceGoalLine": 2.5,
+    "sourceGoalPrices": [
+      1.740741,
+      2.05
+    ],
+    "goalCharts": 2,
+    "recentResults": 10,
+    "chartValuesMatchActualAPI": true,
+    "manualGoalLine": 3.5,
+    "personalGoalJournalSave": true,
+    "footballDailyBeforePlayers": true,
+    "dailyVisible": [],
+    "photoPlayer": "Lamine Yamal",
+    "photoURL": "https://r2.thesportsdb.com/images/media/player/cutout/m9n4ja1761512633.png",
+    "photoLoaded": true,
+    "mobileNoOverflow": true,
+    "desktop": true,
+    "pageErrors": []
+  },
+  "controlledFootballDaily": {
+    "target": "http://127.0.0.1:3220",
+    "mockedSources": true,
+    "footballDailyTotalGoalsAndWinnerVisible": true,
+    "priceMinimumPreserved": true,
+    "onePerFixture": true,
+    "footballDailyBeforePlayers": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "controlledNBARegression": {
+    "target": "http://127.0.0.1:3220",
+    "mockedSources": true,
+    "playerQuotesProvided": 0,
+    "automaticAnalysisLine": "Cade Cunningham powyżej 6,5 asysty",
+    "realObservationValues": [
+      8,
+      11,
+      7,
+      9,
+      10,
+      8,
+      12,
+      6,
+      9,
+      8
+    ],
+    "firstCardTopMobile": 656.171875,
+    "abovePricedDailyList": true,
+    "athleteAndMetricSelection": true,
+    "playerBeyondFirstFourSelectable": true,
+    "expandFromFourToSix": true,
+    "strictPriceFilterOnlyAffectsPricedList": true,
+    "historyAndDetailsRetained": true,
+    "mobileNoOverflow": true,
+    "desktopNoOverflow": true,
+    "pageErrors": []
+  },
+  "notes": [
+    "Real source test verifies actual team results, exact goal prices and loaded verified Lamine Yamal photo. No API sources were mocked in the production flow.",
+    "No Championship daily candidate qualified during this real check. The positive goals and full-time winner daily-list flows were separately tested with clearly controlled fixtures; no selection was forced into live results.",
+    "Goal results use confirmed 90 minutes including added time, without extra time or penalties. Current descriptive observations remain excluded from model experiments.",
+    "Missing source quote update time remains unverified; historical counts are not win probabilities or validated predictive accuracy.",
+    "Four individually verified football portraits are catalogued; other football players retain source-provided pictures or initials.",
+    "First Vercel attempt dpl_AEVPTTdFfA3Z2wnKQ5JdPZvxHy4z stopped in build checks because docs/ evidence was excluded. Added one .vercelignore exception, then repeated all 354 tests and deployed exact successful CI commit.",
+    "src/data, src/models and .github/workflows/history.yml were unchanged."
+  ],
+  "runtimeErrors": {
+    "checkedForDeployment": "dpl_9F8aFbgLLCbtHyAHjLhxY8efyB85",
+    "levels": [
+      "error",
+      "fatal"
+    ],
+    "window": "10m",
+    "records": 0
+  }
+}
