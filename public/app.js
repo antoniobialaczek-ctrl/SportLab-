@@ -30,6 +30,7 @@ let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = nul
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
 let marketView = 'daily';
+let playerCardContext = '', playerCardAthlete = 'all', playerCardMetric = 'all', playerCardsExpanded = false;
 let pickScreening = { minOdds: 1.5, band: 'all' };
 try {
   const saved = JSON.parse(localStorage.getItem('sportlab.pick-screening.v1'));
@@ -141,8 +142,8 @@ function updateCurrentDetails(event, data, failed = false) {
   $('match-boxscore').innerHTML = existingStatsHTML(data, event);
 }
 
-function eventPlayerPicks(event) {
-  const options = { excludedPlayerIds: excludedPlayers(event), oddsData: oddsFor(event), screening: pickScreening };
+function eventPlayerPicks(event, { analysis = false } = {}) {
+  const options = { excludedPlayerIds: excludedPlayers(event), oddsData: oddsFor(event), screening: analysis ? undefined : pickScreening, analysisOnly: analysis };
   const home = playerForms.get(playerKey(event, event.homeId))?.data;
   const away = playerForms.get(playerKey(event, event.awayId))?.data;
   const lists = [home, away].map(data => data ? buildPlayerPicks(data, event, options).picks.map(pick => ({
@@ -279,7 +280,19 @@ function updatePreviewNodes(event) {
   if (data) updateMatchDetail(event, data);
   renderBetting();
 }
+function playerAnalysisSection(rows, loading) {
+  const athletes = new Map();
+  for (const { event, pick } of rows) athletes.set(`${event.id}:${pick.playerId}`, `${pick.playerName} · ${pick.teamId === event.homeId ? event.home : event.away}`);
+  const metrics = { nba: [['PTS', 'Punkty'], ['AST', 'Asysty'], ['REB', 'Zbiórki']], nhl: [['S', 'Strzały']], football: [['SH', 'Strzały']] }[sport] || [];
+  const selected = rows.filter(row => (playerCardAthlete === 'all' || `${row.event.id}:${row.pick.playerId}` === playerCardAthlete) && (playerCardMetric === 'all' || row.pick.metric === playerCardMetric));
+  const cards = playerFormCardsHTML(selected, { sport, ...pickScreening, analysis: true, limit: 12 });
+  const count = (cards.match(/data-player-form-card/g) || []).length;
+  const visibleCards = !playerCardsExpanded && count > 4 ? cards.replace('class="player-form-cards"', 'class="player-form-cards pfc-collapsed"') : cards;
+  return `<section class="daily-player-section" data-player-analysis><h3>Zawodnicy — linia i ostatnie występy</h3><p class="small">Automatyczne porównania z historią. Brak kursu nie ukrywa wyników; linia analityczna nie jest rekomendacją.</p><div class="player-card-controls"><label>Zawodnik<select data-player-card-athlete><option value="all">Wszyscy zawodnicy</option>${playerCardAthlete !== 'all' && !athletes.has(playerCardAthlete) ? `<option value="${esc(playerCardAthlete)}" selected>Wybrany zawodnik — oczekiwanie na dane</option>` : ''}${[...athletes].sort((a, b) => a[1].localeCompare(b[1], 'pl')).map(([id, name]) => `<option value="${esc(id)}" ${id === playerCardAthlete ? 'selected' : ''}>${esc(name)}</option>`).join('')}</select></label><label>Statystyka<select data-player-card-metric><option value="all">Wszystkie</option>${metrics.map(([key, name]) => `<option value="${key}" ${key === playerCardMetric ? 'selected' : ''}>${name}</option>`).join('')}</select></label></div>${visibleCards || `<p class="small" role="status">${loading ? 'Pobieranie ostatnich występów zawodników…' : 'Brak aktualnej porównywalnej historii dla tego wyboru. Pełne dostępne dane znajdziesz w szczegółach.'}</p>`}${count > 4 ? `<button type="button" data-expand-player-cards>${playerCardsExpanded ? 'Pokaż mniej kart' : `Pokaż pozostałe karty (${count - 4})`}</button>` : ''}</section>`;
+}
 function renderBetting() {
+  const playerContext = `${sport}:${league}:${$('date').value}`;
+  if (playerCardContext !== playerContext) { playerCardContext = playerContext; playerCardAthlete = 'all'; playerCardMetric = 'all'; playerCardsExpanded = false; }
   const query = $('q').value.toLocaleLowerCase('pl'), status = $('status').value;
   const upcoming = events.filter(event => event.state === 'pre' && Date.parse(event.date) > Date.now()
     && (status === 'all' || status === 'pre')
@@ -299,7 +312,7 @@ function renderBetting() {
       const matchPicks = analysis ? buildMatchPicks(analysis, event, marketOptions(event)).candidates : [];
       return [...matchPicks, ...eventPlayerPicks(event)].map(pick => ({ event, pick, oddsData: oddsFor(event) }));
     });
-    const playerCards = playerFormCardsHTML(candidates, { sport, ...pickScreening, limit: 4 });
+    const analysisRows = upcoming.flatMap(event => eventPlayerPicks(event, { analysis: true }).map(pick => ({ event, pick, oddsData: oddsFor(event) })));
     const analysed = upcoming.filter(event => previews.get(previewKey(event))?.data).length;
     const playerEvents = upcoming.filter(event => ['nba', 'nhl', 'football'].includes(event.sport) && event.route !== 'soccer/pol.1');
     const remaining = playerEvents.filter(event => ![event.homeId, event.awayId].every(id => playerEntryFresh(playerForms.get(playerKey(event, id)))));
@@ -307,10 +320,18 @@ function renderBetting() {
     const loading = upcoming.some(event => previews.get(previewKey(event))?.status === 'loading') || playerEvents.some(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.status === 'loading'));
     $('betting-summary').innerHTML = !upcoming.length
       ? '<p class="small">Brak nadchodzących spotkań w wybranym zestawie. Zmień sport lub dzień; rozegrane mecze znajdziesz poniżej.</p>'
-      : `<p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5 })}${playerCards ? `<section class="daily-player-section"><h3>Zawodnicy — typ i ostatnie mecze</h3><p class="small">Konkretna linia i wcześniejsze występy. To osobne porównania historyczne, bez potwierdzonej skuteczności prognoz.</p>${playerCards}</section>` : ''}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
+      : `${playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}<section class="daily-priced-section"><h3>Typy dnia z dopasowanym kursem</h3><p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5 })}</section><div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
     document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
     const more = document.querySelector('[data-more-daily-players]');
     if (more) more.onclick = () => queuePlayerForms(remaining, 2);
+    document.querySelectorAll('[data-player-card-athlete], [data-player-card-metric]').forEach(select => select.onchange = () => {
+      playerCardAthlete = document.querySelector('[data-player-card-athlete]').value;
+      playerCardMetric = document.querySelector('[data-player-card-metric]').value;
+      const target = select.hasAttribute('data-player-card-athlete') ? '[data-player-card-athlete]' : '[data-player-card-metric]';
+      renderBetting(); document.querySelector(target)?.focus({ preventScroll: true });
+    });
+    const expand = document.querySelector('[data-expand-player-cards]');
+    if (expand) expand.onclick = () => { playerCardsExpanded = !playerCardsExpanded; renderBetting(); };
     return;
   }
   if (marketView === 'matches') {
@@ -439,7 +460,7 @@ async function load() {
     $('info').textContent = `Terminarz jest chwilowo niedostępny: ${error.message}. Dostępne analizy archiwalne poniżej.`;
   }
   render();
-  queuePlayerForms(events, 2);
+  queuePlayerForms(events, Math.min(events.length, 12));
   if (!events.length && sport !== 'cs2') await loadArchive(controller.signal);
 }
 function existingStatsHTML(data, event) {

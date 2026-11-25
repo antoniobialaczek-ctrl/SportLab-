@@ -162,6 +162,7 @@ export function buildPlayerPicks(data, event, options = {}) {
   const selected = options.screening ? filterPricedPicks(candidates, event, { ...options.screening, oddsData: options.oddsData, now: state.now }) : candidates;
   const ranked = selected.sort((a, b) => Number(b.priceAvailable) - Number(a.priceAvailable) || b.hits / b.sample - a.hits / a.sample || b.sample - a.sample
     || (b.median - b.line) / b.line - (a.median - a.line) / a.line || a.playerName.localeCompare(b.playerName, 'pl'));
+  if (options.analysisOnly === true) return output(ranked.length ? 'available' : 'unavailable', ranked.length ? null : 'Brak aktualnej porównywalnej historii zawodników.', data, event, ranked);
   const picks = [], perPlayer = new Map(), selectedKeys = new Set();
   function add(pick) {
     if (!pick || picks.length >= MAX_PICKS || (perPlayer.get(pick.playerId) || 0) >= 2) return false;

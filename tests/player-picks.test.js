@@ -148,3 +148,13 @@ test('freshness allows rounded cutoffs but rejects expired, impossible and malfo
   assert.ok(build({ ...rounded, fetchedAt: new Date(now + 60000).toISOString() }).picks.length > 0);
   assert.deepEqual(build({ ...rounded, fetchedAt: new Date(now - 30 * 60000).toISOString() }).picks, []);
 });
+
+test('analysis-only player choices retain qualified athletes and metrics beyond the six-pick shortlist', () => {
+  const data = fixture();
+  data.players.push(...Array.from({ length: 8 }, (_, index) => ({ ...structuredClone(data.players[0]), id: String(200 + index), name: `Additional Player ${index}` })));
+  assert.ok(build(data).picks.length <= 6);
+  const analyses = build(data, event, { analysisOnly: true });
+  assert.ok(analyses.picks.length > 6);
+  for (const player of data.players.filter(player => player.metrics.AST)) assert.ok(analyses.picks.some(pick => pick.playerId === player.id && pick.metric === 'AST'));
+  assert.ok(analyses.picks.every(pick => pick.probability === undefined && pick.expectedValue === undefined));
+});

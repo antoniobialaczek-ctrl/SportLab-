@@ -62,3 +62,63 @@ test('untrusted names and statements are escaped, and photos use the exact athle
   assert.ok(!html.includes('<script>')); assert.ok(!html.includes('<svg')); assert.match(html, /&lt;img/); assert.match(html, /&lt;svg/);
   assert.match(html, /headshots\/nba\/players\/full\/10.png/);
 });
+
+test('analysis cards retain genuine history without a price and never manufacture an offer', () => {
+  const row = fixture(); delete row.oddsData;
+  assert.equal(playerFormCardsHTML([row], options), '');
+  const html = playerFormCardsHTML([row], { ...options, analysis: true });
+  assert.match(html, /data-analysis-only="true"/);
+  assert.match(html, /Linia do analizy — historia, nie rekomendacja/);
+  assert.match(html, /Brak kursu spełniającego filtr/);
+  assert.match(html, /Example Player — powyżej 6,5 asysty/);
+  assert.deepEqual(renderedValues(html), [13, 12, 11, 10, 9, 8, 7, 0]);
+  assert.match(html, /Średnia <b>8,8/);
+  assert.doesNotMatch(html, /Kurs \d|data-journal-pick|\d%|pewniak/);
+});
+
+test('unusable quotes leave an honest analysis-only card rather than hiding the historical line', () => {
+  for (const mutate of [row => row.oddsData.quotes[0].playerId = '99', row => row.oddsData.quotes[0].line = 7.5,
+    row => row.oddsData.quotes[0].scope = 'regulation_90', row => row.oddsData.quotes[0].outcomes[0].decimal = 1.49,
+    row => row.oddsData.fetchedAt = '2026-11-20T11:40:00.000Z']) {
+    const row = fixture(); mutate(row);
+    const html = playerFormCardsHTML([row], { ...options, analysis: true });
+    assert.match(html, /data-analysis-only="true"/); assert.match(html, /Brak kursu spełniającego filtr/);
+    assert.doesNotMatch(html, /Kurs 1,85|Kurs 1,49/);
+    assert.equal(playerFormCardsHTML([row], options), '');
+  }
+  const expired = playerFormCardsHTML([fixture()], { ...options, analysis: true, now: now + 6 * 60000 });
+  assert.match(expired, /data-analysis-only="true"/); assert.equal(renderedValues(expired).length, 8);
+  const priced = playerFormCardsHTML([fixture()], { ...options, analysis: true });
+  assert.match(priced, /Kurs 1,85/); assert.match(priced, /Linia do analizy/); assert.doesNotMatch(priced, /data-analysis-only/);
+});
+
+test('analysis-only cards still reject wrong identities, invalid lines and fabricated observations', () => {
+  for (const mutate of [row => row.pick.playerId = 'abc', row => row.pick.teamId = '3', row => row.pick.metric = 'S',
+    row => row.pick.scope = 'regulation_90', row => row.pick.line = 6, row => row.event.state = 'post',
+    row => row.event.date = '2026-11-24T00:00:00.000Z', row => row.event.homeId = row.event.awayId,
+    row => row.pick.observations[0].date = row.event.date, row => row.pick.observations[0].matchId = row.event.id,
+    row => row.pick.observations[0].matchId = row.pick.observations[1].matchId, row => row.pick.observations[0].value = null,
+    row => row.pick.hits = 8]) {
+    const row = fixture(); delete row.oddsData; mutate(row);
+    assert.equal(playerFormCardsHTML([row], { ...options, analysis: true }), '');
+  }
+});
+
+test('analysis cards preserve metric variety before filling the bounded list', () => {
+  const rows = [fixture('200001', '10'), fixture('200002', '11'), fixture('200003', '12'), fixture('200004', '13'), fixture('200005', '14')];
+  rows.forEach(row => delete row.oddsData);
+  rows[0].pick.metric = 'PTS'; rows[1].pick.metric = 'PTS'; rows[2].pick.metric = 'PTS'; rows[3].pick.metric = 'AST'; rows[4].pick.metric = 'REB';
+  const html = playerFormCardsHTML(rows, { ...options, analysis: true });
+  assert.equal((html.match(/data-player-form-card/g) || []).length, 4);
+  assert.match(html, /data-metric="PTS"/); assert.match(html, /data-metric="AST"/); assert.match(html, /data-metric="REB"/);
+  assert.equal((html.match(/data-analysis-only="true"/g) || []).length, 4);
+});
+
+test('analysis can expand to twelve cards while strict priced mode stays capped at four', () => {
+  const rows = Array.from({ length: 14 }, (_, index) => fixture(String(300000 + Math.floor(index / 2)), String(100 + index)));
+  const html = playerFormCardsHTML(rows, { ...options, analysis: true, limit: 12 });
+  assert.equal((html.match(/data-player-form-card/g) || []).length, 12);
+  for (let fixtureId = 300000; fixtureId < 300007; fixtureId++) assert.ok((html.match(new RegExp(`data-fixture-id="basketball/nba:${fixtureId}"`, 'g')) || []).length <= 2);
+  assert.equal(playerFormCardsHTML(rows, { ...options, analysis: true, limit: 13 }), '');
+  assert.equal(playerFormCardsHTML(rows, { ...options, limit: 5 }), '');
+});
