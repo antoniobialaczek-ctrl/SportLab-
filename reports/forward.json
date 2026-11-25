@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-25T17:12:41.446Z",
+  "generatedAt": "2026-11-25T21:04:11.681Z",
   "kind": "prospective",
   "modelVersion": "3.2.0",
   "validation": {
@@ -313,8 +313,8 @@
             "target": 60,
             "minimumValid": 40,
             "recorded": 18,
-            "settled": 9,
-            "pending": 9,
+            "settled": 11,
+            "pending": 7,
             "void": 0,
             "frozenAt": null
           },
@@ -548,8 +548,8 @@
             "minimumValid": 40,
             "recorded": 35,
             "settled": 0,
-            "pending": 9,
-            "void": 26,
+            "pending": 6,
+            "void": 29,
             "frozenAt": null
           },
           "selection": {
@@ -581,7 +581,7 @@
   "audit": {
     "verified": 242,
     "legacyResearch": 43,
-    "checkedAt": "2026-11-25T17:12:41.446Z"
+    "checkedAt": "2026-11-25T21:04:11.681Z"
   },
   "note": "Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.",
   "sports": {
@@ -1352,22 +1352,22 @@
       },
       "samples": {
         "recorded": 117,
-        "settled": 86,
+        "settled": 88,
         "hiddenTestResults": 0,
-        "pending": 31,
+        "pending": 29,
         "void": 0
       },
       "metrics": {
-        "count": 86,
-        "correct": 43,
-        "accuracy": 0.5,
+        "count": 88,
+        "correct": 45,
+        "accuracy": 0.5113636363636364,
         "accuracyInterval": {
-          "lower": 0.3966097232742094,
-          "upper": 0.6033902767257906,
+          "lower": 0.40865530398151334,
+          "upper": 0.6131213535942844,
           "level": 0.95
         },
-        "brier": 0.20164329061006173,
-        "logLoss": 1.0089568576543346,
+        "brier": 0.20001525141636894,
+        "logLoss": 1.0020585217632225,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -1393,9 +1393,9 @@
           {
             "lower": 0.3,
             "upper": 0.4,
-            "count": 11,
-            "confidence": 0.38280428524628163,
-            "accuracy": 0.5454545454545454
+            "count": 12,
+            "confidence": 0.38334718193154527,
+            "accuracy": 0.5833333333333334
           },
           {
             "lower": 0.4,
@@ -1414,9 +1414,9 @@
           {
             "lower": 0.6,
             "upper": 0.7,
-            "count": 9,
-            "confidence": 0.6350656903261573,
-            "accuracy": 0.7777777777777778
+            "count": 10,
+            "confidence": 0.6342155401756934,
+            "accuracy": 0.8
           },
           {
             "lower": 0.7,
@@ -1442,16 +1442,16 @@
         ]
       },
       "baselineMetrics": {
-        "count": 86,
+        "count": 88,
         "correct": 40,
-        "accuracy": 0.46511627906976744,
+        "accuracy": 0.45454545454545453,
         "accuracyInterval": {
-          "lower": 0.3634587154004887,
-          "upper": 0.5697569727822375,
+          "lower": 0.35459403744214907,
+          "upper": 0.5582993322546592,
           "level": 0.95
         },
-        "brier": 0.21548892306247613,
-        "logLoss": 1.0707029417977671,
+        "brier": 0.21611245891960432,
+        "logLoss": 1.0712701039562424,
         "reliabilityBins": [
           {
             "lower": 0,
@@ -1491,9 +1491,9 @@
           {
             "lower": 0.5,
             "upper": 0.6,
-            "count": 9,
-            "confidence": 0.5118343195266272,
-            "accuracy": 0.5555555555555556
+            "count": 11,
+            "confidence": 0.5118343195266271,
+            "accuracy": 0.45454545454545453
           },
           {
             "lower": 0.6,
@@ -2848,22 +2848,22 @@
           },
           "samples": {
             "recorded": 18,
-            "settled": 9,
+            "settled": 11,
             "hiddenTestResults": 0,
-            "pending": 9,
+            "pending": 7,
             "void": 0
           },
           "metrics": {
-            "count": 9,
-            "correct": 5,
-            "accuracy": 0.5555555555555556,
+            "count": 11,
+            "correct": 7,
+            "accuracy": 0.6363636363636364,
             "accuracyInterval": {
-              "lower": 0.26665129349549305,
-              "upper": 0.8112214789023355,
+              "lower": 0.35380117450784887,
+              "upper": 0.8483352890463243,
               "level": 0.95
             },
-            "brier": 0.18045733952219947,
-            "logLoss": 0.918179487116209,
+            "brier": 0.17128501707954105,
+            "logLoss": 0.8794977764487892,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -2889,9 +2889,9 @@
               {
                 "lower": 0.3,
                 "upper": 0.4,
-                "count": 0,
-                "confidence": null,
-                "accuracy": null
+                "count": 1,
+                "confidence": 0.3893190454694453,
+                "accuracy": 1
               },
               {
                 "lower": 0.4,
@@ -2910,8 +2910,8 @@
               {
                 "lower": 0.6,
                 "upper": 0.7,
-                "count": 2,
-                "confidence": 0.6431828020306083,
+                "count": 3,
+                "confidence": 0.6376432642942446,
                 "accuracy": 1
               },
               {
@@ -2938,16 +2938,16 @@
             ]
           },
           "baselineMetrics": {
-            "count": 9,
+            "count": 11,
             "correct": 5,
-            "accuracy": 0.5555555555555556,
+            "accuracy": 0.45454545454545453,
             "accuracyInterval": {
-              "lower": 0.26665129349549305,
-              "upper": 0.8112214789023355,
+              "lower": 0.21271271622459764,
+              "upper": 0.719908462590678,
               "level": 0.95
             },
-            "brier": 0.20391507715130835,
-            "logLoss": 1.031521334696749,
+            "brier": 0.21100769962854618,
+            "logLoss": 1.0431825605283724,
             "reliabilityBins": [
               {
                 "lower": 0,
@@ -2987,9 +2987,9 @@
               {
                 "lower": 0.5,
                 "upper": 0.6,
-                "count": 9,
-                "confidence": 0.5118343195266272,
-                "accuracy": 0.5555555555555556
+                "count": 11,
+                "confidence": 0.5118343195266271,
+                "accuracy": 0.45454545454545453
               },
               {
                 "lower": 0.6,
@@ -3061,8 +3061,8 @@
         "recorded": 52,
         "settled": 0,
         "hiddenTestResults": 0,
-        "pending": 9,
-        "void": 43
+        "pending": 6,
+        "void": 46
       },
       "metrics": null,
       "baselineMetrics": null,
@@ -3103,8 +3103,8 @@
             "recorded": 43,
             "settled": 0,
             "hiddenTestResults": 0,
-            "pending": 9,
-            "void": 34
+            "pending": 6,
+            "void": 37
           },
           "metrics": null,
           "baselineMetrics": null,
