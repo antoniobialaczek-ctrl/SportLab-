@@ -13,7 +13,8 @@ const timestamp = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.te
 const integer = value => Number.isInteger(value) && value >= 0;
 const validLine = (value, minimum, maximum) => Number.isFinite(value) && value >= minimum && value <= maximum && Number.isInteger(value * 2) && !Number.isInteger(value);
 const response = (status, reason, totals = null, candidates = []) => ({ status, best: candidates[0] || null, candidates, totals, reason, note: NOTE });
-const regulationTotals = event => event?.sport === 'football' && ['soccer/pol.1', 'soccer/usa.1'].includes(event.route);
+const footballRoutes = new Set(['soccer/eng.1', 'soccer/esp.1', 'soccer/ger.1', 'soccer/ita.1', 'soccer/fra.1', 'soccer/pol.1', 'soccer/usa.1', 'soccer/uefa.champions', 'soccer/uefa.europa', 'soccer/eng.2', 'soccer/ned.1', 'soccer/por.1']);
+const regulationTotals = event => event?.sport === 'football' && footballRoutes.has(event.route);
 const separateSource = event => event?.sport === 'football' && event.route === 'soccer/pol.1';
 const fixtureIdPattern = event => separateSource(event) ? /^tsdb-\d{4,14}$/ : /^\d{4,14}$/;
 const participantIdPattern = event => separateSource(event) ? /^tsdb-\d{1,14}$/ : /^\d{1,14}$/;
@@ -38,6 +39,7 @@ function fixtureContext(analysis, event, now) {
     || event.homeId === event.awayId || analysis.home?.id !== event.homeId || analysis.away?.id !== event.awayId
     || analysis.fixtureId && analysis.fixtureId !== event.id) return 'Historia nie potwierdza właściwego meczu i jego uczestników.';
   const cutoff = Date.parse(analysis.cutoff);
+  if (event.sport === 'football' && !['soccer/pol.1', 'soccer/usa.1'].includes(event.route) && analysis.resultScope !== 'regulation_90') return 'Brak potwierdzonych wyników 90 minut do porównania goli i wyniku.';
   if (cutoff > now || cutoff > start || now - cutoff > 15 * 60000) return 'Odśwież wcześniejsze wyniki przed porównaniem rynków.';
   if (!({ nba: ['basketball/nba'], nhl: ['hockey/nhl'], tennis: ['tennis/atp', 'tennis/wta'] }[event.sport]?.includes(event.route)
     || event.sport === 'football' && /^soccer\/(?:eng\.1|esp\.1|ger\.1|ita\.1|fra\.1|pol\.1|usa\.1|uefa\.champions|uefa\.europa|eng\.2|ned\.1|por\.1)$/.test(event.route))) return 'Brak porównywalnego rynku dla tej dyscypliny.';
@@ -54,7 +56,8 @@ function observations(form, event, cutoff, now) {
       || separateSource(event) && row.sourceEventId !== row.id.slice(event.route.length + 1)
       || row.id === event.id || seen.has(row.id)
       || row.route !== event.route || !timestamp(row.date) || Date.parse(row.date) >= cutoff
-      || ![row.scoreFor, row.scoreAgainst].every(value => integer(value) && value <= (separateSource(event) || event.sport === 'nhl' ? 30 : 300))
+      || ![row.scoreFor, row.scoreAgainst].every(value => integer(value) && value <= (event.sport === 'football' || event.sport === 'nhl' ? 30 : 300))
+      || event.sport === 'football' && !['soccer/pol.1', 'soccer/usa.1'].includes(event.route) && (row.scoreScope !== 'regulation_90' || row.regulationOnly !== true)
       || ['nba', 'nhl'].includes(event.sport) && row.scoreFor === row.scoreAgainst) return null;
     seen.add(row.id);
     rows.push({ id: row.id, matchId: row.id, date: row.date, total: row.scoreFor + row.scoreAgainst,
@@ -89,6 +92,16 @@ function resultCandidate(analysis, event, now) {
   return { kind: 'result', market: assessment.candidate.market, side: assessment.candidate.side, label: assessment.candidate.label,
     support: { home: { hits: homeHits, sample: home.sample }, away: { hits: awayHits, sample: away.sample } },
     reasons: assessment.reasons, scope: event.sport === 'football' ? 'regulation_90' : event.sport === 'nhl' ? 'including_overtime_shootout' : 'including_overtime' };
+}
+function footballWinnerCandidate(analysis, event, direction) {
+  if (event.sport !== 'football' || !direction) return null;
+  const isHome = direction.side === 'home', homeHits = isHome ? analysis.home.wins : analysis.home.losses;
+  const awayHits = isHome ? analysis.away.losses : analysis.away.wins;
+  if (homeHits < 6 || awayHits < 6) return null;
+  return { kind: 'result', market: 'winner', side: direction.side, scope: 'regulation_90',
+    label: `${isHome ? event.home : event.away} — zwycięstwo (90 minut)`,
+    support: { home: { hits: homeHits, sample: analysis.home.sample }, away: { hits: awayHits, sample: analysis.away.sample } },
+    reasons: ['Porównanie rzeczywistych zwycięstw i porażek po 90 minutach, bez doliczania remisów do zwycięstw.'] };
 }
 
 /** Compare two transparent historical screens. Their support counts are not
@@ -127,7 +140,8 @@ export function buildMatchPicks(analysis, event, { now = Date.now(), totalLine, 
   const totals = { line, lineOrigin: totalLine === undefined ? 'analytical' : sourceLineVerified ? 'source' : 'manual', referenceAverage,
     home, away, uniqueSample: uniqueObservations.length, uniqueObservations, market: config.market, scope: config.scope, unit: config.unit,
     over: uniqueObservations.filter(row => row.total > line).length, under: uniqueObservations.filter(row => row.total < line).length };
-  const candidates = winner ? [winner] : [];
+  const fullTimeWinner = footballWinnerCandidate(analysis, event, winner);
+  const candidates = [winner, fullTimeWinner].filter(Boolean);
   for (const direction of ['over', 'under']) {
     const homeHits = home[direction], awayHits = away[direction], uniqueHits = totals[direction];
     const trendAgrees = direction === 'over' ? home.last5Average > line && away.last5Average > line : home.last5Average < line && away.last5Average < line;

@@ -23,7 +23,8 @@ async function request(handler, params, method = 'GET') { const res = response()
 async function isolated(t, name, files) {
   const root = await mkdtemp(join(tmpdir(), 'sportlab-journal-api-'));
   t.after(() => rm(root, { recursive: true, force: true }));
-  await Promise.all([cp(new URL('../api/', import.meta.url), join(root, 'api'), { recursive: true }), cp(new URL('../src/', import.meta.url), join(root, 'src'), { recursive: true }), writeFile(join(root, 'package.json'), '{"type":"module"}')]);
+  await mkdir(join(root, 'public'), { recursive: true });
+  await Promise.all([cp(new URL('../api/', import.meta.url), join(root, 'api'), { recursive: true }), cp(new URL('../src/', import.meta.url), join(root, 'src'), { recursive: true }), cp(new URL('../public/football-portraits.js', import.meta.url), join(root, 'public/football-portraits.js')), writeFile(join(root, 'package.json'), '{"type":"module"}')]);
   for (const [path, data] of Object.entries(files || {})) {
     await mkdir(join(root, path, '..'), { recursive: true });
     await writeFile(join(root, path), typeof data === 'string' ? data : JSON.stringify(data));

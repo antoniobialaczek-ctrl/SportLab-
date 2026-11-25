@@ -83,7 +83,8 @@ async function call(handler, query) { const res = response(); await handler({ me
 async function isolated(t, files = {}) {
   const directory = await mkdtemp(join(tmpdir(), 'sportlab-result-source-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  await Promise.all([cp(new URL('../api/', import.meta.url), join(directory, 'api'), { recursive: true }), cp(new URL('../src/', import.meta.url), join(directory, 'src'), { recursive: true }), writeFile(join(directory, 'package.json'), '{"type":"module"}')]);
+  await mkdir(join(directory, 'public'), { recursive: true });
+  await Promise.all([cp(new URL('../api/', import.meta.url), join(directory, 'api'), { recursive: true }), cp(new URL('../src/', import.meta.url), join(directory, 'src'), { recursive: true }), cp(new URL('../public/football-portraits.js', import.meta.url), join(directory, 'public/football-portraits.js')), writeFile(join(directory, 'package.json'), '{"type":"module"}')]);
   for (const [path, data] of Object.entries(files)) { await mkdir(join(directory, path, '..'), { recursive: true }); await writeFile(join(directory, path), JSON.stringify(data)); }
   return (await import(pathToFileURL(join(directory, 'api/journal-results.js')))).default;
 }

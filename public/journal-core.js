@@ -67,7 +67,7 @@ function marketValid(record) {
   if (!['over', 'under'].includes(record.outcome)) return false;
   if (record.market === 'total_points') return record.sport === 'nba' && record.scope === 'including_overtime'
     && halfLine(record.line, 599.5) && playerFields.every(key => record[key] === undefined);
-  if (record.market === 'total_goals') return ((record.sport === 'football' && ['soccer/pol.1', 'soccer/usa.1'].includes(record.route) && record.scope === 'regulation_90' && halfLine(record.line, 15.5))
+  if (record.market === 'total_goals') return ((record.sport === 'football' && SPORTS.football.includes(record.route) && record.scope === 'regulation_90' && halfLine(record.line, 15.5))
     || (record.sport === 'nhl' && record.route === 'hockey/nhl' && record.scope === 'including_overtime_shootout' && halfLine(record.line, 25.5))) && playerFields.every(key => record[key] === undefined);
   return record.market === 'player_prop' && record.route !== 'soccer/pol.1' && halfLine(record.line)
     && numericId(record.playerId) && numericId(record.teamId) && [record.homeId, record.awayId].includes(record.teamId)

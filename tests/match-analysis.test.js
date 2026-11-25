@@ -28,7 +28,8 @@ async function request(api, params = query, method = 'GET') {
 async function isolated(t, content) {
   const root = await mkdtemp(join(tmpdir(), 'sportlab-match-api-'));
   t.after(() => rm(root, { recursive: true, force: true }));
-  await Promise.all([cp(new URL('../api/', import.meta.url), join(root, 'api'), { recursive: true }), cp(new URL('../src/', import.meta.url), join(root, 'src'), { recursive: true }), writeFile(join(root, 'package.json'), '{"type":"module"}')]);
+  await mkdir(join(root, 'public'), { recursive: true });
+  await Promise.all([cp(new URL('../api/', import.meta.url), join(root, 'api'), { recursive: true }), cp(new URL('../src/', import.meta.url), join(root, 'src'), { recursive: true }), cp(new URL('../public/football-portraits.js', import.meta.url), join(root, 'public/football-portraits.js')), writeFile(join(root, 'package.json'), '{"type":"module"}')]);
   if (content !== undefined) {
     await mkdir(join(root, 'data/history'), { recursive: true });
     await writeFile(join(root, 'data/history/nba.json'), typeof content === 'string' ? content : JSON.stringify(content));

@@ -114,3 +114,56 @@ test('NHL compact goal charts keep settlement visible and scale expands for high
   assert.ok(!html.includes('<table>'));
   assert.deepEqual(totals(matchChartsHTML(value, { ...nhlEvent, homeId: '3' })), []);
 });
+
+const footballEvent = { ...event, id: 'soccer/eng.1:999999', route: 'soccer/eng.1', sport: 'football' };
+const footballRow = (id, at, scored, conceded, extra = {}) => row(id, at, scored, conceded, {
+  id: `soccer/eng.1:${id}`, route: 'soccer/eng.1', scoreScope: 'regulation_90', regulationOnly: true, ...extra,
+});
+const footballAnalysis = (home, away = []) => ({ ...analysis(home, away), sport: 'football', route: footballEvent.route, fixtureId: footballEvent.id, resultScope: 'regulation_90' });
+
+test('football goal charts keep 0:0 and 2:2, exact goal values and a shared zero-based goal scale', () => {
+  const value = footballAnalysis([footballRow('100002', 2, 2, 2), footballRow('100001', 1, 0, 0)], [footballRow('200001', 3, 3, 1)]);
+  const html = matchChartsHTML(value, footballEvent, { line: 2.5 });
+  assert.deepEqual(totals(html), [0, 4, 4]);
+  assert.equal((html.match(/data-zero-baseline="true"/g) || []).length, 2);
+  assert.equal((html.match(/>6<\/text>/g) || []).length, 2);
+  assert.match(html, /data-total="0"[^>]*><rect[^>]*height="0"/);
+  assert.match(html, /0:0; suma 0 goli/);
+  assert.match(html, /2:2; suma 4 goli/);
+  assert.match(html, /Wynik po 90 minutach/);
+  assert.match(html, /90 minutach z doliczonym czasem, bez dogrywki i karnych/);
+  assert.match(html, /Gole zdobyte \/ mecz: <b>1<\/b>/);
+  assert.match(html, /data-score-scope="regulation_90"/);
+  assert.doesNotMatch(html, /punktów|Wygrana w serii karnych|po 60 minutach/);
+});
+
+test('football charts require verified 90-minute scope and ignore unknown, extra-time and future rows', () => {
+  const valid = footballRow('100001', 1, 0, 0);
+  const unknown = footballRow('100002', 2, 1, 1); delete unknown.scoreScope; delete unknown.regulationOnly;
+  const records = [valid, unknown, footballRow('100003', 3, 2, 2, { scoreScope: 'including_overtime' }),
+    footballRow('100004', 4, 3, 1, { regulationOnly: false }), footballRow('100005', 5, 31, 1),
+    footballRow('999999', 6, 1, 0), footballRow('100006', 7, 2, 1, { date: footballEvent.date })];
+  assert.deepEqual(totals(matchChartsHTML(footballAnalysis(records), footballEvent)), [0]);
+  for (const scope of [undefined, 'including_overtime', 'including_overtime_shootout']) {
+    assert.deepEqual(totals(matchChartsHTML({ ...footballAnalysis([valid]), resultScope: scope }, footballEvent)), []);
+    assert.equal(matchChartsHTML({ ...footballAnalysis([valid]), resultScope: scope }, footballEvent, { compact: true }), '');
+  }
+  assert.equal(matchChartsHTML(footballAnalysis([valid]), { ...footballEvent, route: 'soccer/unknown' }), '');
+});
+
+test('football scope markers support proven MLS and separate-source Poland identities without inventing unknown results', () => {
+  const fixture = { ...footballEvent, id: 'soccer/pol.1:tsdb-999999', route: 'soccer/pol.1', homeId: 'tsdb-1', awayId: 'tsdb-2' };
+  const records = [footballRow('100001', 1, 0, 0, { id: 'soccer/pol.1:tsdb-100001', route: fixture.route }),
+    footballRow('100002', 2, 2, 1, { id: 'soccer/pol.1:tsdb-100002', route: fixture.route })];
+  for (const record of records) { delete record.scoreScope; delete record.regulationOnly; }
+  const value = { ...footballAnalysis(records), route: fixture.route, fixtureId: fixture.id,
+    home: { id: fixture.homeId, recent: records }, away: { id: fixture.awayId, recent: [] } };
+  assert.deepEqual(totals(matchChartsHTML(value, fixture)), [0, 3]);
+  assert.deepEqual(totals(matchChartsHTML({ ...value, resultScope: undefined }, fixture)), []);
+  records[1].scoreScope = 'including_overtime';
+  assert.deepEqual(totals(matchChartsHTML(value, fixture)), [0]);
+  const mls = { ...footballEvent, id: 'soccer/usa.1:999999', route: 'soccer/usa.1' };
+  const mlsRows = [footballRow('100001', 1, 1, 1, { id: 'soccer/usa.1:100001', route: mls.route })];
+  delete mlsRows[0].scoreScope; delete mlsRows[0].regulationOnly;
+  assert.deepEqual(totals(matchChartsHTML({ ...footballAnalysis(mlsRows), route: mls.route, fixtureId: mls.id }, mls)), [2]);
+});

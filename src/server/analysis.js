@@ -1,8 +1,16 @@
-export function summarizeParticipant(events, { participantId, route, cutoff, limit = 10 }) {
+export function isResultAvailableAt(event, before, availabilityInclusive = false) {
+  const available = Date.parse(event.resultAvailableAt);
+  return available < before || availabilityInclusive && available === before
+    && event.status === 'completed' && event.descriptiveOnly === true && event.regulationOnly === true
+    && event.scoreScope === 'regulation_90' && event.availabilityBasis === 'current-descriptive-observation'
+    && event.source?.fetchedAt === event.resultAvailableAt;
+}
+
+export function summarizeParticipant(events, { participantId, route, cutoff, limit = 10, availabilityInclusive = false }) {
   const before = Date.parse(cutoff);
   if (!Number.isFinite(before)) throw new Error('Nieprawidłowy punkt odcięcia');
   const history = events.filter(e => e.route === route && (e.homeId === participantId || e.awayId === participantId)
-    && Date.parse(e.resultAvailableAt) < before && Date.parse(e.startTime) < before)
+    && isResultAvailableAt(e, before, availabilityInclusive) && Date.parse(e.startTime) < before)
     .sort((a, b) => b.startTime.localeCompare(a.startTime)).slice(0, limit);
   let wins = 0, draws = 0, scored = 0, conceded = 0;
   const recent = history.map(e => {

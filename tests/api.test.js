@@ -42,9 +42,11 @@ const fixture = ({ id = '401234567', date = '2026-01-01T18:00:00Z', state = 'pos
 async function isolatedAPI(t, name, files = {}) {
   const root = await mkdtemp(join(tmpdir(), 'sportlab-api-test-'));
   t.after(() => rm(root, { recursive: true, force: true }));
+  await mkdir(join(root, 'public'), { recursive: true });
   await Promise.all([
     cp(new URL('../api/', import.meta.url), join(root, 'api'), { recursive: true }),
     cp(new URL('../src/', import.meta.url), join(root, 'src'), { recursive: true }),
+    cp(new URL('../public/football-portraits.js', import.meta.url), join(root, 'public/football-portraits.js')),
     writeFile(join(root, 'package.json'), '{"type":"module"}'),
   ]);
   for (const [path, content] of Object.entries(files)) {

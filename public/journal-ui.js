@@ -16,7 +16,7 @@ function marketOptions(event) {
   if (event.sport === 'football') return [
     { key: 'result_90', name: 'Wynik po 90 minutach', outcomes: [['home', event.home], ['draw', 'Remis'], ['away', event.away]] },
     { key: 'double_chance_90', name: 'Podwójna szansa po 90 minutach', outcomes: [['home_draw', `${event.home} lub remis (1X)`], ['draw_away', `Remis lub ${event.away} (X2)`]] },
-    ...(['soccer/pol.1', 'soccer/usa.1'].includes(event.route) ? [{ key: 'total_goals', name: 'Suma goli po 90 minutach', outcomes: [['over', 'Powyżej linii'], ['under', 'Poniżej linii']] }] : []),
+    { key: 'total_goals', name: 'Suma goli po 90 minutach', outcomes: [['over', 'Powyżej linii'], ['under', 'Poniżej linii']] },
   ];
   return [{ key: 'winner', name: event.sport === 'nhl' ? 'Zwycięzca z dogrywką i karnymi' : 'Zwycięzca z dogrywką', outcomes: [['home', event.home], ['away', event.away]] },
     ...(event.sport === 'nhl' ? [{ key: 'total_goals', name: 'Suma goli — oficjalny wynik z dogrywką i karnymi', outcomes: [['over', 'Powyżej linii'], ['under', 'Poniżej linii']] }] : []),

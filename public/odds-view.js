@@ -9,7 +9,7 @@ const recentObservation = value => Number.isFinite(Date.parse(value)) && Date.pa
 function selection(row, quote, event) {
   if (['total_points', 'total_goals'].includes(quote.market)) {
     const direction = row.direction || row.side;
-    const valid = quote.market === 'total_goals' ? event.sport === 'nhl' && quote.line >= 0.5 && quote.line <= 25.5 && quote.line % 1 === 0.5 : halfPoint(quote.line);
+    const valid = quote.market === 'total_goals' ? ['nhl', 'football'].includes(event.sport) && quote.line >= 0.5 && quote.line <= (event.sport === 'football' ? 15.5 : 25.5) && quote.line % 1 === 0.5 : halfPoint(quote.line);
     return valid && ['over', 'under'].includes(direction) ? `${direction === 'over' ? 'Powyżej' : 'Poniżej'} ${decimal(quote.line)} ${quote.market === 'total_goals' ? 'gola' : 'pkt'}` : null;
   }
   return row.side === 'home' ? event.home : row.side === 'away' ? event.away : row.side === 'draw' ? 'Remis' : null;
@@ -38,8 +38,8 @@ export function oddsHTML(data, event) {
     if (!outcomes.length) return [];
     const total = ['total_points', 'total_goals'].includes(quote.market), goals = quote.market === 'total_goals', unit = goals ? 'gola' : 'pkt';
     const directions = outcomes.map(row => row.direction || row.side);
-    const canUseLine = total && (event.sport === 'nba' || event.sport === 'nhl') && event.state === 'pre' && start > Date.now()
-      && quote.scope === (event.sport === 'nhl' ? 'including_overtime_shootout' : 'including_overtime') && (goals ? quote.line >= 0.5 && quote.line <= 25.5 && quote.line % 1 === 0.5 : halfPoint(quote.line)) && directions.includes('over') && directions.includes('under')
+    const canUseLine = total && (event.sport === 'nba' || event.sport === 'nhl' || event.sport === 'football') && event.state === 'pre' && start > Date.now()
+      && quote.scope === (event.sport === 'football' ? 'regulation_90' : event.sport === 'nhl' ? 'including_overtime_shootout' : 'including_overtime') && (goals ? quote.line >= 0.5 && quote.line <= (event.sport === 'football' ? 15.5 : 25.5) && quote.line % 1 === 0.5 : halfPoint(quote.line)) && directions.includes('over') && directions.includes('under')
       && quote.freshness !== 'stale' && recentObservation(data.fetchedAt) && recentObservation(quote.observedAt);
     return [`<div class="odds-quote"><p><b>${esc(quote.provider)}</b> • ${esc(quote.marketLabel || (total ? goals ? 'Suma goli' : 'Suma punktów' : 'Wynik meczu'))}${total ? ` • linia ${decimal(quote.line)} ${unit}` : ''}</p><p class="small">${esc(scope[quote.scope] || scope.unknown)}</p><div class="scroll"><table><thead><tr><th>Wybór</th><th>Kurs dziesiętny</th><th>Kurs amerykański</th></tr></thead><tbody>${outcomes.map(row => `<tr><td>${esc(row.label)}</td><td>${decimal(row.decimal)}</td><td>${Number.isFinite(row.american) ? esc(row.american > 0 ? '+' + row.american : row.american) : '—'}</td></tr>`).join('')}</tbody></table></div>${canUseLine ? `<button type="button" data-use-source-line data-line="${quote.line}" data-provider="${esc(quote.provider)}">Porównaj linię z odczytu ${decimal(quote.line)} ${unit}</button>` : ''}<p class="small">Aktualizacja kursu w źródle: ${esc(date(quote.quotedAt))}. ${quote.freshness === 'unverified' ? 'Świeżość niepotwierdzona.' : quote.freshness === 'stale' ? 'Kurs starszy niż 10 minut.' : 'Źródłowy znacznik aktualizacji mieści się w ostatnich 10 minutach.'}<br>Pobrano: ${esc(date(quote.observedAt))}. Tego odczytu nie używamy automatycznie w ocenie opłacalności ani w dzienniku.</p>${ruleLink(quote.scopeBasis)}</div>`];
   });

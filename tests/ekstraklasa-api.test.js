@@ -23,9 +23,11 @@ function sourceRow(date, extra = {}) {
 async function isolatedAPIs(t, files = {}) {
   const directory = await mkdtemp(join(tmpdir(), 'sportlab-ekstraklasa-api-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
+  await mkdir(join(directory, 'public'), { recursive: true });
   await Promise.all([
     cp(new URL('../api/', import.meta.url), join(directory, 'api'), { recursive: true }),
     cp(new URL('../src/', import.meta.url), join(directory, 'src'), { recursive: true }),
+    cp(new URL('../public/football-portraits.js', import.meta.url), join(directory, 'public/football-portraits.js')),
     writeFile(join(directory, 'package.json'), '{"type":"module"}'),
   ]);
   for (const [path, data] of Object.entries(files)) {

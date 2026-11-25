@@ -1,0 +1,163 @@
+{
+  "provider": "TheSportsDB",
+  "sourceKey": "public demo 123",
+  "minimumSearchSpacingMs": 6100,
+  "records": [
+    {
+      "espn": {
+        "id": "362150",
+        "name": "Lamine Yamal",
+        "born": "2007-07-13",
+        "team": "Barcelona",
+        "teamId": "83",
+        "route": "soccer/esp.1",
+        "nationality": "Spain",
+        "sourceURL": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/teams/83/roster",
+        "sourceTimestamp": "2026-11-25T13:34:06Z"
+      },
+      "sportsDB": {
+        "id": "34219490",
+        "name": "Lamine Yamal",
+        "born": "2007-07-13",
+        "team": "Barcelona",
+        "nationality": "Spain",
+        "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p=Lamine_Yamal",
+        "photoURL": "https://r2.thesportsdb.com/images/media/player/cutout/m9n4ja1761512633.png",
+        "thumbURL": "https://r2.thesportsdb.com/images/media/player/thumb/cdjnqt1786385175.jpg",
+        "cutoutURL": "https://r2.thesportsdb.com/images/media/player/cutout/m9n4ja1761512633.png"
+      },
+      "imageCheck": {
+        "status": 200,
+        "contentType": "image/png",
+        "contentLength": "228427"
+      },
+      "checkedAt": "2026-11-25T13:34:17.163Z"
+    },
+    {
+      "espn": {
+        "id": "231050",
+        "name": "Raphinha",
+        "born": "1996-12-14",
+        "team": "Barcelona",
+        "teamId": "83",
+        "route": "soccer/esp.1",
+        "nationality": "Brazil",
+        "sourceURL": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/teams/83/roster",
+        "sourceTimestamp": "2026-11-25T13:34:06Z"
+      },
+      "sportsDB": {
+        "id": "34163304",
+        "name": "Raphinha",
+        "born": "1996-12-14",
+        "team": "Barcelona",
+        "nationality": "Brazil",
+        "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p=Raphinha",
+        "photoURL": "https://r2.thesportsdb.com/images/media/player/cutout/w94spe1726510018.png",
+        "thumbURL": "https://r2.thesportsdb.com/images/media/player/thumb/14kuzy1771260047.jpg",
+        "cutoutURL": "https://r2.thesportsdb.com/images/media/player/cutout/w94spe1726510018.png"
+      },
+      "imageCheck": {
+        "status": 200,
+        "contentType": "image/png",
+        "contentLength": "242914"
+      },
+      "checkedAt": "2026-11-25T13:34:23.284Z"
+    },
+    {
+      "espn": {
+        "id": "250465",
+        "name": "Pedri",
+        "born": "2002-11-25",
+        "team": "Barcelona",
+        "teamId": "83",
+        "route": "soccer/esp.1",
+        "nationality": "Spain",
+        "sourceURL": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/teams/83/roster",
+        "sourceTimestamp": "2026-11-25T13:34:06Z"
+      },
+      "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p=Pedri",
+      "excluded": true,
+      "reason": "identity-mismatch-or-ambiguous"
+    },
+    {
+      "espn": {
+        "id": "323702",
+        "name": "Gavi",
+        "born": "2004-08-05",
+        "team": "Barcelona",
+        "teamId": "83",
+        "route": "soccer/esp.1",
+        "nationality": "Spain",
+        "sourceURL": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/teams/83/roster",
+        "sourceTimestamp": "2026-11-25T13:34:06Z"
+      },
+      "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p=Gavi",
+      "excluded": true,
+      "reason": "identity-mismatch-or-ambiguous"
+    },
+    {
+      "espn": {
+        "id": "227765",
+        "name": "Dani Olmo",
+        "born": "1998-05-07",
+        "team": "Barcelona",
+        "teamId": "83",
+        "route": "soccer/esp.1",
+        "nationality": "Spain",
+        "sourceURL": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/teams/83/roster",
+        "sourceTimestamp": "2026-11-25T13:34:06Z"
+      },
+      "sportsDB": {
+        "id": "34168363",
+        "name": "Dani Olmo",
+        "born": "1998-05-07",
+        "team": "Barcelona",
+        "nationality": "Spain",
+        "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p=Dani_Olmo",
+        "photoURL": "https://r2.thesportsdb.com/images/media/player/cutout/s9hzoh1725611346.png",
+        "thumbURL": "https://r2.thesportsdb.com/images/media/player/thumb/b075cd1786385273.jpg",
+        "cutoutURL": "https://r2.thesportsdb.com/images/media/player/cutout/s9hzoh1725611346.png"
+      },
+      "imageCheck": {
+        "status": 200,
+        "contentType": "image/png",
+        "contentLength": "223479"
+      },
+      "checkedAt": "2026-11-25T13:34:41.594Z"
+    },
+    {
+      "espn": {
+        "id": "253989",
+        "name": "Erling Haaland",
+        "born": "2000-07-21",
+        "team": "Manchester City",
+        "teamId": "382",
+        "route": "soccer/eng.1",
+        "nationality": "Norway",
+        "sourceURL": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/382/roster",
+        "sourceTimestamp": "2026-11-25T13:34:02Z"
+      },
+      "sportsDB": {
+        "id": "34169116",
+        "name": "Erling Haaland",
+        "born": "2000-07-21",
+        "team": "Manchester City",
+        "nationality": "Norway",
+        "sourceURL": "https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p=Erling_Haaland",
+        "photoURL": "https://r2.thesportsdb.com/images/media/player/cutout/e8cart1789115621.png",
+        "thumbURL": "https://r2.thesportsdb.com/images/media/player/thumb/bb1agj1727415216.jpg",
+        "cutoutURL": "https://r2.thesportsdb.com/images/media/player/cutout/e8cart1789115621.png"
+      },
+      "imageCheck": {
+        "status": 200,
+        "contentType": "image/png",
+        "contentLength": "228173"
+      },
+      "checkedAt": "2026-11-25T13:34:47.673Z"
+    }
+  ],
+  "purpose": "Static portrait identity and image availability evidence; no runtime API requests.",
+  "identityMatch": "Exact normalized name, exact birth date and current club; ESPN athlete IDs are never inferred from a photo filename.",
+  "licenseClaim": null,
+  "limitations": "Four curated identities only. TheSportsDB is credited as the image source; no statement of copyright ownership or unrestricted image licensing is made."
+}

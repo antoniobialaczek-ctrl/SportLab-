@@ -47,6 +47,7 @@ test('wrong team, malformed identity/date, score and conflicting duplicate fail 
 
 test('soccer cross-league and extra-time games never become regulation player candidates', async () => {
   const valid = fixture('100'); valid.league = { slug: 'eng.1' }; valid.competitions[0].status = { period: 2, type: { state: 'post', completed: true, name: 'STATUS_FULL_TIME' } };
+  valid.competitions[0].competitors.forEach((team, index) => { team.score = { value: 2 - index, displayValue: String(2 - index) }; });
   const cup = structuredClone(valid); cup.id = cup.competitions[0].id = '101'; cup.league.slug = 'eng.fa';
   const overtime = structuredClone(valid); overtime.id = overtime.competitions[0].id = '102'; overtime.competitions[0].status.period = 4;
   const result = await loader(async () => body([valid, cup, overtime]))([], { ...query, sport: 'football', route: 'soccer/eng.1' });

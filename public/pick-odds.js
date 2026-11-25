@@ -32,7 +32,7 @@ function selectionFor(pick, event, options) {
   if (kind === 'total' && pick.market === 'total_points' && event.sport === 'nba' && ['over', 'under'].includes(pick.direction) && line(pick.line)) {
     return { market: 'total_points', selection: pick.direction, scope: pick.scope, line: pick.line };
   }
-  if (kind === 'total' && pick.market === 'total_goals' && ((event.sport === 'football' && event.route === 'soccer/usa.1' && pick.scope === 'regulation_90')
+  if (kind === 'total' && pick.market === 'total_goals' && ((event.sport === 'football' && ROUTES.football.includes(event.route) && pick.scope === 'regulation_90')
     || (event.sport === 'nhl' && event.route === 'hockey/nhl' && pick.scope === 'including_overtime_shootout')) && ['over', 'under'].includes(pick.direction) && line(pick.line)) {
     return { market: 'total_goals', selection: pick.direction, scope: pick.scope, line: pick.line };
   }
