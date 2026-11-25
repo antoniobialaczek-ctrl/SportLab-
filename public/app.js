@@ -6,6 +6,8 @@ import { oddsHTML } from '/odds-view.js';
 import { buildPlayerPicks, playerPicksHTML, evaluatePlayerLine } from '/player-picks.js';
 import { buildMatchPicks, matchPicksHTML } from '/match-picks.js';
 import { matchChartsHTML } from '/match-charts.js';
+import { buildFootballAnalysis } from '/football-analysis.js';
+import { footballAnalysisCardHTML, footballAnalysisDetailHTML } from '/football-analysis-view.js';
 import { matchPickQuote, pickOddsHTML, pickOddsContentHTML } from '/pick-odds.js';
 import { playerPhotoHTML, installPlayerPhotoFallback } from '/player-photo.js';
 import { cs2SourceHTML } from '/source-status.js';
@@ -30,7 +32,7 @@ let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = nul
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
 let marketView = 'daily';
-let playerCardContext = '', playerCardAthlete = 'all', playerCardMetric = 'all', playerCardsExpanded = false;
+let playerCardContext = '', playerCardAthlete = 'all', playerCardMetric = 'all', playerCardsExpanded = false, footballCardLimit = 6;
 let pickScreening = { minOdds: 1.5, band: 'all' };
 try {
   const saved = JSON.parse(localStorage.getItem('sportlab.pick-screening.v1'));
@@ -124,10 +126,17 @@ function updateMatchDetail(event, data) {
   const options = marketOptions(event), picks = buildMatchPicks(data, event, options), node = $('betting-detail');
   const key = `${data.cutoff}:${oddsFor(event)?.fetchedAt}:${options.totalLine}:${picks.status}:${pickScreening.minOdds}:${pickScreening.band}`;
   if (node.dataset.renderKey !== key) {
+    const toolsOpen = node.querySelector('.fa-tools')?.open;
+    const comparisonOpen = node.querySelector('.football-analysis-detail .fa-other-markets')?.open;
     const input = node.querySelector('[name=totalLine]');
     if (input && (input.value !== input.defaultValue || document.activeElement === input)) matchDrafts.set(event.id, { value: input.value.slice(0, 50), focus: document.activeElement === input });
-    node.innerHTML = matchPicksHTML(data, event, options) + matchChartsHTML(data, event, { line: picks.totals?.line ?? null });
+    const football = event.sport === 'football' ? buildFootballAnalysis(data, event, options) : null;
+    node.innerHTML = football
+      ? footballAnalysisDetailHTML(football, event, options) + matchChartsHTML(data, event, { line: football.line ?? picks.totals?.line ?? null }) + `<details class="fa-tools"><summary>Własna linia goli i dodatkowe porównania</summary>${matchPicksHTML(data, event, options)}</details>`
+      : matchPicksHTML(data, event, options) + matchChartsHTML(data, event, { line: picks.totals?.line ?? null });
     node.dataset.marketStatus = picks.status; node.dataset.renderKey = key;
+    if (toolsOpen && node.querySelector('.fa-tools')) node.querySelector('.fa-tools').open = true;
+    if (comparisonOpen && node.querySelector('.football-analysis-detail .fa-other-markets')) node.querySelector('.football-analysis-detail .fa-other-markets').open = true;
     const draft = matchDrafts.get(event.id), updated = node.querySelector('[name=totalLine]');
     if (draft && updated) { updated.value = draft.value; if (draft.focus) updated.focus({ preventScroll: true }); }
   }
@@ -268,6 +277,7 @@ function previewContent(event) {
   if (entry?.data) {
     const options = marketOptions(event);
     const picks = buildMatchPicks(entry.data, event, options);
+    if (event.sport === 'football') return footballAnalysisCardHTML(buildFootballAnalysis(entry.data, event, options), event, options);
     return matchPicksHTML(entry.data, event, { ...options, compact: true })
       + matchChartsHTML(entry.data, event, { line: picks.totals?.line ?? null, compact: true })
       + `<details class="card-form-details"><summary>Forma obu drużyn</summary>${previewHTML(entry.data, event)}</details>`;
@@ -281,6 +291,28 @@ function updatePreviewNodes(event) {
   if (data) updateMatchDetail(event, data);
   renderBetting();
 }
+function footballAnalysisSection(upcoming) {
+  const rows = upcoming.slice(0, footballCardLimit).map(event => {
+    const entry = previews.get(previewKey(event)), options = marketOptions(event);
+    const analysis = entry?.data ? buildFootballAnalysis(entry.data, event, options) : {
+      sport: 'football', route: event.route, fixtureId: event.id,
+      status: entry?.status === 'error' ? 'unavailable' : 'loading', best: null, candidates: [],
+      reason: entry?.status === 'error' ? 'Źródło analizy jest chwilowo niedostępne. Otwórz szczegóły lub odśwież dane.' : 'Sprawdzanie wyników obu drużyn i rynków meczu…',
+    };
+    return { event, analysis, options };
+  });
+  rows.sort((a, b) => Number(Boolean(b.analysis.best)) - Number(Boolean(a.analysis.best)) || Date.parse(a.event.date) - Date.parse(b.event.date));
+  return `<section class="football-daily-analysis" data-football-analysis><h3>Analizy dnia — wynik i gole</h3><p class="small">Kierunek z formy, argumenty za i przeciw oraz ostatnie wyniki drużyn. Brak kursu nie ukrywa analizy. Kolejność pokazuje najpierw mecze ze zgodnym kierunkiem historycznym.</p><div class="football-analysis-grid">${rows.map(({ event, analysis, options }) => footballAnalysisCardHTML(analysis, event, options)).join('')}</div>${upcoming.length > footballCardLimit ? `<button type="button" data-more-football>Pokaż kolejne analizy (${upcoming.length - footballCardLimit})</button>` : ''}<p class="small fa-method-note">Liczniki dotyczą wcześniejszych meczów. Wskazanie z formy nie określa szansy trafienia ani opłacalności przy danym kursie.</p></section>`;
+}
+function bindFootballAnalysisActions(upcoming) {
+  document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
+  const more = document.querySelector('[data-more-football]');
+  if (more) more.onclick = () => {
+    footballCardLimit += 6;
+    renderBetting();
+    queuePreviews(upcoming.slice(0, footballCardLimit).filter(event => !previews.get(previewKey(event))?.data).slice(0, 12));
+  };
+}
 function playerAnalysisSection(rows, loading) {
   const athletes = new Map();
   for (const { event, pick } of rows) athletes.set(`${event.id}:${pick.playerId}`, `${pick.playerName} · ${pick.teamId === event.homeId ? event.home : event.away}`);
@@ -293,7 +325,7 @@ function playerAnalysisSection(rows, loading) {
 }
 function renderBetting() {
   const playerContext = `${sport}:${league}:${$('date').value}`;
-  if (playerCardContext !== playerContext) { playerCardContext = playerContext; playerCardAthlete = 'all'; playerCardMetric = 'all'; playerCardsExpanded = false; }
+  if (playerCardContext !== playerContext) { playerCardContext = playerContext; playerCardAthlete = 'all'; playerCardMetric = 'all'; playerCardsExpanded = false; footballCardLimit = 6; }
   const query = $('q').value.toLocaleLowerCase('pl'), status = $('status').value;
   const upcoming = events.filter(event => event.state === 'pre' && Date.parse(event.date) > Date.now()
     && (status === 'all' || status === 'pre')
@@ -321,8 +353,9 @@ function renderBetting() {
     const loading = upcoming.some(event => previews.get(previewKey(event))?.status === 'loading') || playerEvents.some(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.status === 'loading'));
     $('betting-summary').innerHTML = !upcoming.length
       ? '<p class="small">Brak nadchodzących spotkań w wybranym zestawie. Zmień sport lub dzień; rozegrane mecze znajdziesz poniżej.</p>'
-      : `${sport !== 'football' && playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}<section class="daily-priced-section"><h3>Typy dnia z dopasowanym kursem</h3><p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5 })}</section>${sport === 'football' && playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
+      : `${sport === 'football' ? footballAnalysisSection(upcoming) : playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}<section class="daily-priced-section"><h3>Typy dnia z dopasowanym kursem</h3><p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5 })}</section>${sport === 'football' && playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
     document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
+    if (sport === 'football') bindFootballAnalysisActions(upcoming);
     const more = document.querySelector('[data-more-daily-players]');
     if (more) more.onclick = () => queuePlayerForms(remaining, 2);
     document.querySelectorAll('[data-player-card-athlete], [data-player-card-metric]').forEach(select => select.onchange = () => {
@@ -336,6 +369,11 @@ function renderBetting() {
     return;
   }
   if (marketView === 'matches') {
+    if (sport === 'football' && upcoming.length) {
+      $('betting-summary').innerHTML = footballAnalysisSection(upcoming);
+      bindFootballAnalysisActions(upcoming);
+      return;
+    }
     const rows = upcoming.flatMap(event => {
       const data = previews.get(previewKey(event))?.data;
       const options = marketOptions(event);
@@ -394,6 +432,9 @@ function queuePreviews(selected) {
 }
 function nav() {
   document.querySelector('[data-market-view=matches]').textContent = ['nhl', 'football'].includes(sport) ? 'Wynik i suma goli' : sport === 'nba' ? 'Wynik i suma punktów' : 'Wynik meczu';
+  document.querySelector('.betting-overview > p.small').textContent = sport === 'football'
+    ? 'Analiza wyniku, goli i obu drużyn strzelających: forma, argumenty za i przeciw, kurs właściwego rynku. Wybierz mecz po pełne porównanie.'
+    : 'Linie zawodników z ostatnimi występami oraz lista typów z dopasowanym kursem. Skuteczność prognoz nie jest potwierdzona.';
   $('sports').innerHTML = Object.entries(sports).map(([key, title]) => `<button data-s="${key}" class="${key === sport ? 'active' : ''}" aria-pressed="${key === sport}">${title}</button>`).join('');
   $('leagues').innerHTML = leagues[sport].map(([key, title]) => `<button data-l="${key}" class="${key === league ? 'active' : ''}" aria-pressed="${key === league}">${title}</button>`).join('');
   $('leagues').hidden = leagues[sport].length === 1;
