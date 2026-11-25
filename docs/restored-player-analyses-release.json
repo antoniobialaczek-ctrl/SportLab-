@@ -1,0 +1,77 @@
+{
+  "verifiedAt": "2026-11-25T12:38:14.057287+01:00",
+  "productionUrl": "https://sportlab-2-analizy.vercel.app",
+  "productionDeploymentId": "dpl_GVQz1ZAYCMWhJdbTCoWaKqKykRRj",
+  "sourceCommit": "ba607dacf1601bbfe182e6575eb484a540cbef57",
+  "ciRun": "https://github.com/antoniobialaczek-ctrl/SportLab-/actions/runs/45605428423",
+  "technicalTests": 328,
+  "liveBrowser": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "actualVisibleAnalysisTitle": "Tyrese Maxey — powyżej 3,5 asysty",
+    "latestText": "Ostatni dostępny występ z tą statystyką: 24.11.2026",
+    "actualLatestObservation": {
+      "date": "2026-11-24T00:00:00.000Z",
+      "value": 5
+    },
+    "observations": 9,
+    "sourceValuesMatch": true,
+    "savedMinimumOdds": 100,
+    "savedBand": "higher",
+    "analysisStillVisible": true,
+    "pricedDailyListEmptyAt100": true,
+    "firstCardTopMobile": 656.171875,
+    "analysisAboveDailyList": true,
+    "athleteAndMetricSelection": true,
+    "mobileNoOverflow": true,
+    "desktopNoOverflow": true,
+    "pageErrors": []
+  },
+  "noPlayerQuoteRegressionFixture": {
+    "target": "http://127.0.0.1:3210",
+    "mockedSources": true,
+    "playerQuotesProvided": 0,
+    "automaticAnalysisLine": "Cade Cunningham powyżej 6,5 asysty",
+    "realObservationValues": [
+      8,
+      11,
+      7,
+      9,
+      10,
+      8,
+      12,
+      6,
+      9,
+      8
+    ],
+    "firstCardTopMobile": 656.171875,
+    "abovePricedDailyList": true,
+    "athleteAndMetricSelection": true,
+    "playerBeyondFirstFourSelectable": true,
+    "expandFromFourToSix": true,
+    "strictPriceFilterOnlyAffectsPricedList": true,
+    "historyAndDetailsRetained": true,
+    "mobileNoOverflow": true,
+    "desktopNoOverflow": true,
+    "pageErrors": []
+  },
+  "priorLiveAudit": {
+    "playerPropQuotesAvailable": true,
+    "firstCardTopMobileFreshMinimum150": 1118,
+    "noJavaScriptErrors": true,
+    "globalPlayerCardCap": 4
+  },
+  "fixes": [
+    "Analysis cards before priced daily shortlist",
+    "Player and metric selection beyond original first-four and six-per-team shortlist",
+    "Honest unpriced analysis cards independent of odds filters",
+    "Expand to at most twelve cards",
+    "Automatic bounded history queue for up to twelve fixtures"
+  ],
+  "pricedDailyListFiltersPreserved": true,
+  "livePlayerHistoryValuesCheckedAgainstAPI": true,
+  "syntheticCadeExampleIsNotALiveBetRecommendation": true,
+  "frozenScientificSourcesChanged": false,
+  "futureProbabilitiesPublished": false,
+  "paidServicesAdded": false
+}
