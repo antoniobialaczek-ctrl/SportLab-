@@ -34,3 +34,8 @@ Nie włączono płatnych usług, planów ani dostawców danych. Potwierdzenie dz
 ## Piłkarskie typy dnia i zdjęcia — 25 listopada 2026
 
 Opublikowano wynik po 90 minutach, sumy goli z dokładnymi kursami, wykresy ostatnich wyników oraz cztery zweryfikowane zdjęcia piłkarzy. Wszystkie 354 testy i build przeszły lokalnie oraz w CI; publiczny przepływ sprawdzono na rzeczywistych danych, osobno od kontrolowanych dodatnich przypadków listy dnia. Szczegóły, zakres i ograniczenia: [dowody wydania](football-daily-picks-release.json).
+
+
+## Widoczne kierunki piłkarskie bez blokowania kursem — 25 listopada 2026
+
+Karty piłkarskie na początku strony pokazują kierunek z formy, argumenty przeciw, wynik/gole/BTTS, ostatnie występy oraz dom/wyjazd także bez kursu. Publiczny test rzeczywistych danych potwierdził cztery różne widoczne kierunki oraz brak podmieniania ceny X2 kursem zwycięzcy. Testy: 366/366, kompilacja i CI poprawne. [Dowody wydania i ograniczenia](deep-football-analysis-release.json).

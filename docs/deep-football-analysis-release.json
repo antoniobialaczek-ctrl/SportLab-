@@ -1,0 +1,106 @@
+{
+  "verifiedAt": "2026-11-25T19:19:19.518459+00:00",
+  "sourceCommit": "004788287a6af9d1a23e559d3dc5c3d8e115eaef",
+  "deploymentId": "dpl_FYFvssq9qJnLWKbSXfmEYay7afcs",
+  "deploymentState": "READY",
+  "productionURL": "https://sportlab-2-analizy.vercel.app",
+  "ci": {
+    "runId": 45683647651,
+    "conclusion": "success",
+    "command": "npm run check",
+    "tests": 366,
+    "failures": 0
+  },
+  "localRealSources": {
+    "target": "http://127.0.0.1:3230",
+    "mockedSources": false,
+    "fixture": "soccer/eng.2:401880139",
+    "verdict": "Birmingham City nie przegra — X2 (90 minut)",
+    "analysisSurvivesMinimumOdds100": true,
+    "unpricedX2VisibleWithoutBorrowedWinnerPrice": true,
+    "teamLatestDatesMatchSource": true,
+    "teamPanels": 2,
+    "lastResults": 10,
+    "comparedMarkets": 9,
+    "goalsAndBTTSCompared": true,
+    "counterevidenceVisible": true,
+    "charts": 2,
+    "manualGoalLine": 3.5,
+    "manualControlsRemainOpen": true,
+    "analysisAlsoInMatchView": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "productionRealSources": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "fixture": "soccer/eng.2:401880139",
+    "verdict": "Birmingham City nie przegra — X2 (90 minut)",
+    "dailyDirections": [
+      "Obie drużyny strzelą — tak (90 minut)",
+      "Birmingham City nie przegra — X2 (90 minut)",
+      "Blackburn Rovers nie przegra — X2 (90 minut)",
+      "Stoke City nie przegra — 1X (90 minut)"
+    ],
+    "analysisSurvivesMinimumOdds100": true,
+    "unpricedX2VisibleWithoutBorrowedWinnerPrice": true,
+    "teamLatestDatesMatchSource": true,
+    "teamPanels": 2,
+    "lastResults": 10,
+    "comparedMarkets": 9,
+    "goalsAndBTTSCompared": true,
+    "counterevidenceVisible": true,
+    "charts": 2,
+    "manualGoalLine": 3.5,
+    "manualControlsRemainOpen": true,
+    "analysisAlsoInMatchView": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "controlledNBARegression": {
+    "target": "http://127.0.0.1:3230",
+    "mockedSources": true,
+    "playerQuotesProvided": 0,
+    "automaticAnalysisLine": "Cade Cunningham powyżej 6,5 asysty",
+    "realObservationValues": [
+      8,
+      11,
+      7,
+      9,
+      10,
+      8,
+      12,
+      6,
+      9,
+      8
+    ],
+    "firstCardTopMobile": 656.171875,
+    "abovePricedDailyList": true,
+    "athleteAndMetricSelection": true,
+    "playerBeyondFirstFourSelectable": true,
+    "expandFromFourToSix": true,
+    "strictPriceFilterOnlyAffectsPricedList": true,
+    "historyAndDetailsRetained": true,
+    "mobileNoOverflow": true,
+    "desktopNoOverflow": true,
+    "pageErrors": []
+  },
+  "runtimeErrors": {
+    "levels": [
+      "error",
+      "fatal"
+    ],
+    "window": "10m",
+    "records": 0
+  },
+  "notes": [
+    "The new default football analysis shows descriptive directions and counterevidence independently of price screening; the existing priced daily list remains strictly filtered.",
+    "Production browser test used actual current team history and prices without mocking the APIs. It verified visible unpriced X2 at minOdds100 without borrowing the three-way winner price.",
+    "Production direction labels were deduplicated because the same cards also exist in hidden match previews.",
+    "Compared markets: 1X, X2, both winners, draw, exact goal-total over and under, BTTS yes and no. Only complete exact supported market quotes can display a price.",
+    "At least eight validated 90-minute observations per team and aligned recent/venue evidence are required for a lead direction. Three to seven games retain factual statistics without a lead. Stale, contradictory or future data fail closed.",
+    "These historical counts and ranking rules are descriptive, with no validated predictive accuracy, win probabilities or EV claims. Missing lineups, injuries and opponent-strength corrections remain explicit.",
+    "Goal line is the exact source line, manually entered line or fixed2.5; alternative easier lines are not searched to inflate historical support.",
+    "Frozen src/data, src/models and .github/workflows/history.yml were not changed. No paid data or service was introduced."
+  ]
+}
