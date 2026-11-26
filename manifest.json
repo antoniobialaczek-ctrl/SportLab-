@@ -2,32 +2,32 @@
   "schemaVersion": 1,
   "repository": "antoniobialaczek-ctrl/SportLab-",
   "branch": "sportlab-data",
-  "generatedAt": "2026-11-26T13:30:21.658Z",
-  "dataCommit": "0b87c019e7773fd41072e9cde9d0cfee92b74ef2",
+  "generatedAt": "2026-11-26T17:17:27.623Z",
+  "dataCommit": "092d06ecb9471cb1e681d2caaa87ccc76d33346b",
   "files": {
     "history/nba.json": {
       "bytes": 2033344,
-      "sha256": "7a3eed37803b38707243923028dc2f802327d0beaff285f6f731f2de7d726ac6"
+      "sha256": "5a18643fb21b62a38e407efe6eca44ec3d9a9df2567700f82e2230731b04e76e"
     },
     "history/football.json": {
       "bytes": 4962924,
-      "sha256": "0a8d3d45a6c6f5f7539e45766de0767f92315c721163267767da41864f30787a"
+      "sha256": "a286d9db2a65be767018752e326785a44d8237d40fd5a28798ab18db35409b8f"
     },
     "history/nhl.json": {
       "bytes": 2146667,
-      "sha256": "a6d6ea6ad043dcee939001aaa22d0d6743a6c011c0de3f1beb3425c84fdb3bd2"
+      "sha256": "f29ad1eff459923a2457dd1c5f21ab07bff0f2d3019b581eca4315593587022a"
     },
     "history/tennis.json": {
       "bytes": 15367537,
-      "sha256": "020a9863e57e5059f425916c9f919e385947c73da5295d918f3b92a4529f0358"
+      "sha256": "1cac7de0799f345a1a133a28caa22c9ab341dc6d1efdc51af06a20664efb9d0b"
     },
     "reports/models.json": {
       "bytes": 175007,
-      "sha256": "51e20558edda88ec124e8cec8af9c60d94684c8f0cf7ea6e8ddecfd1941ab547"
+      "sha256": "ffee4976fe51991e9377bdcb85f4cad58746bb5804ff5267364ea53016b3da2f"
     },
     "reports/forward.json": {
       "bytes": 86220,
-      "sha256": "0202142bc0ed4c405fb2bf06afaadba01086b011dcabc82f2e9db4a623f013d3"
+      "sha256": "a85a5ffc82ad08ff321d83eb29b6d0fc3d27c5ca17ac8186a4fbcb99aac36fb9"
     }
   }
 }
