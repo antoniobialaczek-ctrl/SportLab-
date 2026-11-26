@@ -1,0 +1,49 @@
+{
+  "verifiedAt": "2026-11-26T22:41:41.579699+00:00",
+  "sourceCommit": "949f07e525119a8446c4136b8a8609e58c4d9906",
+  "deploymentId": "dpl_7UsffBjXsjcH1oSKwd3VwgmFhsyq",
+  "deploymentState": "READY",
+  "productionURL": "https://sportlab-2-analizy.vercel.app",
+  "ci": {
+    "runId": 45906171925,
+    "conclusion": "success",
+    "tests": 370,
+    "failures": 0
+  },
+  "controlledShortHistory": {
+    "target": "http://127.0.0.1:3240",
+    "mockedSources": true,
+    "fixture": "soccer/uefa.europa:999998",
+    "winnerHeading": "Test Home — kierunek na zwycięstwo",
+    "reasonsVisible": true,
+    "shortSampleVisible": true,
+    "oldEmptyHeadlineRemoved": true,
+    "survivesMinOdds100": true,
+    "detailWinnerVisible": true,
+    "chartsRetained": 2,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "productionRealSources": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "selectedDay": "2026-11-27",
+    "fixture": "soccer/fra.1:401876392",
+    "winnerHeading": "Paris FC — kierunek na zwycięstwo",
+    "reasonsVisible": true,
+    "shortSampleVisible": false,
+    "oldEmptyHeadlineRemoved": true,
+    "survivesMinOdds100": true,
+    "detailWinnerVisible": true,
+    "chartsRetained": 2,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "limitations": [
+    "Winner lean compares normalized league points per game, goal margin, latest form and known venue splits. It is descriptive, not a calibrated win probability or validated prediction.",
+    "Short3–7-game histories show an explicitly preliminary favorite with sample sizes when the evidence agrees. Equal or contradictory form does not force a winner. Stale or invalid history does not unlock a lean.",
+    "Exact winner quotes remain bound to the full-time three-way market; double-chance prices cannot be borrowed. The stricter8-game market-selection rules were preserved.",
+    "The public real-source test selected the following day because the current day’s European matches had already started or finished. The specific short-sample regression was verified separately with controlled source fixtures.",
+    "Frozen data, models and historical pipeline were unchanged."
+  ]
+}
