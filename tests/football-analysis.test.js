@@ -129,3 +129,45 @@ test('a duplicated head-to-head must agree in date, mirrored score and opposite 
   valid.analysis.away.recent[0].isHome = valid.analysis.home.recent[0].isHome;
   assert.equal(build(valid).status, 'unavailable');
 });
+
+test('short verified histories can name a form favourite without unlocking the strict market recommendation', () => {
+  const context = fixture(Array(4).fill([3, 1]), Array(6).fill([1, 3]));
+  const result = build(context), lean = result.winnerLean;
+  assert.equal(result.status, 'limited'); assert.equal(result.best, null);
+  assert.ok(result.candidates.every(candidate => candidate.eligible === false));
+  assert.equal(lean.status, 'lean'); assert.equal(lean.name, 'Burnley'); assert.equal(lean.side, 'home');
+  assert.equal(lean.market, 'winner'); assert.equal(lean.scope, 'regulation_90'); assert.equal(lean.shortSample, true);
+  assert.deepEqual(lean.samples, { home: 4, away: 6 });
+  assert.ok(lean.reasons.some(reason => reason.includes('3 wobec 0')));
+  assert.ok(lean.counterevidence.some(reason => reason.includes('Krótka próba: 4 i 6')));
+  assert.deepEqual(lean.support, { home: { hits: 4, sample: 4 }, away: { hits: 6, sample: 6 } });
+  assert.equal(lean.quote.status, 'unavailable');
+  assert.ok(!/probability|expectedValue|confidence/.test(JSON.stringify(lean)));
+});
+
+test('equal form and conflicting latest results cannot force a named winning team', () => {
+  const equal = build(fixture(Array(4).fill([1, 1]), Array(7).fill([1, 1]))).winnerLean;
+  assert.equal(equal.status, 'balanced'); assert.equal(equal.side, null); assert.equal(equal.name, null);
+  assert.ok(equal.reasons.some(reason => reason.includes('Punkty na mecz: 1 i 1')));
+  const reversed = fixture([...Array(3).fill([0, 1]), ...Array(7).fill([3, 0])], [...Array(3).fill([3, 0]), ...Array(7).fill([0, 1])]);
+  const disagreement = build(reversed).winnerLean;
+  assert.equal(disagreement.status, 'balanced'); assert.equal(disagreement.side, null);
+  assert.ok(disagreement.counterevidence.some(reason => reason.includes('Najnowsza forma')));
+});
+
+test('winner favourite uses only its exact three-way price and stale or invalid results never supply it', () => {
+  const context = fixture(Array(4).fill([3, 1]), Array(6).fill([1, 3]));
+  const source = odds(context.event);
+  assert.equal(build(context, { oddsData: source }).winnerLean.quote.decimal, 2.95);
+  source.quotes = [{ ...source.quotes[1], market: 'double_chance_90', outcomes: [
+    { side: 'home_draw', decimal: 1.3 }, { side: 'home_away', decimal: 1.2 }, { side: 'draw_away', decimal: 3.5 },
+  ] }];
+  assert.equal(build(context, { oddsData: source }).winnerLean.quote.status, 'unavailable');
+  for (const side of ['home', 'away']) {
+    context.analysis[side].recent.forEach(row => row.date = new Date(Date.parse(row.date) - 31 * DAY).toISOString());
+    context.analysis[side].lastMatchAt = context.analysis[side].recent[0].date;
+  }
+  const stale = build(context).winnerLean;
+  assert.equal(stale.status, 'unavailable'); assert.equal(stale.side, null); assert.equal(stale.quote.decimal, null);
+  context.analysis.resultScope = 'unknown'; assert.equal(build(context).winnerLean, null);
+});

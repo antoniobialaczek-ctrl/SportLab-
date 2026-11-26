@@ -61,6 +61,54 @@ function team(form, rows, side, name, line) {
     latestDate: rows[0].date, oldestDate: rows.at(-1).date, recent: rows };
 }
 
+function winnerLean(teams, event, options, current, stale) {
+  const samples = { home: teams.home.sample, away: teams.away.sample };
+  const shortSample = Math.min(samples.home, samples.away) < 8;
+  const points = metrics => (3 * metrics.wins + metrics.draws) / metrics.sample;
+  const home = teams.home, away = teams.away;
+  const difference = points(home.overall) - points(away.overall);
+  const margin = home.overall.averageMargin - away.overall.averageMargin;
+  const recentDifference = points(home.last5) - points(away.last5);
+  const venueKnown = home.venue.reliable && away.venue.reliable;
+  const venueDifference = venueKnown ? points(home.venue) - points(away.venue) : null;
+  const comparison = [
+    `${home.name}: ${home.overall.wins} zwycięstw, ${home.overall.draws} remisów i ${home.overall.losses} porażek w ${home.sample} meczach; ${away.name}: ${away.overall.wins} zwycięstw, ${away.overall.draws} remisów i ${away.overall.losses} porażek w ${away.sample}.`,
+    `Punkty na mecz: ${decimal(points(home.overall))} i ${decimal(points(away.overall))}; średnia różnica goli: ${decimal(home.overall.averageMargin)} i ${decimal(away.overall.averageMargin)}.`,
+  ];
+  const base = { status: 'balanced', kind: 'result', market: 'winner', scope: 'regulation_90', side: null,
+    name: null, label: 'Wyrównana forma — bez faworyta', samples, shortSample, reasons: comparison, counterevidence: [],
+    quote: { status: 'unavailable', decimal: null, reason: 'Nie wybrano drużyny na zwycięstwo.' } };
+  if (stale) return { ...base, status: 'unavailable', label: 'Forma wymaga aktualizacji',
+    reasons: ['Ostatni dostępny mecz co najmniej jednej drużyny jest starszy niż 30 dni.'] };
+  const side = difference >= 0.25 && margin >= 0.25 ? 'home' : difference <= -0.25 && margin <= -0.25 ? 'away' : null;
+  if (!side) return { ...base, counterevidence: ['Punkty na mecz i różnica goli nie wskazują zgodnie jednej drużyny.'] };
+  const sign = side === 'home' ? 1 : -1;
+  if (sign * recentDifference < 0 || venueKnown && sign * venueDifference < -0.25) {
+    return { ...base, counterevidence: [sign * recentDifference < 0
+      ? 'Najnowsza forma punktowa wskazuje przeciwny kierunek niż całe okno wyników.'
+      : 'Forma gospodarzy u siebie i gości na wyjeździe wskazuje przeciwny kierunek.'] };
+  }
+  const chosen = teams[side], other = teams[side === 'home' ? 'away' : 'home'];
+  const pick = { ...base, status: 'lean', side, name: chosen.name,
+    label: `${chosen.name} — kierunek na zwycięstwo (90 minut)`,
+    support: { home: { hits: side === 'home' ? home.overall.wins : home.overall.losses, sample: home.sample },
+      away: { hits: side === 'home' ? away.overall.losses : away.overall.wins, sample: away.sample } },
+    recentSupport: { home: { hits: side === 'home' ? home.last5.wins : home.last5.losses, sample: home.last5.sample },
+      away: { hits: side === 'home' ? away.last5.losses : away.last5.wins, sample: away.last5.sample } },
+    reasons: [
+      `${chosen.name}: ${chosen.overall.wins} zwycięstw, ${chosen.overall.draws} remisów i ${chosen.overall.losses} porażek w ${chosen.sample} ostatnich meczach; ${other.name}: ${other.overall.wins} zwycięstw, ${other.overall.draws} remisów i ${other.overall.losses} porażek w ${other.sample}.`,
+      `Więcej punktów na mecz: ${decimal(points(chosen.overall))} wobec ${decimal(points(other.overall))}; lepsza średnia różnica goli: ${decimal(chosen.overall.averageMargin)} wobec ${decimal(other.overall.averageMargin)}.`,
+      `Ostatnie ${chosen.last5.sample} i ${other.last5.sample} meczów: ${decimal(points(chosen.last5))} wobec ${decimal(points(other.last5))} punktu na mecz.`,
+    ],
+    counterevidence: [`${chosen.name}: ${chosen.overall.draws} remisów i ${chosen.overall.losses} porażek w tej próbie. Remis nie jest wygraną tego wyboru.`,
+      ...(shortSample ? [`Krótka próba: ${samples.home} i ${samples.away} meczów. To wstępny kierunek z dostępnej formy.`] : []),
+      ...(!venueKnown ? ['Brakuje po 3 meczów do osobnego porównania dom/wyjazd.'] : []),
+      'Składy, kontuzje i siła wcześniejszych rywali nie zostały uwzględnione w tym porównaniu.'],
+  };
+  pick.quote = matchPickQuote(options.oddsData, event, pick, { now: current });
+  return pick;
+}
+
 function chooseLine(options, event, current) {
   if (options.totalLine !== undefined) {
     if (!halfLine(options.totalLine)) return null;
@@ -83,7 +131,7 @@ export function buildFootballAnalysis(analysis, event, options = {}) {
   const current = options.now == null ? Date.now() : typeof options.now === 'number' ? options.now : Date.parse(options.now);
   const start = time(event?.date), cutoff = time(analysis?.cutoff);
   const result = (status, reason, extra = {}) => ({ sport: 'football', route: event?.route, fixtureId: event?.id,
-    scope: 'regulation_90', status, reason, best: null, candidates: [], teams: null, notes: [], coverage: null, ...extra });
+    scope: 'regulation_90', status, reason, best: null, winnerLean: null, candidates: [], teams: null, notes: [], coverage: null, ...extra });
   if (!Number.isFinite(current) || !Number.isFinite(start)) return result('unavailable', 'Nie można potwierdzić terminu spotkania.');
   if (event.state !== 'pre' || start <= current) return result('closed', 'Spotkanie już się rozpoczęło; wskazanie przedmeczowe jest zamknięte.');
   if (start - current > 2 * DAY) return result('unavailable', 'Analiza kierunków jest dostępna w ciągu 48 godzin przed meczem.');
@@ -114,7 +162,7 @@ export function buildFootballAnalysis(analysis, event, options = {}) {
   const stale = [teams.home, teams.away].some(side => current - time(side.latestDate) > 30 * DAY);
   const notes = ['Porównanie wcześniejszych wyników po 90 minutach z doliczonym czasem, bez dogrywki i karnych. Liczniki nie są prawdopodobieństwami wygranej.',
     'Brak potwierdzonej korekty na siłę rywali, składy i kontuzje; sprawdź je przed decyzją.'];
-  if (!full) notes.push('Krótka historia: mniej niż 8 meczów co najmniej jednej drużyny. Pokazano statystyki bez wyboru głównego kierunku.');
+  if (!full) notes.push('Krótka historia: mniej niż 8 meczów co najmniej jednej drużyny. Wstępny faworyt z formy pozostaje oddzielony od pełnego porównania rynków.');
   if (stale) notes.push('Ostatni dostępny mecz co najmniej jednej strony jest starszy niż 30 dni. Brak głównego wskazania.');
   else if ([teams.home, teams.away].some(side => current - time(side.latestDate) > 14 * DAY)) notes.push('Co najmniej jedna drużyna nie ma w tej lidze dostępnego meczu z ostatnich 14 dni. Porównanie może pomijać nowsze występy w innych rozgrywkach.');
   if ([teams.home, teams.away].some(side => time(side.latestDate) - time(side.oldestDate) > 120 * DAY)) notes.push('Okno wyników obejmuje ponad 120 dni, w tym możliwy poprzedni sezon. Forma ma ograniczoną aktualność.');
@@ -173,7 +221,7 @@ export function buildFootballAnalysis(analysis, event, options = {}) {
   const best = candidates.find(candidate => candidate.eligible) || null;
   const status = !full || stale ? 'limited' : 'available';
   return result(status, best ? null : !full ? 'Za mało wcześniejszych meczów do głównego wskazania.' : stale ? 'Historia wymaga aktualizacji przed wyborem kierunku.' : 'Sygnały są mieszane. Porównaj poniższe argumenty i odpuść mecz, jeśli nie znajdziesz potwierdzenia.',
-    { teams, candidates, best, line, lineOrigin, notes,
+    { teams, candidates, best, winnerLean: winnerLean(teams, event, options, current, stale), line, lineOrigin, notes,
       coverage: { homeSample: homeRows.length, awaySample: awayRows.length, minimumSample: 8, complete: full,
         sourceComplete: analysis.coverage?.complete === true, sharedMatches, stale, observedAt: analysis.observedAt || analysis.cutoff } });
 }

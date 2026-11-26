@@ -65,3 +65,17 @@ test('unknown binding, loading and malicious text remain safe and do not invent 
   assert.doesNotMatch(escaped, /<script>|<img/); assert.match(escaped, /&lt;script&gt;/); assert.match(escaped, /&lt;img/);
   assert.equal(footballAnalysisCardHTML(result(), { ...event, sport: 'nba' }), '');
 });
+
+test('short verified form shows the winning team and why, without the old empty headline or a borrowed X2 price', () => {
+  const data = result(); data.status = 'limited'; data.best = null;
+  data.winnerLean = { status: 'lean', kind: 'result', market: 'winner', scope: 'regulation_90', side: 'away', name: event.away, shortSample: true, samples: { home: 4, away: 5 }, reasons: ['Birmingham City: 3 zwycięstwa w 5 meczach.', 'Średnia różnica goli gości jest wyższa.'], counterevidence: ['Krótka historia ogranicza ten wniosek.'] };
+  const html = footballAnalysisCardHTML(data, event, { now, oddsData: odds() });
+  assert.match(html, /Faworyt z formy/); assert.match(html, /Birmingham City — kierunek na zwycięstwo/);
+  assert.match(html, /3 zwycięstwa w 5/); assert.match(html, /Krótka próba/); assert.match(html, /Kurs 2,35/);
+  assert.doesNotMatch(html, /Za krótka historia do wskazania typu/);
+  assert.doesNotMatch(footballAnalysisCardHTML(data, event, { now, oddsData: odds('double_chance_90') }).split('<div class="fa-teams">')[0], /Kurs 1,60/);
+  data.winnerLean = { status: 'balanced', reasons: ['Obie drużyny mają po 1,5 punktu na mecz.'] };
+  const balanced = footballAnalysisCardHTML(data, event, { now });
+  assert.match(balanced, /Brak wyraźnego faworyta/); assert.match(balanced, /Obie drużyny mają po 1,5/);
+  assert.doesNotMatch(balanced, /kierunek na zwycięstwo|Za krótka historia do wskazania typu/);
+});

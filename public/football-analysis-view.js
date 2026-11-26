@@ -28,11 +28,22 @@ function supportHTML(pick, event) {
   return `<p class="fa-support"><span>${esc(event.home)}: <b>${ratio(pick.support?.home?.hits, pick.support?.home?.sample)}</b></span><span>${esc(event.away)}: <b>${ratio(pick.support?.away?.hits, pick.support?.away?.sample)}</b></span><small>wcześniejszych wyników zgodnych z kierunkiem</small></p>`;
 }
 
+function winnerSummaryHTML(result, event, options) {
+  const lean = result.winnerLean;
+  if (!['available', 'limited'].includes(result.status) || result.coverage?.stale || !lean || !['lean', 'balanced'].includes(lean.status)) return '';
+  const heading = options.compact ? 'h5' : 'h4';
+  if (lean.status === 'balanced') return `<div class="fa-direction fa-direction-neutral" data-football-winner><p class="fa-eyebrow">Kto ma większe wsparcie w formie?</p><${heading}>Brak wyraźnego faworyta na zwycięstwo</${heading}>${list(lean.reasons, 'fa-reasons', 3)}${list(lean.counterevidence, 'fa-counter-list', 2)}<p class="fa-method">Wyniki obu drużyn dają rozbieżny obraz. Pozostałe rynki i ostatnie mecze są poniżej.</p></div>`;
+  if (!['home', 'away'].includes(lean.side) || lean.name !== event[lean.side] || lean.market !== 'winner' || lean.scope !== 'regulation_90') return '';
+  return `<div class="fa-direction fa-winner-direction" data-football-winner><div class="fa-direction-heading"><div><p class="fa-eyebrow">Faworyt z formy${lean.shortSample ? ' · wstępny kierunek' : ''}</p><${heading}>${esc(lean.name)} — kierunek na zwycięstwo</${heading}></div>${priceHTML(lean, event, options)}</div>${list(lean.reasons, 'fa-reasons', options.compact ? 3 : 4)}${lean.shortSample ? `<p class="fa-sample-note">Krótka próba. Liczba meczów: ${esc(event.home)} — ${count(lean.samples?.home) ?? '—'}; ${esc(event.away)} — ${count(lean.samples?.away) ?? '—'}.</p>` : ''}<div class="fa-counter"><b>Co może przeszkodzić?</b>${list(lean.counterevidence, 'fa-counter-list', options.compact ? 1 : 3)}</div><p class="fa-method">Porównanie formy po 90 minutach. Skuteczność prognozy zwycięzcy nie została potwierdzona.</p></div>`;
+}
+
 function directionHTML(result, event, options) {
+  const winner = winnerSummaryHTML(result, event, options);
   const best = result.status === 'available' && result.best?.eligible === true ? result.best : null;
+  if (winner && (!best || best.market === 'winner' && best.side === result.winnerLean.side)) return winner;
   const heading = options.compact ? 'h5' : 'h4';
   if (!best) return `<div class="fa-direction fa-direction-neutral" data-football-verdict><p class="fa-eyebrow">Wniosek z analizy</p><${heading}>${result.status === 'loading' ? 'Porównywanie wyniku i goli…' : result.status === 'limited' ? result.coverage?.stale ? 'Historia wymaga odświeżenia' : 'Za krótka historia do wskazania typu' : result.status === 'closed' ? 'Dostępne jest porównanie historyczne' : result.status === 'unavailable' ? 'Brak danych do wskazania kierunku' : 'Brak zgodnego kierunku na ten mecz'}</${heading}><p>${esc(result.reason || result.verdict || 'Wynik i gole wymagają osobnego porównania. Poniżej widać dostępne fakty oraz rozbieżności.')}</p></div>`;
-  return `<div class="fa-direction" data-football-verdict><div class="fa-direction-heading"><div><p class="fa-eyebrow">Najlepiej wsparty kierunek w historii</p><${heading}>${esc(best.label)}</${heading}></div>${priceHTML(best, event, options)}</div>${supportHTML(best, event)}${list(best.reasons, 'fa-reasons', options.compact ? 2 : 4)}${strings(best.counterevidence, 2).length ? `<div class="fa-counter"><b>Co przemawia przeciw?</b>${list(best.counterevidence, 'fa-counter-list', options.compact ? 1 : 3)}</div>` : ''}<p class="fa-method">Kierunek analizy opisowej · 90 minut z doliczonym czasem. Liczniki nie są szansą wygranej ani potwierdzeniem opłacalności.</p></div>`;
+  return `<div class="fa-direction" data-football-verdict><div class="fa-direction-heading"><div><p class="fa-eyebrow">${winner ? 'Inny rynek wsparty formą' : 'Najlepiej wsparty kierunek w historii'}</p><${heading}>${esc(best.label)}</${heading}></div>${priceHTML(best, event, options)}</div>${supportHTML(best, event)}${list(best.reasons, 'fa-reasons', options.compact ? 2 : 4)}${strings(best.counterevidence, 2).length ? `<div class="fa-counter"><b>Co przemawia przeciw?</b>${list(best.counterevidence, 'fa-counter-list', options.compact ? 1 : 3)}</div>` : ''}<p class="fa-method">Kierunek analizy opisowej · 90 minut z doliczonym czasem. Liczniki nie są szansą wygranej ani potwierdzeniem opłacalności.</p></div>`;
 }
 
 function metricRow(label, overall, last5, key) {
