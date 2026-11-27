@@ -158,3 +158,16 @@ test('analysis-only player choices retain qualified athletes and metrics beyond 
   for (const player of data.players.filter(player => player.metrics.AST)) assert.ok(analyses.picks.some(pick => pick.playerId === player.id && pick.metric === 'AST'));
   assert.ok(analyses.picks.every(pick => pick.probability === undefined && pick.expectedValue === undefined));
 });
+
+
+test('NBA explanations retain genuine minutes only when bound to the same stat appearances', () => {
+  const data = fixture();
+  data.players[0].minutes = { sample: 10, observations: data.sampledMatches.map((match, index) => ({ matchId: match.id, date: match.date, value: index < 5 ? 36 : 30 })) };
+  const points = build(data).picks.find(pick => pick.playerId === '101' && pick.metric === 'PTS');
+  assert.equal(points.minutes.sample, 10); assert.equal(points.minutes.observations[0].value, 36);
+  const html = playerPicksHTML(data, event, { now });
+  assert.match(html, /Co wspiera typ/); assert.match(html, /średnio 33 min gry, ostatnie 5: 36 min/);
+  data.players[0].minutes.observations[0].date = '2026-11-10T00:00:00.000Z';
+  assert.equal(build(data).picks.find(pick => pick.playerId === '101' && pick.metric === 'PTS').minutes, null);
+  assert.doesNotMatch(playerPicksHTML(data, event, { now }), /33 min gry/);
+});

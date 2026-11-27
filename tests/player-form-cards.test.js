@@ -21,6 +21,7 @@ test('player cards show exact selection, price and genuine latest-first outings 
   assert.deepEqual(renderedValues(html), [13, 12, 11, 10, 9, 8, 7, 0]);
   assert.match(html, /08\.11\.2026/); assert.match(html, /Średnia <b>8,8/); assert.match(html, /Mediana <b>9,5/); assert.match(html, /Ostatnie 5 <b>11/);
   assert.ok(!html.includes('999')); assert.ok(!html.includes('<details')); assert.match(html, /7 z 8/);
+  assert.match(html, /Co wspiera typ/); assert.match(html, /w ostatnich 5: 5\/5/); assert.match(html, /Co może przeszkodzić/); assert.match(html, /0–13/);
   assert.equal((html.match(/class="pfc-observation is-hit"/g) || []).length, 7);
   assert.doesNotMatch(html, /pewniak|najpewniejsz|\d%/);
 });

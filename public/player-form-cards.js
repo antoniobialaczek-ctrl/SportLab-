@@ -3,6 +3,7 @@ import { selectDailyPicks } from './daily-picks.js';
 import { playerPhotoHTML } from './player-photo.js';
 import { pickOddsHTML } from './pick-odds.js';
 import { screenPick } from './pick-screening.js';
+import { playerPickReasonsHTML } from './player-pick-reasons.js';
 
 const decimal = value => value.toLocaleString('pl-PL', { maximumFractionDigits: 1 });
 const date = (value, full = false) => new Date(value).toLocaleDateString('pl-PL', {
@@ -98,6 +99,7 @@ export function playerFormCardsHTML(rows, options = {}) {
       <div class="pfc-heading"><div class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h3>${esc(pick.statement || pick.label)}</h3></div>${analysisOnly ? '<span class="pfc-no-price">Brak kursu spełniającego filtr</span>' : pickOddsHTML(oddsData, event, pick, { now: options.now ?? Date.now() })}</div>
       <p class="pfc-latest">Ostatni dostępny występ z tą statystyką: <b>${esc(date(observations[0].date, true))}</b></p>
       <div class="pfc-stats"><span>Średnia <b>${decimal(average)}</b></span><span>Mediana <b>${decimal(median)}</b></span><span>Ostatnie 5 <b>${decimal(last5)}</b></span></div>
+      ${event.sport === 'nba' ? playerPickReasonsHTML(pick, event, { now: options.now ?? Date.now(), compact: true }) : ''}
       <p class="pfc-history-label">Ostatnie występy · od najnowszego</p>
       <div class="pfc-observations" role="list" aria-label="${esc(`${pick.label || pick.metric}: ostatnie występy od najnowszego`)}">${observations.map(row => {
         const hit = pick.direction === 'under' ? row.value < pick.line : row.value > pick.line;

@@ -3,6 +3,7 @@ import { matchPickQuote, pickOddsHTML } from './pick-odds.js';
 import { playerPhotoHTML, playerPhotoURL } from './player-photo.js';
 import { journalPickButtonHTML } from './pick-actions.js';
 import { filterPricedPicks, screenPick } from './pick-screening.js';
+import { playerPickReasonsHTML } from './player-pick-reasons.js';
 
 const DAY = 86400000;
 const FORM_MAX_AGE = 15 * 60000;
@@ -103,6 +104,19 @@ function observationsFor(player, metricKey, state) {
   return observations.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 }
 
+function minutesFor(player, observations) {
+  const values = player.minutes?.observations;
+  if (!Array.isArray(values) || values.length > 10 || player.minutes.sample !== values.length) return null;
+  const indexed = new Map();
+  for (const row of values) {
+    if (!row || indexed.has(row.matchId) || !validTime(row.date) || !Number.isFinite(row.value) || row.value <= 0 || row.value > 80) return null;
+    indexed.set(row.matchId, row);
+  }
+  const matched = observations.map(row => indexed.get(row.matchId));
+  if (matched.some((row, index) => !row || Date.parse(row.date) !== Date.parse(observations[index].date))) return null;
+  return { sample: matched.length, observations: matched.map(({ matchId, date, value }) => ({ matchId, date, value })) };
+}
+
 function summarizeLine(player, metricKey, line, observations, sport, direction = 'over') {
   const definition = RULES[sport][metricKey], values = observations.map(row => row.value);
   const sample = values.length, hits = values.filter(value => direction === 'under' ? value < line : value > line).length;
@@ -113,6 +127,7 @@ function summarizeLine(player, metricKey, line, observations, sport, direction =
     line, direction, marketLabel: `${direction === 'under' ? 'Poniżej' : 'Powyżej'} ${decimal(line)} ${definition.unit}`,
     statement: `${player.name} — ${comparisonWord} ${decimal(line)} ${definition.unit}`,
     sample, hits, average: mean, median: middle, last5Average: last5, observations,
+    ...(sport === 'nba' ? { minutes: minutesFor(player, observations) } : {}),
     qualifies: hits >= Math.ceil(sample * 0.7) && (direction === 'under' ? middle < line && last5 < line : middle > line && last5 > line),
   };
 }
@@ -194,6 +209,6 @@ export function playerPicksHTML(data, event, options = {}) {
   const result = buildPlayerPicks(data, event, options);
   const name = result.teamName ? ` — ${esc(result.teamName)}` : '';
   return `<section class="player-picks" data-player-picks-team="${esc(result.teamId || '')}"><h4>Typy na zawodników${name}</h4>${result.picks.length
-    ? `${options.showNote === false ? '' : `<p class="small player-picks-note">${esc(result.note)}</p>`}<div class="player-picks-grid">${result.picks.map(pick => `<article class="player-pick"><span class="pill">${esc(pick.label)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h4 class="player-pick-market">${esc(pick.statement)}</h4></span>${pickOddsHTML(options.oddsData, event, { ...pick, kind: 'player', market: 'player_prop', teamId: data.teamId, scope: event.sport === 'nba' ? 'including_overtime' : event.sport === 'football' ? 'regulation_90' : 'including_overtime_excluding_shootout' }, options)}</div><p class="small player-line-origin">${pick.lineOrigin === 'source' ? 'Linia z odczytu źródła' : pick.lineOrigin === 'manual' ? 'Twoja linia' : 'Linia analityczna — sprawdź ofertę'}</p>${priceBandHTML(pick, event, options)}<p><b>${pick.hits} z ${pick.sample}</b> wcześniejszych występów powyżej tej linii.</p><div class="player-pick-metrics"><span>Średnia <b>${decimal(pick.average)}</b></span><span>Mediana <b>${decimal(pick.median)}</b></span><span>Ostatnie 5 <b>${decimal(pick.last5Average)}</b></span></div><div class="player-trend" aria-label="Wyniki od najnowszego: ${pick.observations.map(row => row.value).join(', ')}">${pick.observations.map(row => `<span class="${row.value > pick.line ? 'player-trend-hit' : 'player-trend-miss'}" title="${esc(new Date(row.date).toLocaleDateString('pl-PL'))}">${row.value}</span>`).join('')}</div>${journalPickButtonHTML(event, pick)}<details class="player-line-details"><summary>Sprawdź własną linię</summary><form class="player-line-form" data-player-line data-player-id="${esc(pick.playerId)}" data-team-id="${esc(result.teamId)}" data-metric="${esc(pick.metric)}"><label>Twoja linia<input type="text" name="line" inputmode="decimal" value="${esc(decimal(pick.line))}" pattern="[0-9]+([,.][0-9]+)?" required title="Podaj linię połówkową, np. 24,5"></label><label>Kierunek<select name="direction"><option value="over">Powyżej</option><option value="under">Poniżej</option></select></label><button type="submit">Porównaj z historią</button><p class="small" data-line-result role="status"></p></form></details></article>`).join('')}</div>`
+    ? `${options.showNote === false ? '' : `<p class="small player-picks-note">${esc(result.note)}</p>`}<div class="player-picks-grid">${result.picks.map(pick => `<article class="player-pick"><span class="pill">${esc(pick.label)}</span><div class="pick-title-row"><span class="player-identity">${playerPhotoHTML({ id: pick.playerId, name: pick.playerName, headshot: pick.headshot }, event.sport)}<h4 class="player-pick-market">${esc(pick.statement)}</h4></span>${pickOddsHTML(options.oddsData, event, { ...pick, kind: 'player', market: 'player_prop', teamId: data.teamId, scope: event.sport === 'nba' ? 'including_overtime' : event.sport === 'football' ? 'regulation_90' : 'including_overtime_excluding_shootout' }, options)}</div><p class="small player-line-origin">${pick.lineOrigin === 'source' ? 'Linia z odczytu źródła' : pick.lineOrigin === 'manual' ? 'Twoja linia' : 'Linia analityczna — sprawdź ofertę'}</p>${priceBandHTML(pick, event, options)}<p><b>${pick.hits} z ${pick.sample}</b> wcześniejszych występów powyżej tej linii.</p><div class="player-pick-metrics"><span>Średnia <b>${decimal(pick.average)}</b></span><span>Mediana <b>${decimal(pick.median)}</b></span><span>Ostatnie 5 <b>${decimal(pick.last5Average)}</b></span></div>${event.sport === 'nba' ? playerPickReasonsHTML(pick, event, { now: options.now ?? Date.now(), compact: false }) : ''}<div class="player-trend" aria-label="Wyniki od najnowszego: ${pick.observations.map(row => row.value).join(', ')}">${pick.observations.map(row => `<span class="${row.value > pick.line ? 'player-trend-hit' : 'player-trend-miss'}" title="${esc(new Date(row.date).toLocaleDateString('pl-PL'))}">${row.value}</span>`).join('')}</div>${journalPickButtonHTML(event, pick)}<details class="player-line-details"><summary>Sprawdź własną linię</summary><form class="player-line-form" data-player-line data-player-id="${esc(pick.playerId)}" data-team-id="${esc(result.teamId)}" data-metric="${esc(pick.metric)}"><label>Twoja linia<input type="text" name="line" inputmode="decimal" value="${esc(decimal(pick.line))}" pattern="[0-9]+([,.][0-9]+)?" required title="Podaj linię połówkową, np. 24,5"></label><label>Kierunek<select name="direction"><option value="over">Powyżej</option><option value="under">Poniżej</option></select></label><button type="submit">Porównaj z historią</button><p class="small" data-line-result role="status"></p></form></details></article>`).join('')}</div>`
     : `<p class="small">${esc(result.reason)}</p>${manualComparisonsHTML(data, event, options)}`}</section>`;
 }
