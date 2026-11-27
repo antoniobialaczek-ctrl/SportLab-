@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-26T21:02:42.689Z",
+  "updatedAt": "2026-11-27T01:28:32.183Z",
   "events": [
     {
       "id": "soccer/eng.2:707917",
@@ -149974,7 +149974,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -149999,7 +149999,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150024,7 +150024,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150049,7 +150049,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150074,7 +150074,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150099,7 +150099,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150124,7 +150124,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150149,7 +150149,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150174,7 +150174,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150199,7 +150199,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150224,7 +150224,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150249,7 +150249,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150274,7 +150274,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150299,7 +150299,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150324,7 +150324,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150349,7 +150349,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150374,7 +150374,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150399,7 +150399,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150424,7 +150424,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150449,7 +150449,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150474,7 +150474,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150499,7 +150499,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150524,7 +150524,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150549,7 +150549,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150574,7 +150574,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150599,7 +150599,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150624,7 +150624,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150649,7 +150649,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150674,7 +150674,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150699,7 +150699,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150724,7 +150724,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150749,7 +150749,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150774,7 +150774,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150799,7 +150799,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150824,7 +150824,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150849,7 +150849,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150874,7 +150874,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150899,7 +150899,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150924,7 +150924,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150949,7 +150949,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150974,7 +150974,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -150999,7 +150999,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151024,7 +151024,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151049,7 +151049,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151074,7 +151074,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151099,7 +151099,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151124,7 +151124,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151149,7 +151149,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151174,7 +151174,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151199,7 +151199,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151224,7 +151224,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151249,7 +151249,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151274,7 +151274,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151299,7 +151299,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151324,7 +151324,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151349,7 +151349,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151374,7 +151374,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151399,7 +151399,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151424,7 +151424,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151449,7 +151449,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151474,7 +151474,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151499,7 +151499,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151524,7 +151524,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151549,7 +151549,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151574,7 +151574,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151599,7 +151599,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151624,7 +151624,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151649,7 +151649,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151674,7 +151674,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151699,7 +151699,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151724,7 +151724,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151749,7 +151749,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151774,7 +151774,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151799,7 +151799,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151824,7 +151824,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151849,7 +151849,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151874,7 +151874,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151899,7 +151899,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151924,7 +151924,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151949,7 +151949,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151974,7 +151974,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -151999,7 +151999,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152024,7 +152024,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152049,7 +152049,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152074,7 +152074,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152099,7 +152099,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152124,7 +152124,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152149,7 +152149,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152174,7 +152174,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152199,7 +152199,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152224,7 +152224,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152249,7 +152249,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152274,7 +152274,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152299,7 +152299,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152324,7 +152324,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152349,7 +152349,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152374,7 +152374,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152399,7 +152399,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -152424,7 +152424,457 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915506",
+      "sourceEventId": "401915506",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "1895",
+      "awayId": "13083",
+      "home": "Besiktas",
+      "away": "Hapoel Be'er",
+      "homeScore": 2,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915507",
+      "sourceEventId": "401915507",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "176",
+      "awayId": "490",
+      "home": "Marseille",
+      "away": "Levski Sofia",
+      "homeScore": 1,
+      "awayScore": 0,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915508",
+      "sourceEventId": "401915508",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "5807",
+      "awayId": "2990",
+      "home": "Union St.-Gilloise",
+      "away": "Lech Poznan",
+      "homeScore": 2,
+      "awayScore": 2,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915517",
+      "sourceEventId": "401915517",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "597",
+      "awayId": "131",
+      "home": "Dinamo Zagreb",
+      "away": "Bayer Leverkusen",
+      "homeScore": 0,
+      "awayScore": 2,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915518",
+      "sourceEventId": "401915518",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "11706",
+      "awayId": "1929",
+      "home": "Viktoria Plzen",
+      "away": "Benfica",
+      "homeScore": 4,
+      "awayScore": 0,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915519",
+      "sourceEventId": "401915519",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "85",
+      "awayId": "349",
+      "home": "Celta Vigo",
+      "away": "AFC Bournemouth",
+      "homeScore": 1,
+      "awayScore": 2,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915520",
+      "sourceEventId": "401915520",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "2790",
+      "awayId": "20024",
+      "home": "RB Salzburg",
+      "away": "Ararat-Armenia",
+      "homeScore": 2,
+      "awayScore": 0,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915521",
+      "sourceEventId": "401915521",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T17:45:00.000Z",
+      "resultAvailableAt": "2026-11-27T17:45:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "435",
+      "awayId": "103",
+      "home": "Olympiacos",
+      "away": "AC Milan",
+      "homeScore": 2,
+      "awayScore": 4,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915501",
+      "sourceEventId": "401915501",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "167",
+      "awayId": "987",
+      "home": "Lyon",
+      "away": "Lillestrom",
+      "homeScore": 0,
+      "awayScore": 0,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915502",
+      "sourceEventId": "401915502",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "111",
+      "awayId": "617",
+      "home": "Juventus",
+      "away": "Omonia Nicosia",
+      "homeScore": 4,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915503",
+      "sourceEventId": "401915503",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "1010",
+      "awayId": "441",
+      "home": "OFI Crete",
+      "away": "Anderlecht",
+      "homeScore": 1,
+      "awayScore": 3,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915504",
+      "sourceEventId": "401915504",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "384",
+      "awayId": "89",
+      "home": "Crystal Palace",
+      "away": "Real Sociedad",
+      "homeScore": 2,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915505",
+      "sourceEventId": "401915505",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "147",
+      "awayId": "169",
+      "home": "NEC Nijmegen",
+      "away": "Stade Rennais",
+      "homeScore": 3,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915512",
+      "sourceEventId": "401915512",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "21615",
+      "awayId": "256",
+      "home": "Torreense",
+      "away": "Celtic",
+      "homeScore": 1,
+      "awayScore": 2,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915513",
+      "sourceEventId": "401915513",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "366",
+      "awayId": "11505",
+      "home": "Sunderland",
+      "away": "Jagiellonia Bialystok",
+      "homeScore": 1,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915514",
+      "sourceEventId": "401915514",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "433",
+      "awayId": "140",
+      "home": "Sparta Prague",
+      "away": "AZ Alkmaar",
+      "homeScore": 2,
+      "awayScore": 4,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915515",
+      "sourceEventId": "401915515",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "7911",
+      "awayId": "3746",
+      "home": "TSG Hoffenheim",
+      "away": "SK Sturm Graz",
+      "homeScore": 3,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "soccer/uefa.europa:401915516",
+      "sourceEventId": "401915516",
+      "sport": "football",
+      "route": "soccer/uefa.europa",
+      "league": "uefa.europa",
+      "season": "2026",
+      "startTime": "2026-11-26T20:00:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:00:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "622",
+      "awayId": "3362",
+      "home": "Ferencvaros",
+      "away": "NK Celje",
+      "homeScore": 0,
+      "awayScore": 0,
+      "neutralSite": true,
+      "neutralSiteBasis": "unknown-assume-neutral",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.europa/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     }
   ],
@@ -152442,7 +152892,7 @@
   "coverage": {
     "lastFetch": {
       "from": "2026-11-19",
-      "to": "2026-11-25",
+      "to": "2026-11-26",
       "routes": [
         "soccer/eng.1",
         "soccer/esp.1",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-26T21:02:42.689Z",
+  "updatedAt": "2026-11-27T01:28:32.183Z",
   "events": [
     {
       "id": "tennis/wta:152389",
@@ -478749,7 +478749,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates=20261119&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478774,7 +478774,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261119&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478799,7 +478799,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261119&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478824,7 +478824,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261119&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478849,7 +478849,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates=20261119&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478874,7 +478874,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261119&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478899,7 +478899,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478924,7 +478924,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478949,7 +478949,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478974,7 +478974,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -478999,7 +478999,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479024,7 +479024,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261120&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479049,7 +479049,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479074,7 +479074,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479099,7 +479099,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479124,7 +479124,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261121&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479149,7 +479149,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479174,7 +479174,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479199,7 +479199,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479224,7 +479224,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479249,7 +479249,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479274,7 +479274,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261122&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479299,7 +479299,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479324,7 +479324,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479349,7 +479349,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479374,7 +479374,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479399,7 +479399,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479424,7 +479424,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479449,7 +479449,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261123&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479474,7 +479474,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479499,7 +479499,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479524,7 +479524,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479549,7 +479549,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479574,7 +479574,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479599,7 +479599,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261124&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479624,7 +479624,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479649,7 +479649,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479674,7 +479674,7 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     },
     {
@@ -479699,7 +479699,107 @@
       "source": {
         "provider": "ESPN",
         "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261125&limit=1000",
-        "fetchedAt": "2026-11-26T21:02:42.689Z"
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "tennis/wta:186834",
+      "sourceEventId": "186834",
+      "sport": "tennis",
+      "route": "tennis/wta",
+      "league": "wta",
+      "season": "2026",
+      "startTime": "2026-11-26T18:05:00.000Z",
+      "resultAvailableAt": "2026-11-27T18:05:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "14562",
+      "awayId": "423",
+      "home": "Sofia Costoulas",
+      "away": "Varvara Lepchenko",
+      "homeScore": 1,
+      "awayScore": 2,
+      "neutralSite": true,
+      "neutralSiteBasis": "not-applicable",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "tennis/wta:186836",
+      "sourceEventId": "186836",
+      "sport": "tennis",
+      "route": "tennis/wta",
+      "league": "wta",
+      "season": "2026",
+      "startTime": "2026-11-26T18:05:00.000Z",
+      "resultAvailableAt": "2026-11-27T18:05:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "12957",
+      "awayId": "5168",
+      "home": "Guiomar Maristany Zuleta De Reales",
+      "away": "Nuria Brancaccio",
+      "homeScore": 2,
+      "awayScore": 1,
+      "neutralSite": true,
+      "neutralSiteBasis": "not-applicable",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "tennis/wta:186833",
+      "sourceEventId": "186833",
+      "sport": "tennis",
+      "route": "tennis/wta",
+      "league": "wta",
+      "season": "2026",
+      "startTime": "2026-11-26T20:05:00.000Z",
+      "resultAvailableAt": "2026-11-27T20:05:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "4546",
+      "awayId": "15069",
+      "home": "Irene Burillo",
+      "away": "Laura Samson",
+      "homeScore": 0,
+      "awayScore": 2,
+      "neutralSite": true,
+      "neutralSiteBasis": "not-applicable",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
+      }
+    },
+    {
+      "id": "tennis/wta:186835",
+      "sourceEventId": "186835",
+      "sport": "tennis",
+      "route": "tennis/wta",
+      "league": "wta",
+      "season": "2026",
+      "startTime": "2026-11-26T21:50:00.000Z",
+      "resultAvailableAt": "2026-11-27T21:50:00.000Z",
+      "availabilityBasis": "conservative-24h",
+      "homeId": "3220",
+      "awayId": "3256",
+      "home": "Maria Lourdes Carle",
+      "away": "Nadia Podoroska",
+      "homeScore": 2,
+      "awayScore": 0,
+      "neutralSite": true,
+      "neutralSiteBasis": "not-applicable",
+      "status": "completed",
+      "source": {
+        "provider": "ESPN",
+        "url": "https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard?dates=20261126&limit=1000",
+        "fetchedAt": "2026-11-27T01:28:32.183Z"
       }
     }
   ],
@@ -479737,7 +479837,7 @@
   "coverage": {
     "lastFetch": {
       "from": "2026-11-19",
-      "to": "2026-11-25",
+      "to": "2026-11-26",
       "routes": [
         "tennis/atp",
         "tennis/wta"
