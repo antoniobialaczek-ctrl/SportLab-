@@ -1,0 +1,118 @@
+{
+  "verifiedAt": "2026-11-27T13:12:41.657103+00:00",
+  "sourceCommit": "f93693d9188433998ebbf2c10ec84ca52235bb59",
+  "deploymentId": "dpl_6Hpwkp8dvPbZocMXqKnZS6fwWneZ",
+  "deploymentState": "READY",
+  "productionURL": "https://sportlab-2-analizy.vercel.app",
+  "ci": {
+    "runId": 46004672936,
+    "conclusion": "success",
+    "tests": 384,
+    "failures": 0,
+    "command": "npm run check"
+  },
+  "localRealSources": {
+    "target": "http://127.0.0.1:3250",
+    "mockedSources": false,
+    "fixture": "basketball/nba:401909327",
+    "playerTitle": "Immanuel Quickley — powyżej 9,5 punktu",
+    "playerLine": 9.5,
+    "playerHits": 8,
+    "playerSample": 8,
+    "playerLatest5Hits": 5,
+    "playerReasonsMatchRawObservations": true,
+    "playerAnalysisStillFirst": true,
+    "minOdds100DoesNotHideAnalysis": true,
+    "teamSamples": [
+      10,
+      10
+    ],
+    "teamLatestDatesMatchSource": true,
+    "comparedTeamMarkets": 4,
+    "teamReasonsAndCounters": true,
+    "rawChartValuesMatch": true,
+    "charts": 2,
+    "manualPointLine": 235.5,
+    "manualControlsStayOpen": true,
+    "teamsViewRetained": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "productionRealSources": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "fixture": "basketball/nba:401909327",
+    "playerTitle": "Jalen Brunson — powyżej 19,5 punktu",
+    "playerLine": 19.5,
+    "playerHits": 9,
+    "playerSample": 10,
+    "playerLatest5Hits": 4,
+    "playerReasonsMatchRawObservations": true,
+    "playerAnalysisStillFirst": true,
+    "minOdds100DoesNotHideAnalysis": true,
+    "teamSamples": [
+      10,
+      10
+    ],
+    "teamLatestDatesMatchSource": true,
+    "comparedTeamMarkets": 4,
+    "teamReasonsAndCounters": true,
+    "rawChartValuesMatch": true,
+    "charts": 2,
+    "manualPointLine": 235.5,
+    "manualControlsStayOpen": true,
+    "teamsViewRetained": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "productionControlledRegression": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": true,
+    "nbaPlayerReasonsVerified": true,
+    "pricedListHasExactMarketReasons": true,
+    "exactLineAndLatest5Recomputed": true,
+    "playerAnalysisStillFirst": true,
+    "nbaTeamAnalysisVisible": true,
+    "playerQuotesProvided": 0,
+    "automaticAnalysisLine": "Cade Cunningham powyżej 6,5 asysty",
+    "realObservationValues": [
+      8,
+      11,
+      7,
+      9,
+      10,
+      8,
+      12,
+      6,
+      9,
+      8
+    ],
+    "firstCardTopMobile": 656.171875,
+    "abovePricedDailyList": true,
+    "athleteAndMetricSelection": true,
+    "playerBeyondFirstFourSelectable": true,
+    "expandFromFourToSix": true,
+    "strictPriceFilterOnlyAffectsPricedList": true,
+    "historyAndDetailsRetained": true,
+    "mobileNoOverflow": true,
+    "desktopNoOverflow": true,
+    "pageErrors": []
+  },
+  "runtimeErrors": {
+    "window": "10m",
+    "levels": [
+      "error",
+      "fatal"
+    ],
+    "records": 0
+  },
+  "notes": [
+    "Real production APIs were not mocked in the real-source test. Exact player-line counts and newest5 counts were recomputed from atomic rendered observations. Team chart totals and latest dates were matched to actual API results.",
+    "The controlled Cade Cunningham AST6.5 fixture verifies restored player-first layout, exact reasons9/10 and5/5, strict price filtering, athlete/metric selection, expansion, and explanations beside selections in the priced daily list. It is not a claim of real current Cunningham statistics.",
+    "NBA analyses compare winner and one total-points line including overtime, scored/conceded points, recent5/10, actual venue subsets, median and observed variability.",
+    "Player minutes are historical only and must match the same statistic-game IDs and dates completely. Missing minutes do not become estimated playing time.",
+    "Analyses remain visible without a matching price. Quotes never move between winner/totals/player markets or between lines.",
+    "These are descriptive historical rules with unverified predictive accuracy; no win probabilities, EV, possession/pace claims or lineup/injury adjustments were invented.",
+    "No paid sources or dependencies introduced. Frozen src/data, src/models and .github/workflows/history.yml unchanged."
+  ]
+}

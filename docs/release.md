@@ -39,3 +39,8 @@ Opublikowano wynik po 90 minutach, sumy goli z dokładnymi kursami, wykresy osta
 ## Widoczne kierunki piłkarskie bez blokowania kursem — 25 listopada 2026
 
 Karty piłkarskie na początku strony pokazują kierunek z formy, argumenty przeciw, wynik/gole/BTTS, ostatnie występy oraz dom/wyjazd także bez kursu. Publiczny test rzeczywistych danych potwierdził cztery różne widoczne kierunki oraz brak podmieniania ceny X2 kursem zwycięzcy. Testy: 366/366, kompilacja i CI poprawne. [Dowody wydania i ograniczenia](deep-football-analysis-release.json).
+
+
+## Analiza NBA i uzasadnienia typów — 27 listopada 2026
+
+Opublikowano osobne porównanie drużyn NBA i uzasadnienia dla punktów, asyst i zbiórek. Zwycięzca, suma punktów i linie zawodników mają konkretne argumenty oraz kontrargumenty. Zachowano widok zawodników na początku strony, wykresy, własne linie i ścisłe dopasowanie kursów. 384 testy i kompilacja poprawne; publiczna wersja sprawdzona na rzeczywistych danych oraz oddzielnych kontrolowanych przypadkach. [Dowody i ograniczenia](deep-nba-analysis-release.json).
