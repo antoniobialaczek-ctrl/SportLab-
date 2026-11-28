@@ -1,0 +1,115 @@
+{
+  "verifiedAt": "2026-11-28T00:36:46.656514+00:00",
+  "provider": "ESPN — public unofficial API",
+  "normalizedKeys": {
+    "corners": "wonCorners",
+    "yellowCards": "yellowCards",
+    "shots": "totalShots",
+    "shotsOnTarget": "shotsOnTarget"
+  },
+  "auditedSummaries": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/summary?event=401880139",
+      "observedAt": "2026-11-28T00:28:09.964455+00:00",
+      "httpStatus": 200,
+      "status": "STATUS_FULL_TIME",
+      "summaryPeriodClock": "Not supplied; 90-minute proof must come from verified schedule and matching exact summary identity/final score.",
+      "statistics": [
+        {
+          "teamId": "379",
+          "sourceValues": {
+            "yellowCards": "5",
+            "redCards": "0",
+            "wonCorners": "9",
+            "totalShots": "13",
+            "shotsOnTarget": "4"
+          }
+        },
+        {
+          "teamId": "392",
+          "sourceValues": {
+            "yellowCards": "2",
+            "redCards": "0",
+            "wonCorners": "7",
+            "totalShots": "19",
+            "shotsOnTarget": "8"
+          }
+        }
+      ]
+    },
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/summary?event=401915378",
+      "observedAt": "2026-11-28T00:28:10.284464+00:00",
+      "httpStatus": 200,
+      "status": "STATUS_FULL_TIME",
+      "summaryPeriodClock": "Not supplied; 90-minute proof must come from verified schedule and matching exact summary identity/final score.",
+      "statistics": [
+        {
+          "teamId": "21922",
+          "sourceValues": {
+            "yellowCards": "1",
+            "redCards": "0",
+            "wonCorners": "4",
+            "totalShots": "8",
+            "shotsOnTarget": "3"
+          }
+        },
+        {
+          "teamId": "83",
+          "sourceValues": {
+            "yellowCards": "0",
+            "redCards": "0",
+            "wonCorners": "6",
+            "totalShots": "25",
+            "shotsOnTarget": "14"
+          }
+        }
+      ]
+    }
+  ],
+  "liveHandlerFlow": {
+    "mockedSources": false,
+    "request": {
+      "sport": "football",
+      "route": "soccer/eng.1",
+      "homeId": "357",
+      "awayId": "388",
+      "fixtureId": "soccer/eng.1:401879227",
+      "fixtureStart": "2026-11-28T15:00:00.000Z"
+    },
+    "httpStatus": 200,
+    "status": "available",
+    "teamSamples": [
+      8,
+      8
+    ],
+    "metricCoverage": {
+      "corners": {
+        "home": 8,
+        "away": 8
+      },
+      "yellowCards": {
+        "home": 8,
+        "away": 8
+      },
+      "shots": {
+        "home": 8,
+        "away": 8
+      },
+      "shotsOnTarget": {
+        "home": 8,
+        "away": 8
+      }
+    },
+    "sourceErrors": 0,
+    "observedAt": "2026-11-28T00:35:27.707Z"
+  },
+  "limits": [
+    "Yellow cards are distinct from red cards and card-point settlement; no bookmaker price or equivalence is inferred.",
+    "No missing count is filled with zero. Raw 0 values are retained. Conflicting duplicate statistics are omitted.",
+    "Only verified final90-minute schedules with exact matching summary identity, final status and scores are used; extra time and shootouts are excluded.",
+    "Maximum8 matches perteam, one previousseason ifneeded, three shared summary workers,22second workbudget, cache32 fullresults5min and partialresults30sec. APIpartial/unavailable responses no-store.",
+    "Actual source fetch times survive same-instance shared summary cache/inflight reuse. This does not imply cross-function or cross-region persistent caching.",
+    "No extra records are persisted into model history; these are current descriptive observations with modelExperimentEligiblefalse."
+  ]
+}

@@ -8,6 +8,8 @@ import { buildMatchPicks, matchPicksHTML } from '/match-picks.js';
 import { matchChartsHTML } from '/match-charts.js';
 import { buildFootballAnalysis } from '/football-analysis.js';
 import { footballAnalysisCardHTML, footballAnalysisDetailHTML } from '/football-analysis-view.js';
+import { buildFootballExtraAnalysis } from '/football-extra-analysis.js';
+import { footballExtraCardHTML, footballExtraDetailHTML } from '/football-extra-view.js';
 import { buildNBAAnalysis } from '/nba-analysis.js';
 import { buildNHLAnalysis } from '/nhl-analysis.js';
 import { nhlAnalysisCardHTML, nhlAnalysisDetailHTML, nhlPickReasonsHTML } from '/nhl-analysis-view.js';
@@ -37,7 +39,7 @@ let sport = 'nba', league = 'all', events = [], archiveEvents = [], report = nul
 let loadController, detailController, previewController, lastDetailButton, renderVersion = 0;
 let viewAsOf = Math.floor(Date.now() / 60000) * 60000;
 let marketView = 'daily';
-let playerCardContext = '', playerCardAthlete = 'all', playerCardMetric = 'all', playerCardsExpanded = false, footballCardLimit = 6, nbaCardLimit = 4, nhlCardLimit = 4;
+let playerCardContext = '', playerCardAthlete = 'all', playerCardMetric = 'all', playerCardsExpanded = false, footballCardLimit = 6, nbaCardLimit = 4, nhlCardLimit = 4, footballExtraLimit = 2;
 let pickScreening = { minOdds: 1.5, band: 'all' };
 try {
   const saved = JSON.parse(localStorage.getItem('sportlab.pick-screening.v1'));
@@ -53,6 +55,8 @@ function pricedGroups(rows, pickOf, render, gridClass) {
 }
 const previews = new Map();
 const matchLines = new Map();
+const footballExtras = new Map(), footballExtraLines = new Map(), footballExtraDrafts = new Map(), footballExtraLineMessages = new Map();
+let footballExtraTail = Promise.resolve();
 const playerInspectors = new Map();
 const playerForms = new Map(), fixtureDetails = new Map(), playerDrafts = new Map(), matchDrafts = new Map();
 let playerQueue = [], playerWorkers = 0;
@@ -302,6 +306,79 @@ function updatePreviewNodes(event) {
   if (data) updateMatchDetail(event, data);
   renderBetting();
 }
+function footballExtraResult(event) {
+  const identity = { sport: 'football', route: event.route, fixtureId: event.id, scope: 'regulation_90', metrics: [] };
+  if (event.state !== 'pre' || Date.parse(event.date) <= Date.now()) return { ...identity, status: 'closed', reason: 'Dodatkowe porównania są dostępne przed rozpoczęciem meczu.' };
+  if (event.route === 'soccer/pol.1') return { ...identity, status: 'unavailable', reason: 'Darmowe źródło Ekstraklasy nie udostępnia potwierdzonej historii rożnych, kartek i strzałów.' };
+  const entry = footballExtras.get(event.id);
+  if (entry?.data?.status === 'unavailable' && entry.data.fixtureId === event.id && entry.data.route === event.route && entry.data.scope === 'regulation_90') return { ...identity, status: 'unavailable', reason: entry.data.reason, notes: entry.data.notes };
+
+  if (entry?.data) return buildFootballExtraAnalysis(entry.data, event, { lines: footballExtraLines.get(event.id) || {} });
+  return { sport: 'football', route: event.route, fixtureId: event.id, scope: 'regulation_90', metrics: [],
+    status: event.state !== 'pre' || Date.parse(event.date) <= Date.now() ? 'closed' : entry?.status === 'error' ? 'unavailable' : 'loading',
+    reason: entry?.status === 'error' ? entry.message || 'Źródło dodatkowych statystyk jest chwilowo niedostępne.' : 'Sprawdzanie rożnych, żółtych kartek i strzałów z poprzednich meczów…' };
+}
+function extraFocus(root) {
+  const field = document.activeElement, form = field?.closest?.('[data-football-extra-line]');
+  return form && root.contains(field) && field.name === 'line' ? { fixture: form.dataset.fixtureId, metric: form.dataset.metric, start: field.selectionStart, end: field.selectionEnd } : null;
+}
+function restoreExtraForms(root, focus) {
+  for (const form of root.querySelectorAll('[data-football-extra-line]')) {
+    const key = `${form.dataset.fixtureId}:${form.dataset.metric}`, field = form.elements.namedItem('line');
+    if (footballExtraDrafts.has(key)) field.value = footballExtraDrafts.get(key);
+    form.querySelector('[data-extra-line-result]').textContent = footballExtraLineMessages.get(key) || '';
+    if (focus?.fixture === form.dataset.fixtureId && focus.metric === form.dataset.metric) {
+      for (let parent = field.closest('details'); parent && root.contains(parent); parent = parent.parentElement?.closest('details')) parent.open = true;
+      field.focus({ preventScroll: true });
+      if (focus.start != null) field.setSelectionRange(focus.start, focus.end);
+    }
+  }
+}
+function updateFootballExtraDetail(event) {
+  const node = $('football-extra-detail');
+  if (!node || detailEvent?.id !== event.id || !$('modal').classList.contains('on')) return;
+  const focus = extraFocus(node);
+  node.innerHTML = footballExtraDetailHTML(footballExtraResult(event), event);
+  restoreExtraForms(node, focus);
+}
+function requestFootballExtras(event, signal) {
+  if (event.sport !== 'football' || event.route === 'soccer/pol.1' || event.state !== 'pre' || Date.parse(event.date) <= Date.now() || Date.parse(event.date) - Date.now() > 48 * 3600000) return Promise.resolve(null);
+  const previous = footballExtras.get(event.id);
+  if (previous?.promise) return previous.promise;
+  const age = Date.now() - Date.parse(previous?.data?.observedAt);
+  if (previous?.data && age >= 0 && age < (previous.data.status === 'available' ? 5 * 60000 : 30000)) return Promise.resolve(previous.data);
+  const entry = { ...previous, status: 'loading', attemptedAt: Date.now() }, before = footballExtraTail;
+  let release;
+  footballExtraTail = new Promise(resolve => { release = resolve; });
+  footballExtras.set(event.id, entry);
+  entry.promise = (async () => {
+    await before;
+    try {
+      if (signal?.aborted) throw new DOMException('Przerwano pobieranie', 'AbortError');
+      const query = new URLSearchParams({ sport: 'football', route: event.route, homeId: event.homeId, awayId: event.awayId, fixtureId: event.id, fixtureStart: new Date(event.date).toISOString() });
+      return await json(`/api/football-extra-stats?${query}`, signal);
+    } finally { release(); }
+  })().then(data => { entry.data = data; entry.status = 'ready'; delete entry.promise; updateFootballExtraDetail(event); renderBetting(); return data; })
+    .catch(error => { entry.status = signal?.aborted ? 'idle' : 'error'; entry.message = error.message; delete entry.promise; updateFootballExtraDetail(event); renderBetting(); throw error; });
+  return entry.promise;
+}
+function footballExtraSection(upcoming) {
+  return `<section id="football-extra-analysis" class="football-extra-section" data-football-extra-analysis><h3>Dodatkowe kierunki — rożne, kartki i strzały</h3><p class="small">Sumy obu drużyn w poprzednich meczach, uzasadnienia, kontrargumenty i porównanie Twojej linii. Są to analizy statystyk; cenę i zasady właściwego rynku sprawdź w ofercie.</p><div class="football-extra-grid">${upcoming.slice(0, footballExtraLimit).map(event => footballExtraCardHTML(footballExtraResult(event), event)).join('')}</div>${upcoming.length > footballExtraLimit ? `<button type="button" data-more-football-extra>Sprawdź kolejne mecze (${upcoming.length - footballExtraLimit})</button>` : ''}</section>`;
+}
+function bindFootballExtraActions(upcoming, focus) {
+  restoreExtraForms($('betting-summary'), focus);
+  for (const event of upcoming.slice(0, footballExtraLimit)) {
+    const entry = footballExtras.get(event.id), age = Date.now() - Date.parse(entry?.data?.observedAt);
+    const expired = entry?.data && age >= (entry.data.status === 'available' ? 5 * 60000 : 30000);
+    if (!entry || entry.status === 'idle' || !entry.promise && (expired || entry.status === 'error') && Date.now() - (entry.attemptedAt || 0) >= 60000) void requestFootballExtras(event, loadController?.signal).catch(() => {});
+  }
+  const more = document.querySelector('[data-more-football-extra]');
+  if (more) more.onclick = () => {
+    footballExtraLimit += 2;
+    renderBetting();
+    for (const event of upcoming.slice(0, footballExtraLimit)) void requestFootballExtras(event, loadController?.signal).catch(() => {});
+  };
+}
 function footballAnalysisSection(upcoming) {
   const rows = upcoming.slice(0, footballCardLimit).map(event => {
     const entry = previews.get(previewKey(event)), options = marketOptions(event);
@@ -313,9 +390,10 @@ function footballAnalysisSection(upcoming) {
     return { event, analysis, options };
   });
   rows.sort((a, b) => Number(Boolean(b.analysis.best)) - Number(Boolean(a.analysis.best)) || Date.parse(a.event.date) - Date.parse(b.event.date));
-  return `<section class="football-daily-analysis" data-football-analysis><h3>Analizy dnia — wynik i gole</h3><p class="small">Kierunek z formy, argumenty za i przeciw oraz ostatnie wyniki drużyn. Brak kursu nie ukrywa analizy. Kolejność pokazuje najpierw mecze ze zgodnym kierunkiem historycznym.</p><div class="football-analysis-grid">${rows.map(({ event, analysis, options }) => footballAnalysisCardHTML(analysis, event, options)).join('')}</div>${upcoming.length > footballCardLimit ? `<button type="button" data-more-football>Pokaż kolejne analizy (${upcoming.length - footballCardLimit})</button>` : ''}<p class="small fa-method-note">Liczniki dotyczą wcześniejszych meczów. Wskazanie z formy nie określa szansy trafienia ani opłacalności przy danym kursie.</p></section>`;
+  return `<section class="football-daily-analysis" data-football-analysis><h3>Analizy dnia — wynik i gole</h3><a class="small" href="#football-extra-analysis">Rożne, kartki i strzały — dodatkowe analizy</a><p class="small">Kierunek z formy, argumenty za i przeciw oraz ostatnie wyniki drużyn. Brak kursu nie ukrywa analizy. Kolejność pokazuje najpierw mecze ze zgodnym kierunkiem historycznym.</p><div class="football-analysis-grid">${rows.map(({ event, analysis, options }) => footballAnalysisCardHTML(analysis, event, options)).join('')}</div>${upcoming.length > footballCardLimit ? `<button type="button" data-more-football>Pokaż kolejne analizy (${upcoming.length - footballCardLimit})</button>` : ''}<p class="small fa-method-note">Liczniki dotyczą wcześniejszych meczów. Wskazanie z formy nie określa szansy trafienia ani opłacalności przy danym kursie.</p></section>`;
 }
-function bindFootballAnalysisActions(upcoming) {
+function bindFootballAnalysisActions(upcoming, focus) {
+  bindFootballExtraActions(upcoming, focus);
   document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
   const more = document.querySelector('[data-more-football]');
   if (more) more.onclick = () => {
@@ -392,8 +470,9 @@ function playerAnalysisSection(rows, loading) {
   return `<section class="daily-player-section" data-player-analysis><h3>Zawodnicy — linia i ostatnie występy</h3><p class="small">Automatyczne porównania z historią. Brak kursu nie ukrywa wyników; linia analityczna nie jest rekomendacją.</p><div class="player-card-controls"><label>Zawodnik<select data-player-card-athlete><option value="all">Wszyscy zawodnicy</option>${playerCardAthlete !== 'all' && !athletes.has(playerCardAthlete) ? `<option value="${esc(playerCardAthlete)}" selected>Wybrany zawodnik — oczekiwanie na dane</option>` : ''}${[...athletes].sort((a, b) => a[1].localeCompare(b[1], 'pl')).map(([id, name]) => `<option value="${esc(id)}" ${id === playerCardAthlete ? 'selected' : ''}>${esc(name)}</option>`).join('')}</select></label><label>Statystyka<select data-player-card-metric><option value="all">Wszystkie</option>${metrics.map(([key, name]) => `<option value="${key}" ${key === playerCardMetric ? 'selected' : ''}>${name}</option>`).join('')}</select></label></div>${visibleCards || `<p class="small" role="status">${loading ? 'Pobieranie ostatnich występów zawodników…' : 'Brak aktualnej porównywalnej historii dla tego wyboru. Pełne dostępne dane znajdziesz w szczegółach.'}</p>`}${count > 4 ? `<button type="button" data-expand-player-cards>${playerCardsExpanded ? 'Pokaż mniej kart' : `Pokaż pozostałe karty (${count - 4})`}</button>` : ''}</section>`;
 }
 function renderBetting() {
+  const focusedExtra = extraFocus($('betting-summary'));
   const playerContext = `${sport}:${league}:${$('date').value}`;
-  if (playerCardContext !== playerContext) { playerCardContext = playerContext; playerCardAthlete = 'all'; playerCardMetric = 'all'; playerCardsExpanded = false; footballCardLimit = 6; nbaCardLimit = 4; nhlCardLimit = 4; }
+  if (playerCardContext !== playerContext) { playerCardContext = playerContext; playerCardAthlete = 'all'; playerCardMetric = 'all'; playerCardsExpanded = false; footballCardLimit = 6; nbaCardLimit = 4; nhlCardLimit = 4; footballExtraLimit = 2; }
   const query = $('q').value.toLocaleLowerCase('pl'), status = $('status').value;
   const upcoming = events.filter(event => event.state === 'pre' && Date.parse(event.date) > Date.now()
     && (status === 'all' || status === 'pre')
@@ -421,9 +500,9 @@ function renderBetting() {
     const loading = upcoming.some(event => previews.get(previewKey(event))?.status === 'loading') || playerEvents.some(event => [event.homeId, event.awayId].some(id => playerForms.get(playerKey(event, id))?.status === 'loading'));
     $('betting-summary').innerHTML = !upcoming.length
       ? '<p class="small">Brak nadchodzących spotkań w wybranym zestawie. Zmień sport lub dzień; rozegrane mecze znajdziesz poniżej.</p>'
-      : `${sport === 'football' ? footballAnalysisSection(upcoming) : playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}${sport === 'nba' ? nbaAnalysisSection(upcoming) : sport === 'nhl' ? nhlAnalysisSection(upcoming) : ''}<section class="daily-priced-section"><h3>Typy dnia z dopasowanym kursem</h3><p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5, explanationHTML: dailyGameReasons })}</section>${sport === 'football' && playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
+      : `${sport === 'football' ? footballAnalysisSection(upcoming) + footballExtraSection(upcoming) : playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}${sport === 'nba' ? nbaAnalysisSection(upcoming) : sport === 'nhl' ? nhlAnalysisSection(upcoming) : ''}<section class="daily-priced-section"><h3>Typy dnia z dopasowanym kursem</h3><p class="daily-summary-context">Kurs od ${priceLabel(pickScreening.minOdds)} · godziny w Polsce</p>${loading && !candidates.length ? '<p class="small" role="status">Sprawdzanie meczów i dostępnych kursów…</p>' : dailyPicksHTML(candidates, { sport, ...pickScreening, limit: 5, explanationHTML: dailyGameReasons })}</section>${sport === 'football' && playerEvents.length ? playerAnalysisSection(analysisRows, loading) : ''}<div class="daily-coverage"><span class="small">Analizy meczów: ${analysed}/${upcoming.length}${playerEvents.length ? ` · dane zawodników: ${playerFormsAvailable}/${playerEvents.length}` : ''}.</span>${remaining.length ? `<button type="button" data-more-daily-players ${loading ? 'disabled' : ''}>${loading ? 'Sprawdzanie zawodników…' : 'Sprawdź kolejnych zawodników'}</button>` : ''}</div>`;
     document.querySelectorAll('[data-bet-id]').forEach(button => button.onclick = () => detail(button.dataset.betId, button));
-    if (sport === 'football') bindFootballAnalysisActions(upcoming);
+    if (sport === 'football') bindFootballAnalysisActions(upcoming, focusedExtra);
     if (sport === 'nba') bindNBAAnalysisActions(upcoming);
     if (sport === 'nhl') bindNHLAnalysisActions(upcoming);
     const more = document.querySelector('[data-more-daily-players]');
@@ -450,8 +529,8 @@ function renderBetting() {
       return;
     }
     if (sport === 'football' && upcoming.length) {
-      $('betting-summary').innerHTML = footballAnalysisSection(upcoming);
-      bindFootballAnalysisActions(upcoming);
+      $('betting-summary').innerHTML = footballAnalysisSection(upcoming) + footballExtraSection(upcoming);
+      bindFootballAnalysisActions(upcoming, focusedExtra);
       return;
     }
     const rows = upcoming.flatMap(event => {
@@ -610,6 +689,12 @@ async function detail(id, button) {
     <details class="panel detail-section"><summary>Kalkulator kursu i dziennik własnych typów</summary><div id="journal-form"></div></details>
     <details id="game-boxscore" class="panel detail-section" ${event.state !== 'pre' ? 'open' : ''}><summary>${event.state === 'pre' ? 'Dodatkowe informacje o spotkaniu' : 'Statystyki rozegranego meczu'}</summary><div id="match-boxscore"><p class="small">Pobieranie dodatkowych statystyk…</p></div></details>`;
   if (['nhl', 'football'].includes(event.sport)) $('detail').insertBefore($('betting-detail'), $('detail').querySelector('.player-analysis-section'));
+  if (event.sport === 'football') {
+    const extraNode = document.createElement('div'); extraNode.id = 'football-extra-detail';
+    $('detail').insertBefore(extraNode, $('betting-detail').nextSibling);
+    updateFootballExtraDetail(event);
+    void requestFootballExtras(event, loadController?.signal).catch(() => {});
+  }
   journal.open(event, $('journal-form'));
   void previewRequest(event, previewController?.signal).then(data => {
     if (!controller.signal.aborted) {
@@ -771,6 +856,39 @@ document.addEventListener('keydown', event => {
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }
 });
+function footballExtraInput(event) {
+  const form = event.target.closest?.('[data-football-extra-line]');
+  if (form && event.target.name === 'line') {
+    const key = `${form.dataset.fixtureId}:${form.dataset.metric}`;
+    footballExtraDrafts.set(key, String(event.target.value).slice(0, 50));
+    footballExtraLineMessages.delete(key);
+    form.querySelector('[data-extra-line-result]').textContent = '';
+  }
+}
+function footballExtraSubmit(submit) {
+  const form = submit.target.closest?.('[data-football-extra-line]');
+  if (!form) return;
+  submit.preventDefault();
+  const event = [...events, ...archiveEvents].find(row => row.id === form.dataset.fixtureId), metric = form.dataset.metric;
+  if (!event || event.sport !== 'football' || !['corners', 'yellowCards', 'shots', 'shotsOnTarget'].includes(metric)) return;
+  const raw = String(form.elements.namedItem('line').value).trim(), line = /^\d+(?:[,.]\d+)?$/.test(raw) ? Number(raw.replace(',', '.')) : NaN;
+  const maximum = Number(form.dataset.maximum), output = form.querySelector('[data-extra-line-result]');
+  if (!Number.isFinite(line) || line < 0.5 || line > maximum || line % 1 !== 0.5) { output.textContent = `Wpisz linię połówkową od 0,5 do ${String(maximum).replace('.', ',')}.`; footballExtraLineMessages.set(`${event.id}:${metric}`, output.textContent); return; }
+  if (!footballExtras.get(event.id)?.data) { output.textContent = 'Poczekaj na odczyt wcześniejszych statystyk.'; footballExtraLineMessages.set(`${event.id}:${metric}`, output.textContent); return; }
+  footballExtraLines.set(event.id, { ...footballExtraLines.get(event.id), [metric]: line });
+  footballExtraDrafts.set(`${event.id}:${metric}`, raw);
+  footballExtraLineMessages.set(`${event.id}:${metric}`, `Porównano Twoją linię ${String(line).replace('.', ',')} z wcześniejszymi sumami obu drużyn. To porównanie historyczne.`);
+  const owner = $('detail').contains(form) ? $('football-extra-detail') : $('betting-summary');
+  updateFootballExtraDetail(event); renderBetting();
+  for (const updated of owner.querySelectorAll('[data-football-extra-line]')) if (updated.dataset.fixtureId === event.id && updated.dataset.metric === metric) {
+    updated.querySelector('[data-extra-line-result]').textContent = `Porównano Twoją linię ${String(line).replace('.', ',')} z wcześniejszymi sumami obu drużyn. To porównanie historyczne.`;
+    updated.elements.namedItem('line').focus({ preventScroll: true });
+  }
+}
+for (const root of [$('betting-summary'), $('detail')]) {
+  root.addEventListener('input', footballExtraInput);
+  root.addEventListener('submit', footballExtraSubmit);
+}
 $('detail').addEventListener('submit', submit => {
   const matchForm = submit.target.closest('form[data-match-line]');
   if (matchForm && detailEvent) {

@@ -133,14 +133,19 @@ function sourcePlayerGroups(data, sport, match) {
 /** Shared bounded cache for successful historical boxscores. Failed requests
  * and empty payloads are retried, and simultaneous consumers share one fetch.
  */
+const summaryObservedAt = new WeakMap();
+
 export function createSummaryLoader({ fetchImpl = fetchJSON, clock = Date.now, ttl = 15 * 60000, maxEntries = 128, concurrency = 3 } = {}) {
-  const cache = new Map(), inflight = new Map(), queue = [];
+  const cache = new Map(), inflight = new Map(), queue = [], running = new Set();
   let active = 0;
   async function run(url) {
     if (active >= concurrency) await new Promise(resolve => queue.push(resolve));
     else active++;
     try {
+      running.add(url);
       const data = await fetchImpl(url, { timeoutMs: 3500, retries: 0 });
+      const observed = clock();
+      if (data && typeof data === 'object' && Number.isFinite(observed)) summaryObservedAt.set(data, new Date(observed).toISOString());
       let validHeader = false, sourceMatch = null;
       if (data?.header) {
         let wanted; try { wanted = new URL(url).searchParams.get('event'); } catch { /* Not a provider URL; cannot cache its header. */ }
@@ -158,11 +163,12 @@ export function createSummaryLoader({ fetchImpl = fetchJSON, clock = Date.now, t
       }
       return data;
     } finally {
+      running.delete(url);
       const waiting = queue.shift();
       if (waiting) waiting(); else active--;
     }
   }
-  return function load(url) {
+  const load = function load(url) {
     const cached = cache.get(url);
     if (cached?.expiresAt > clock()) return Promise.resolve(cached.data);
     cache.delete(url);
@@ -171,8 +177,19 @@ export function createSummaryLoader({ fetchImpl = fetchJSON, clock = Date.now, t
     inflight.set(url, pending);
     return pending;
   };
+  // Supplemental consumers can avoid adding to the existing queue while
+  // preserving the normal player-form behavior and original observation time.
+  load.ready = url => cache.get(url)?.expiresAt > clock() || running.has(url) || active < concurrency;
+  load.waitForSlot = () => Promise.race([...inflight.values()].map(pending => pending.then(() => undefined, () => undefined)));
+  return load;
 }
 const defaultSummaryLoader = createSummaryLoader();
+export async function loadPlayerSummary(url) {
+  const data = await defaultSummaryLoader(url);
+  return { data, observedAt: summaryObservedAt.get(data) || null };
+}
+loadPlayerSummary.ready = url => defaultSummaryLoader.ready(url);
+loadPlayerSummary.waitForSlot = () => defaultSummaryLoader.waitForSlot();
 
 /** Retrospective, descriptive form only. A missing match/statistic is never 0. */
 export function selectPreviousMatches(events, { sport, route, teamId, cutoff, count = 10, currentDescriptive = false }) {
