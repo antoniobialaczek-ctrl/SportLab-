@@ -1,0 +1,161 @@
+{
+  "verifiedAt": "2026-11-28T12:53:03.823708+00:00",
+  "sourceCommit": "df952ef2cec82ccac7907d7c3335e3aca72cb46d",
+  "deploymentId": "dpl_GEPz85R42b2mwwLtpB8fBnHnCzS2",
+  "deploymentState": "READY",
+  "productionURL": "https://sportlab-2-analizy.vercel.app",
+  "ci": {
+    "runId": 46146673578,
+    "conclusion": "success",
+    "tests": 418,
+    "failures": 0,
+    "command": "npm run check"
+  },
+  "localRealSources": {
+    "target": "http://127.0.0.1:3270",
+    "mockedSources": false,
+    "fixture": "soccer/eng.1:401879227",
+    "sourceStatus": "available",
+    "metricSamples": {
+      "corners": {
+        "home": 8,
+        "away": 8
+      },
+      "yellowCards": {
+        "home": 8,
+        "away": 8
+      },
+      "shots": {
+        "home": 8,
+        "away": 8
+      },
+      "shotsOnTarget": {
+        "home": 8,
+        "away": 8
+      }
+    },
+    "metrics": [
+      "corners",
+      "yellowCards",
+      "shots",
+      "shotsOnTarget"
+    ],
+    "scope": "regulation_90",
+    "currentDescriptiveOnly": true,
+    "rawCornersChartMatchesSource": true,
+    "extraCharts": 8,
+    "manualCornerLine": 10.5,
+    "manualYellowLine": 4.5,
+    "manualOnlyChangesChosenMetric": true,
+    "draftsAndFocusSurviveRender": true,
+    "manualLinesDoNotRefetch": true,
+    "statCallsForFixture": 1,
+    "noBorrowedOdds": true,
+    "yellowCardRuleWarningVisible": true,
+    "minOdds100DoesNotHideStats": true,
+    "statsAlsoInTeamsView": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "productionRealSources": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "fixture": "soccer/eng.1:401879227",
+    "sourceStatus": "available",
+    "metricSamples": {
+      "corners": {
+        "home": 8,
+        "away": 8
+      },
+      "yellowCards": {
+        "home": 8,
+        "away": 8
+      },
+      "shots": {
+        "home": 8,
+        "away": 8
+      },
+      "shotsOnTarget": {
+        "home": 8,
+        "away": 8
+      }
+    },
+    "metrics": [
+      "corners",
+      "yellowCards",
+      "shots",
+      "shotsOnTarget"
+    ],
+    "scope": "regulation_90",
+    "currentDescriptiveOnly": true,
+    "rawCornersChartMatchesSource": true,
+    "extraCharts": 8,
+    "manualCornerLine": 10.5,
+    "manualYellowLine": 4.5,
+    "manualOnlyChangesChosenMetric": true,
+    "draftsAndFocusSurviveRender": true,
+    "manualLinesDoNotRefetch": true,
+    "statCallsForFixture": 1,
+    "noBorrowedOdds": true,
+    "yellowCardRuleWarningVisible": true,
+    "minOdds100DoesNotHideStats": true,
+    "statsAlsoInTeamsView": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "controlledNBARegression": {
+    "target": "http://127.0.0.1:3270",
+    "mockedSources": true,
+    "nbaPlayerReasonsVerified": true,
+    "pricedListHasExactMarketReasons": true,
+    "exactLineAndLatest5Recomputed": true,
+    "playerAnalysisStillFirst": true,
+    "nbaTeamAnalysisVisible": true,
+    "playerQuotesProvided": 0,
+    "automaticAnalysisLine": "Cade Cunningham powyżej 6,5 asysty",
+    "realObservationValues": [
+      8,
+      11,
+      7,
+      9,
+      10,
+      8,
+      12,
+      6,
+      9,
+      8
+    ],
+    "firstCardTopMobile": 656.171875,
+    "abovePricedDailyList": true,
+    "athleteAndMetricSelection": true,
+    "playerBeyondFirstFourSelectable": true,
+    "expandFromFourToSix": true,
+    "strictPriceFilterOnlyAffectsPricedList": true,
+    "historyAndDetailsRetained": true,
+    "mobileNoOverflow": true,
+    "desktopNoOverflow": true,
+    "pageErrors": []
+  },
+  "readOnlyReview": "Passed: confirmed regulation scope, identity and timestamp validation, missing statistics, manual lines, escaped UI and no borrowed prices.",
+  "runtimeLogs": {
+    "checkedAt": "2026-11-28T12:52:36.944Z",
+    "window": "10m",
+    "levels": [
+      "error",
+      "fatal"
+    ],
+    "matchingEntries": 0,
+    "limitation": "No matching log entries does not replace HTTP or browser verification."
+  },
+  "limits": [
+    "Current descriptive comparisons only; no verified future probability, expected value or profitability claim.",
+    "Historical totals in prior matches contain both teams; observations in shared head-to-head matches are not independent.",
+    "Fixed references or exact manual half-lines, without optimizing an easier threshold to improve historical counts.",
+    "Yellow-card ESPN counter is distinct from red cards, second-yellow settlement rules and booking points; bookmaker equivalence is unverified.",
+    "New markets do not borrow a winner or goal-total price and are not automatically saved or settled in the journal.",
+    "Only the selected league and confirmed 90-minute fixtures; extra time and shootouts are excluded. Missing statistics remain absent.",
+    "Ekstraklasa source does not supply these statistics. Availability of other leagues depends on actual ESPN coverage.",
+    "No referee, confirmed-lineup or opponent-strength adjustment, and no claim of complete coverage.",
+    "Frozen data/model experiment and history workflow unchanged. No paid service or key was added."
+  ]
+}

@@ -49,3 +49,8 @@ Opublikowano osobne porównanie drużyn NBA i uzasadnienia dla punktów, asyst i
 ## Głębsza analiza NHL — 28 listopada 2026
 
 Opublikowano analizę drużyn NHL oraz uzasadnienia typów na strzały na bramkę. Wynik i sumy goli mają jawny zakres z dogrywką i karnymi, a statystyki zawodników wykluczają serię karnych. Potwierdzone zasady dostawcy pozwalają wyświetlać standardowe kursy meczowe. 400 testów i kompilacja poprawne; rzeczywiste publiczne dane, kursy, wykresy, ręczna linia oraz regresja NBA sprawdzone. [Dowody i ograniczenia](deep-nhl-analysis-release.json).
+
+
+## Piłka: rożne, żółte kartki i strzały — 28 listopada 2026
+
+Opublikowano dodatkowe porównania sum rożnych, żółtych kartek, strzałów i strzałów celnych po 90 minutach, z argumentami za i przeciw, wykresami oraz własną linią. 418 testów i kompilacja przeszły lokalnie, w CI i podczas budowania na Vercel. Publiczna strona potwierdziła po osiem wcześniejszych meczów obu drużyn dla każdej z czterech statystyk Leeds–Coventry, zgodność wykresów z odpowiedzią źródła, niezależne ręczne linie i widok mobilny bez błędów JavaScript. Kursów dla nowych rynków ani reguł rozliczania kartek nie zgadywano. [Dowody wydania i ograniczenia](football-extra-analysis-release.json).
