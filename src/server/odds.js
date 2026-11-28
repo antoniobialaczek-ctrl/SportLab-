@@ -13,6 +13,12 @@ const DRAFTKINGS_FOOTBALL_RULES = Object.freeze({
   section: '3-Way Moneyline and Over / Under', checkedAt: '2026-11-25T13:35:31.744Z',
   note: 'Standardowe rynki dotyczą 90 minut z doliczonym czasem, bez dogrywki i karnych. Indywidualne wyjątki oferty wymagają sprawdzenia.',
 });
+const DRAFTKINGS_NHL_RULES = Object.freeze({
+  kind: 'provider-rules', provider: 'DraftKings', jurisdiction: 'Kansas, US',
+  url: 'https://boothillcasino.com/wp-content/uploads/2026/10/KS-DKE-House-Rules-v13.0-EN-CLEAN-9.2.26.pdf',
+  section: 'Hockey — General Hockey Settlement Rules, page 115', checkedAt: '2026-11-28T00:10:16.000Z',
+  note: 'Standardowe rynki NHL obejmują dogrywkę i karne. Rozstrzygnięcie karnymi dodaje jeden gol zwycięzcy i sumie meczu. Wyjątki rynku wymagają odrębnego sprawdzenia.',
+});
 const clean = value => typeof value === 'string' && value.trim() ? value.trim().slice(0, 120) : null;
 
 /** ESPN's moneyLine values use American odds, never a probability. */
@@ -30,7 +36,7 @@ function scopeFor(market, sport) {
   if (sport === 'football' && /\b(?:including|incl\.?|with)\s+(?:extra\s*time|overtime|penalt|shootout)|qualif|to\s+advance|win\s+cup/i.test(label)) return 'unknown';
   if (sport === 'football' && /\b90\s*(?:minutes|minut|min)\b/i.test(label)) return 'regulation_90';
   if (sport === 'nba' && /\b(?:including|incl\.?)\s+overtime\b/i.test(label)) return 'including_overtime';
-  if (sport === 'nhl' && /\b(?:excluding|excl\.?|without)\s+(?:the\s+)?shootouts?\b/i.test(label)) return 'unknown';
+  if (sport === 'nhl' && /\b(?:excluding|excl\.?|without)\s+(?:the\s+)?(?:shootouts?|overtime|OT)\b|\bregulation\b|\b60\s*(?:minutes?|mins?)\b/i.test(label)) return 'unknown';
   if (sport === 'nhl' && /\b(?:including|incl\.?)\s+overtime\b/i.test(label) && /\bshootouts?\b/i.test(label)) return 'including_overtime_shootout';
   return 'unknown';
 }
@@ -45,6 +51,12 @@ function marketScope(market, row, fixture, kind, now) {
     && clean(market.displayName)?.toLowerCase() === expectedLabel && market.period == null && row.period == null
     && now >= Date.parse(DRAFTKINGS_FOOTBALL_RULES.checkedAt) && now - Date.parse(DRAFTKINGS_FOOTBALL_RULES.checkedAt) <= 30 * 86400000) {
     return { scope: 'regulation_90', scopeBasis: { ...DRAFTKINGS_FOOTBALL_RULES } };
+  }
+  if (fixture.sport === 'nhl' && fixture.route === 'hockey/nhl' && String(row.provider?.id) === '100'
+    && name?.toLowerCase() === 'draftkings' && clean(row.header?.text)?.toLowerCase() === 'game odds'
+    && clean(market.displayName)?.toLowerCase() === expectedLabel && market.period == null && row.period == null
+    && now >= Date.parse(DRAFTKINGS_NHL_RULES.checkedAt) && now - Date.parse(DRAFTKINGS_NHL_RULES.checkedAt) <= 30 * 86400000) {
+    return { scope: 'including_overtime_shootout', scopeBasis: { ...DRAFTKINGS_NHL_RULES } };
   }
   // The documented default is bound to this provider and its full-game ESPN
   // market, not inferred merely from the league. Period and special markets
@@ -160,12 +172,12 @@ export function extractOdds(data, fixture, { now = Date.now() } = {}) {
     });
     if (outcomes.length && outcomes.every(Boolean)) addQuote(row, market, provider, 'winner', outcomes, null);
 
-    // Full-game NBA totals must have two actual prices at the exact same
+    // Full-game totals must have two actual prices at the exact same
     // half-point line. Opening lines and spread prices never fill gaps.
     const total = row?.total;
     const totalLabel = clean(total?.displayName) || '';
     const allowedTotal = fixture.sport === 'nba' ? /^total(?:\s*\(including overtime\))?$/i.test(totalLabel)
-      : ((fixture.sport === 'nhl' && /^total\b/i.test(totalLabel) && scopeFor(total, 'nhl') === 'including_overtime_shootout')
+      : ((fixture.sport === 'nhl' && /^total\b/i.test(totalLabel) && total && marketScope(total, row, fixture, 'total_goals', current).scope === 'including_overtime_shootout' && !/\b(?:shots?|saves?|assists?|points?|penalt(?:y|ies))\b/i.test(totalLabel))
         || (fixture.sport === 'football' && /^total(?:\s+goals)?\b/i.test(totalLabel) && total && marketScope(total, row, fixture, 'total_goals', current).scope === 'regulation_90'))
         && !/quarter|half|period|player|team\s+total|corner|card|\b[1-4](?:st|nd|rd|th)\b/i.test(totalLabel);
     if (!allowedTotal || !total

@@ -4,6 +4,10 @@ const decimal = value => value.toLocaleString('pl-PL', { maximumFractionDigits: 
 const stamp = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)
   && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value.slice(0, 10);
 const mean = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+const RULES = {
+  nba: { route: 'basketball/nba', metrics: ['PTS', 'AST', 'REB'], scope: 'including_overtime', match: /^basketball\/nba:\d{4,14}$/ },
+  nhl: { route: 'hockey/nhl', metrics: ['S'], scope: 'including_overtime_excluding_shootout', match: /^hockey\/nhl:\d{4,14}$/ },
+};
 
 /** Recompute only observed facts for the exact athlete line. Playing-time
  * comparisons use the same matches and never stand in for a minutes forecast.
@@ -11,17 +15,17 @@ const mean = values => values.reduce((sum, value) => sum + value, 0) / values.le
 export function buildPlayerPickReasons(pick, event, options = {}) {
   const unavailable = { status: 'unavailable', reasons: [], counterevidence: [], stats: null };
   const now = options.now == null ? Date.now() : typeof options.now === 'number' ? options.now : Date.parse(options.now);
-  const start = Date.parse(event?.date);
-  if (event?.sport !== 'nba' || event.route !== 'basketball/nba' || event.state !== 'pre' || !stamp(event.date)
+  const start = Date.parse(event?.date), rule = RULES[event?.sport], nhl = event?.sport === 'nhl';
+  if (!rule || event.route !== rule.route || event.state !== 'pre' || !stamp(event.date)
     || !Number.isFinite(now) || start <= now || start - now > 2 * 86400000
-    || !['PTS', 'AST', 'REB'].includes(pick?.metric) || !['over', 'under'].includes(pick.direction)
-    || pick.scope != null && pick.scope !== 'including_overtime'
+    || !rule.metrics.includes(pick?.metric) || !['over', 'under'].includes(pick.direction)
+    || pick.scope != null && pick.scope !== rule.scope
     || !Number.isFinite(pick.line) || pick.line <= 0 || pick.line > 1000 || pick.line % 1 !== 0.5
     || !Array.isArray(pick.observations) || pick.observations.length < 8 || pick.observations.length > 10
     || pick.sample !== pick.observations.length) return unavailable;
   const seen = new Set(), observations = [];
   for (const row of pick.observations) {
-    if (!row || typeof row.matchId !== 'string' || !/^basketball\/nba:\d{4,14}$/.test(row.matchId)
+    if (!row || typeof row.matchId !== 'string' || !rule.match.test(row.matchId)
       || row.matchId === event.id || seen.has(row.matchId) || !stamp(row.date) || Date.parse(row.date) >= Math.min(now, start)
       || !Number.isInteger(row.value) || row.value < 0 || row.value > 1000) return unavailable;
     seen.add(row.matchId); observations.push(row);
@@ -39,6 +43,7 @@ export function buildPlayerPickReasons(pick, event, options = {}) {
     `${hits}/${sample} wcześniejszych występów ${word} linii ${decimal(pick.line)}; w ostatnich ${recent.length}: ${recentHits}/${recent.length}.`,
     `Mediana: ${decimal(median)}, linia: ${decimal(pick.line)}${margin > 0 ? ` — różnica ${decimal(margin)} w kierunku typu` : ''}. Średnia ostatnich ${recent.length}: ${decimal(last5Average)}.`,
   ];
+  if (nhl) reasons.push('NHL: strzały na bramkę z dogrywką, bez serii karnych. Nie są to wszystkie próby strzeleckie.');
   const counterevidence = [`Wynik przeciwny kierunkowi: ${sample - hits}/${sample}. Zakres obserwowanych wyników: ${sorted[0]}–${sorted.at(-1)}.${!hit(values[0]) ? ' Ostatni występ był przeciwny temu kierunkowi.' : ''}`];
   let minutes = null;
   const minuteRows = pick.minutes?.observations;
@@ -53,11 +58,11 @@ export function buildPlayerPickReasons(pick, event, options = {}) {
     if (minuteMap.size === sample) {
       const times = observations.map(row => minuteMap.get(row.matchId));
       minutes = { sample, average: mean(times), last5Average: mean(times.slice(0, 5)) };
-      reasons.push(`W tych samych ${sample} meczach: średnio ${decimal(minutes.average)} min gry, ostatnie ${recent.length}: ${decimal(minutes.last5Average)} min.`);
-      counterevidence.push('To historyczne minuty. Czas gry i rola w najbliższym meczu nie są potwierdzone przez ten licznik.');
+      reasons.push(`W tych samych ${sample} meczach: średnio ${decimal(minutes.average)} min ${nhl ? 'na lodzie' : 'gry'}, ostatnie ${recent.length}: ${decimal(minutes.last5Average)} min.`);
+      counterevidence.push(nhl ? 'To historyczny czas na lodzie. Rola w formacji, gra w przewadze i czas w najbliższym meczu wymagają potwierdzenia.' : 'To historyczne minuty. Czas gry i rola w najbliższym meczu nie są potwierdzone przez ten licznik.');
     }
   }
-  if (!minutes) counterevidence.push('Brak pełnych minut z tych samych występów. Nie zakładamy stałego czasu gry ani nie wyliczamy korekty na rywala.');
+  if (!minutes) counterevidence.push(nhl ? 'Brak pełnego czasu na lodzie z tych samych występów. Nie zakładamy stałej roli w formacji ani wykorzystania w przewadze.' : 'Brak pełnych minut z tych samych występów. Nie zakładamy stałego czasu gry ani nie wyliczamy korekty na rywala.');
   return { status: 'available', supported, reasons, counterevidence,
     stats: { sample, hits, recentSample: recent.length, recentHits, average: mean(values), median, last5Average,
       minimum: sorted[0], maximum: sorted.at(-1), latestDate: observations[0].date, latestValue: values[0], minutes } };
