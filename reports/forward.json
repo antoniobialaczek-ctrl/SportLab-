@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-28T08:59:04.263Z",
+  "generatedAt": "2026-11-28T13:08:01.313Z",
   "kind": "prospective",
   "modelVersion": "3.2.0",
   "validation": {
@@ -581,7 +581,7 @@
   "audit": {
     "verified": 378,
     "legacyResearch": 43,
-    "checkedAt": "2026-11-28T08:59:04.263Z"
+    "checkedAt": "2026-11-28T13:08:01.313Z"
   },
   "note": "Prawdopodobieństwa rejestrowano prywatnie przed rozpoczęciem meczu, wyniki rozliczano wyłącznie z późniejszych zachowanych migawek. Nie są opublikowanymi prognozami. Metryki całego rejestru to opis badawczy, nie osobny końcowy test kalibracji.",
   "sports": {
