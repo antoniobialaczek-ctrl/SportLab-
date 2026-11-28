@@ -44,3 +44,8 @@ Karty piłkarskie na początku strony pokazują kierunek z formy, argumenty prze
 ## Analiza NBA i uzasadnienia typów — 27 listopada 2026
 
 Opublikowano osobne porównanie drużyn NBA i uzasadnienia dla punktów, asyst i zbiórek. Zwycięzca, suma punktów i linie zawodników mają konkretne argumenty oraz kontrargumenty. Zachowano widok zawodników na początku strony, wykresy, własne linie i ścisłe dopasowanie kursów. 384 testy i kompilacja poprawne; publiczna wersja sprawdzona na rzeczywistych danych oraz oddzielnych kontrolowanych przypadkach. [Dowody i ograniczenia](deep-nba-analysis-release.json).
+
+
+## Głębsza analiza NHL — 28 listopada 2026
+
+Opublikowano analizę drużyn NHL oraz uzasadnienia typów na strzały na bramkę. Wynik i sumy goli mają jawny zakres z dogrywką i karnymi, a statystyki zawodników wykluczają serię karnych. Potwierdzone zasady dostawcy pozwalają wyświetlać standardowe kursy meczowe. 400 testów i kompilacja poprawne; rzeczywiste publiczne dane, kursy, wykresy, ręczna linia oraz regresja NBA sprawdzone. [Dowody i ograniczenia](deep-nhl-analysis-release.json).

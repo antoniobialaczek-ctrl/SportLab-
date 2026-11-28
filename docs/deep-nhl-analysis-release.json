@@ -1,0 +1,139 @@
+{
+  "verifiedAt": "2026-11-28T00:19:01.029551+00:00",
+  "sourceCommit": "6e4dcfa003f24532061d42cd2387d01a63df2f42",
+  "deploymentId": "dpl_58vfGh3zGqjg8QBWmy5NAsqiHuLt",
+  "deploymentState": "READY",
+  "productionURL": "https://sportlab-2-analizy.vercel.app",
+  "ci": {
+    "runId": 46086969326,
+    "conclusion": "success",
+    "tests": 400,
+    "failures": 0,
+    "command": "npm run check"
+  },
+  "localRealSources": {
+    "target": "http://127.0.0.1:3260",
+    "mockedSources": false,
+    "fixture": "hockey/nhl:401892812",
+    "playerTitle": "Tomas Hertl — powyżej 1,5 strzału na bramkę",
+    "playerLine": 1.5,
+    "playerHits": 8,
+    "playerSample": 10,
+    "playerLatest5Hits": 4,
+    "playerReasonsMatchRawObservations": true,
+    "playerAnalysisStillFirst": true,
+    "minOdds100DoesNotHideAnalysis": true,
+    "teamSamples": [
+      10,
+      10
+    ],
+    "teamLatestDatesMatchSource": true,
+    "comparedTeamMarkets": 4,
+    "teamReasonsAndCounters": true,
+    "officialOvertimeAndShootoutScope": true,
+    "playerShotsExcludeShootout": true,
+    "rawChartValuesMatch": true,
+    "charts": 2,
+    "manualGoalLine": 7.5,
+    "manualControlsStayOpen": true,
+    "teamsViewRetained": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "productionRealSources": {
+    "target": "https://sportlab-2-analizy.vercel.app",
+    "mockedSources": false,
+    "fixture": "hockey/nhl:401892812",
+    "playerTitle": "Alex DeBrincat — powyżej 1,5 strzału na bramkę",
+    "playerLine": 1.5,
+    "playerHits": 9,
+    "playerSample": 10,
+    "playerLatest5Hits": 5,
+    "playerReasonsMatchRawObservations": true,
+    "playerAnalysisStillFirst": true,
+    "minOdds100DoesNotHideAnalysis": true,
+    "teamSamples": [
+      10,
+      10
+    ],
+    "teamLatestDatesMatchSource": true,
+    "comparedTeamMarkets": 4,
+    "teamReasonsAndCounters": true,
+    "officialOvertimeAndShootoutScope": true,
+    "playerShotsExcludeShootout": true,
+    "rawChartValuesMatch": true,
+    "charts": 2,
+    "sourceGoalLine": 5.5,
+    "sourceGoalPrices": [
+      1.740741,
+      2.14
+    ],
+    "actualGoalQuotesMatchUI": true,
+    "manualGoalLine": 7.5,
+    "manualLineNeverBorrowsSourcePrice": true,
+    "manualControlsStayOpen": true,
+    "teamsViewRetained": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "controlledNBARegression": {
+    "target": "http://127.0.0.1:3260",
+    "mockedSources": true,
+    "nbaPlayerReasonsVerified": true,
+    "pricedListHasExactMarketReasons": true,
+    "exactLineAndLatest5Recomputed": true,
+    "playerAnalysisStillFirst": true,
+    "nbaTeamAnalysisVisible": true,
+    "playerQuotesProvided": 0,
+    "automaticAnalysisLine": "Cade Cunningham powyżej 6,5 asysty",
+    "realObservationValues": [
+      8,
+      11,
+      7,
+      9,
+      10,
+      8,
+      12,
+      6,
+      9,
+      8
+    ],
+    "firstCardTopMobile": 656.171875,
+    "abovePricedDailyList": true,
+    "athleteAndMetricSelection": true,
+    "playerBeyondFirstFourSelectable": true,
+    "expandFromFourToSix": true,
+    "strictPriceFilterOnlyAffectsPricedList": true,
+    "historyAndDetailsRetained": true,
+    "mobileNoOverflow": true,
+    "desktopNoOverflow": true,
+    "pageErrors": []
+  },
+  "runtimeErrors": {
+    "levels": [
+      "error",
+      "fatal"
+    ],
+    "window": "10m",
+    "records": 0
+  },
+  "NHLSettlementRules": {
+    "provider": "DraftKings",
+    "jurisdiction": "Kansas, US",
+    "url": "https://boothillcasino.com/wp-content/uploads/2026/10/KS-DKE-House-Rules-v13.0-EN-CLEAN-9.2.26.pdf",
+    "section": "General Hockey Settlement Rules, printed page115",
+    "checkedAt": "2026-11-28T00:10:16.000Z",
+    "httpStatus": 200,
+    "pdfSHA256": "a6d3dbbc398611bc6cc5d1b752ac542c2a22003bc5b0fc08d3a1253d2b867ca3",
+    "summary": "Standard full-game hockey markets include overtime; a shootout adds one goal to the winning team and game total. Regulation/ExclOT/60minute and period exceptions remain excluded. Individual player statistics exclude the shootout.",
+    "binding": "NHLonly/provider100/nameDraftKings/headerGameOdds/exactMoneyline-or-Total/no-periods/complete-prices/correct-fixture. Rules evidence expires30days."
+  },
+  "notes": [
+    "Real production data and APIs were not mocked. Source goal prices and exact total line were matched against visible UI, and a different manual line did not borrow that price.",
+    "Player goal-shot counts and latest5 were recomputed from atomic rendered observations for the exact line. Historical minutes are included only for the same complete set of games; future role/time is not inferred.",
+    "NHL team markets use official full overtime/shootout results, with one extra official shootout-winning goal, not all shootout attempts. Player S markets include overtime but exclude shootout attempts; shot attempts are not relabelled shots on goal.",
+    "Historical form, scored/conceded goals, actual venue samples, medians, variability and counterevidence remain visible even at a minOdds100 filter or without a price. Confirmed starting goalies, xG, special-teams strength and save rates were not invented.",
+    "Descriptive directions have unverified predictive accuracy; no win probabilities or EV were introduced. No paid services were added.",
+    "NBA player-first layout, exact Cade AST6.5 fixture, explanations, strict pricing and expansion were separately checked with controlled fixtures. Frozen data/models/history workflow were unchanged."
+  ]
+}
